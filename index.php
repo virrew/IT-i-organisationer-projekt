@@ -7,7 +7,8 @@
     
 </head>
 <body>
-    <h1>hej</h1>
-    <p>Test test test</p>
+    <h1>Welcome</h1>
+    <p>This is a merge test</p>
+    <img src="">
 </body>
 </html>
