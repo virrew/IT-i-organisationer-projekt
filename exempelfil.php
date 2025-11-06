@@ -94,5 +94,7 @@ echo "<strong>LISTA:</strong><br>";
 foreach($response['data'] AS $key => $value){
   echo $value["name"]."<br>";
 }
+// länk för filtrering av data
+// http://193.93.250.83:8080/api/resource/Patient?filters=[["name","like","G6%"]]
 
 ?>
