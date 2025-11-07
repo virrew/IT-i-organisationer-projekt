@@ -22,7 +22,7 @@ session_start();
         <input type="submit" value="Register">
     </form>
 <?php
-    $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'wwwit-utv', 'Pangolin!24');
+    $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
     $pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
     
     if(isset($_POST['username'])){
