@@ -9,7 +9,7 @@ session_start();
     <title>Document</title>
 </head>
 <body>
-    <form action="" method="POST">
+    <form action="index.php" method="POST">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
         <br>
@@ -22,5 +22,13 @@ session_start();
         <label for="create">Create Account</label>
         <input type="submit" value="Register">
     </form>
+    <?php
+
+    if (isset($_SESSION['username'])) {
+        echo "Logged in as: " . $_SESSION['username'];
+    } else {
+        echo "Not logged in.";
+    }
+    ?>
 </body>
 </html>
