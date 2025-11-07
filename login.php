@@ -16,13 +16,7 @@ session_start();
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
         <br>
-        <input type="submit" value="Login">
-    </form>
-    <form action="register.php" method="POST">
-        <label for="create">Create Account</label>
-        <input type="submit" value="Register">
-    </form>
-    <?php
+        <?php
 
     if (isset($_SESSION['username'])) {
         echo "Logged in as: " . $_SESSION['username'];
@@ -30,5 +24,13 @@ session_start();
         echo "Not logged in.";
     }
     ?>
+        <input type="submit" value="Login">
+    </form>
+
+    <form action="register.php" method="POST">
+        <label for="create">Create Account</label>
+        <input type="submit" value="Register">
+    </form>
+
 </body>
 </html>
