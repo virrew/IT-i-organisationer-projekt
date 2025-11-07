@@ -16,15 +16,7 @@ session_start();
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
         <br>
-        <input type="submit" value="Login">
-    </form>
-    <form action="register.php" method="POST">
-        <label for="create">Create Account</label>
-        <input type="submit" value="Register">
-    </form>
-    <?php
-    $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
-    $pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+        <?php
 
     if (isset($_SESSION['username'])) {
         echo "Logged in as: " . $_SESSION['username'];
@@ -32,5 +24,13 @@ session_start();
         echo "Not logged in.";
     }
     ?>
+        <input type="submit" value="Login">
+    </form>
+
+    <form action="register.php" method="POST">
+        <label for="create">Create Account</label>
+        <input type="submit" value="Register">
+    </form>
+
 </body>
 </html>
