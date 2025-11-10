@@ -10,29 +10,29 @@ session_start();
 </head>
 <body>
     <form action="index.php" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-    </form>
-    <form action="register.php" method="POST">
-        <label for="create">Create Account</label>
-        <input type="submit" value="Register">
-    </form>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <input type="submit" value="Register">
+</form>
+
 <?php
     $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
-    $pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    if(isset($_POST['username'])){
-        $querystring = "INSERT INTO logindetails (username, password) VALUES (:username, :password)";
-        $stmt = $pdo->prepare($querystring);
-        $stmt->bindParam(':username', $_POST['username']);
-        $stmt->bindParam(':password', ($_POST['password']));
-        $stmt->execute();
-        echo "User registered successfully.";
-    }
+    if (!empty($_POST['username']) && !empty($_POST['password'])) {
+    $querystring = "INSERT INTO logindetails (username, password) VALUES (:username, :password)";
+    $stmt = $pdo->prepare($querystring);
+    $stmt->bindParam(':username', $_POST['username']);
+    $hashedPassword = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $stmt->bindParam(':password', $hashedPassword);
+    $stmt->execute();
+    echo "User registered successfully.";
+}
+
 ?>
 </body>
 </html>

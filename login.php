@@ -28,8 +28,8 @@ session_start();
     </form>
 
     <form action="register.php" method="POST">
-        <label for="create">Create Account</label>
-        <input type="submit" value="Register">
+        <label for="create">New member?</label>
+        <input type="submit" value="Register here">
     </form>
 
 </body>
