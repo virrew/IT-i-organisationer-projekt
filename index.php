@@ -26,7 +26,6 @@ session_start();
     if ($username === $dbUsername && $password === $dbPassword) {
         $_SESSION['username'] = $username;
         echo "Login successful! Welcome, " . htmlspecialchars($username) . ".<br>";
-        echo '<a href="form.php">Go to Patient Registration Form</a>';
     } else {
         echo "Invalid username or password.<br>";
         echo '<a href="login.php">Back to Login</a>';
