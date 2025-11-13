@@ -24,18 +24,6 @@ session_start();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         echo "Hello from index.php";
-
-        // Verify the password
-        if ($user && password_verify($password, $user['password'])) {
-            // Login successful
-            $_SESSION['username'] = $username;                
-                // Redirect to appropriate page
-                header("Location: form.php");
-                exit;
-            } else {
-                // Login failed
-                echo "Invalid username or password";
-            }
     }
 ?>
 </body>
