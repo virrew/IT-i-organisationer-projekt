@@ -19,29 +19,24 @@ session_start();
         $dbUsername = $username;
         $dbPassword = $password;
 
-        try {
-            $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo "Attempting to log in user: " . htmlspecialchars($username) . "<br>";
+        $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Verify the password
-            if ($user && password_verify($password, $user['password'])) {
-                // Login successful
-                $_SESSION['username'] = $username;
-                $_SESSION['user_id'] = $user['id'];
-                
+        echo "Hello from index.php";
+
+        // Verify the password
+        if ($user && password_verify($password, $user['password'])) {
+            // Login successful
+            $_SESSION['username'] = $username;                
                 // Redirect to appropriate page
-                header("Location: welcome.php");
+                header("Location: form.php");
                 exit;
             } else {
                 // Login failed
                 echo "Invalid username or password";
             }
-        } catch(PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-        $conn = null;
-    }     
+    }
 ?>
 </body>
 </html>
