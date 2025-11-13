@@ -16,20 +16,12 @@ session_start();
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        // Database connection
-        $host = "localhost";  // or your database host
-        $dbUsername = "root"; // your database username
-        $dbPassword = "";     // your database password
-        $dbName = "your_database_name"; // your database name
+        $dbUsername = $username;
+        $dbPassword = $password;
 
         try {
-            $conn = new PDO("mysql:host=$host;dbname=$dbName", $dbUsername, $dbPassword);
+            $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Prepare SQL statement to prevent SQL injection
-            $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
-            $stmt->bindParam(':username', $username);
-            $stmt->execute();
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             // Verify the password
