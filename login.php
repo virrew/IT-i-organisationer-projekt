@@ -16,14 +16,6 @@ session_start();
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
         <br>
-        <?php
-
-    if (isset($_SESSION['username'])) {
-        echo "Logged in as: " . $_SESSION['username'];
-    } else {
-        echo "Not logged in.";
-    }
-    ?>
         <input type="submit" value="Login">
     </form>
 
