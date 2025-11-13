@@ -20,11 +20,10 @@ session_start();
         $dbPassword = $password;
 
         echo "Attempting to log in user: " . htmlspecialchars($username) . "<br>";
-        
         $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo "Hello from index.php<br>";
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        echo "Hello from index.php";
 
         // Verify the password
         if ($user && password_verify($password, $user['password'])) {
