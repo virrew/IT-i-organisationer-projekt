@@ -22,8 +22,14 @@ session_start();
         echo "Attempting to log in user: " . htmlspecialchars($username) . "<br>";
         $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        echo "Hello from index.php";
+    }
+    if ($username === $dbUsername && $password === $dbPassword) {
+        $_SESSION['username'] = $username;
+        echo "Login successful! Welcome, " . htmlspecialchars($username) . ".<br>";
+        echo '<a href="form.php">Go to Patient Registration Form</a>';
+    } else {
+        echo "Invalid username or password.<br>";
+        echo '<a href="login.php">Back to Login</a>';
     }
 ?>
 </body>
