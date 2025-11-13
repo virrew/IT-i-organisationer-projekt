@@ -36,6 +36,7 @@ error_reporting(E_ALL);
     $stmt->bindParam(':username', $username);
     $stmt->bindParam(':password', $hashedPassword);
     $stmt->execute();
+    header("Location: index.php");
     echo "User registered successfully.";
 }
 
