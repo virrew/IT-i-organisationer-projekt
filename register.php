@@ -1,5 +1,9 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,7 +13,7 @@ session_start();
     <title>Document</title>
 </head>
 <body>
-    <form action="index.php" method="POST">
+    <form action="register.php" method="POST">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required>
     <br>
@@ -26,8 +30,10 @@ session_start();
     if (!empty($_POST['username']) && !empty($_POST['password'])) {
     $querystring = "INSERT INTO logindetails (username, password) VALUES (:username, :password)";
     $stmt = $pdo->prepare($querystring);
-    $stmt->bindParam(':username', $_POST['username']);
-    $hashedPassword = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    // bindParam
+    $username = $_POST['username'];
+    $hashedPassword = $_POST['password'];
+    $stmt->bindParam(':username', $username);
     $stmt->bindParam(':password', $hashedPassword);
     $stmt->execute();
     echo "User registered successfully.";
