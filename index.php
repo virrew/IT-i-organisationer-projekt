@@ -13,12 +13,17 @@ session_start();
     <h1>Welcome</h1>
 <?php
  if(isset($_POST['username']) && isset($_POST['password'])) {
+        $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $pdo->prepare('SELECT username, password FROM logindetails');
+        $stmt->execute();
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        print_r($users);
+
         $username = $_POST['username'];
         $password = $_POST['password'];
         $dbUsername = $username;
         $dbPassword = $password;
-        $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     if ($username === $dbUsername && $password === $dbPassword) {
         $_SESSION['username'] = $username;
