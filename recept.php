@@ -1,3 +1,7 @@
+<?php 
+session_start(); 
+$user = $_SESSION['patient_name'];
+?> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
