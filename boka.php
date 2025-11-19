@@ -1,15 +1,15 @@
 <?php
 session_start();
 
-  GET ('http://193.93.250.83:8080/api/resource/Healthcare%20Practitioner?fields=[%22first_name%22,%20%22name%22]&filters=[[%22first_name%22,%22LIKE%22,%22%G6%%22]]', {
-    headers: {
-        'Authorization': '49faecfb2c53bd2:7fe935b2a6dbd0b'
-    }
-    })
-    .then(r => r.json())
-    .then(r => {
-    console.log(r);
-})
+//   FETCH('http://193.93.250.83:8080/api/resource/Healthcare%20Practitioner?fields=[%22first_name%22,%20%22name%22]&filters=[[%22first_name%22,%22LIKE%22,%22%G6%%22]]', {
+//     headers: {
+//         'Authorization': '49faecfb2c53bd2:7fe935b2a6dbd0b'
+//     }
+//     })
+//     .then(r => r.json())
+//     .then(r => {
+//     console.log(r);
+//})
 
 
 ?>
