@@ -27,18 +27,10 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
         echo "Invalid username or password.<br>"; 
         echo '<a href="login.php">Back to Login</a>'; 
     } 
-    print_r($users); 
     $username = $_POST['username']; 
     $password = $_POST['password']; 
     $dbUsername = $username; 
     $dbPassword = $password; 
-} 
-if ($username === $dbUsername && $password === $dbPassword) { 
-    $_SESSION['username'] = $username; 
-    echo "Login successful! Welcome, " . htmlspecialchars($username) . ".<br>"; 
-} else { 
-    echo "Invalid username or password.<br>"; 
-    echo '<a href="login.php">Back to Login</a>'; 
 } 
 ?> 
 </body> 
