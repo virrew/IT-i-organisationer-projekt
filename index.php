@@ -15,7 +15,7 @@ session_start();
  if(isset($_POST['username']) && isset($_POST['password'])) {
         $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $pdo->prepare('SELECT * FROM logindetails'); //where username==username
+        $stmt = $pdo->prepare('SELECT * FROM logindetails WHERE username = :username');
         $stmt->execute();
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // print_r($users);
