@@ -1,5 +1,17 @@
 <?php
 session_start();
+
+  GET ('http://193.93.250.83:8080/api/resource/Healthcare%20Practitioner?fields=[%22first_name%22,%20%22name%22]&filters=[[%22first_name%22,%22LIKE%22,%22%G6%%22]]', {
+    headers: {
+        'Authorization': '49faecfb2c53bd2:7fe935b2a6dbd0b'
+    }
+    })
+    .then(r => r.json())
+    .then(r => {
+    console.log(r);
+})
+
+
 ?>
 <!doctype html>
 <html lang="sv">
@@ -12,39 +24,21 @@ session_start();
 
 <h1>Bokningsformulär</h1>
 
-<form method="post" action="">
-    <label for="name">Namn *</label>
-    <input id="name" name="name" type="text" required value="<?php echo e($values['name']); ?>">
+<form method="post" action="process_booking.php">
+  <label for="name">Namn:</label><br>
+  <input type="text" id="name" name="name" required><br><br>
+  
+  <label for="email">E-post:</label><br>
+  <input type="email" id="email" name="email" required><br><br>
+  
+  <label for="date">Datum för bokning:</label><br>
+  <input type="date" id="date" name="date" required><br><br>
+  
+  <label for="time">Tid för bokning:</label><br>
+  <input type="time" id="time" name="time" required><br><br>
+  
+  <input type="submit" value="Boka tid">
 
-    <label for="email">E-post *</label>
-    <input id="email" name="email" type="email" required value="<?php echo e($values['email']); ?>">
-
-    <label for="phone">Telefon</label>
-    <input id="phone" name="phone" type="tel" value="<?php echo e($values['phone']); ?>">
-
-    <div class="row">
-        <div>
-            <label for="date">Datum *</label>
-            <input id="date" name="date" type="date" required min="<?php echo e($minDate); ?>" value="<?php echo e($values['date']); ?>">
-        </div>
-        <div>
-            <label for="time">Tid *</label>
-            <input id="time" name="time" type="time" required step="900" value="<?php echo e($values['time']); ?>">
-        </div>
-    </div>
-
-    <label for="people">Antal personer *</label>
-    <select id="people" name="people" required>
-        <?php for ($i = 1; $i <= 20; $i++): ?>
-            <option value="<?php echo $i; ?>"<?php if ((int)$values['people'] === $i) echo ' selected'; ?>><?php echo $i; ?></option>
-        <?php endfor; ?>
-    </select>
-
-    <label for="message">Meddelande / Önskemål</label>
-    <textarea id="message" name="message" rows="4"><?php echo e($values['message']); ?></textarea>
-
-    <button type="submit">Skicka bokning</button>
-</form>
 
 </body>
 </html>
