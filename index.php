@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 session_start();
 ?>
 <!DOCTYPE html>
@@ -17,22 +15,16 @@ session_start();
  if(isset($_POST['username']) && isset($_POST['password'])) {
         $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $pdo->prepare('SELECT username, password FROM logindetails WHERE username = :username AND password = :password');
-        $stmt->execute([':username' => $_POST['username'], ':password' => $_POST['password']]);
-
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($user) {
-        $_SESSION['username'] = $user['username'];
-        echo "Login successful! Welcome, " . htmlspecialchars($user['username']) . ".<br>";
-        } else {
-        echo "Invalid username or password.<br>";
-        echo '<a href="login.php">Back to Login</a>';
-}
-
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-        $dbUsername = $username;
-        $dbPassword = $password;
+        $stmt = $pdo->prepare('SELECT * FROM logindetails WHERE username = :username');
+        $stmt->execute();
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // print_r($users);
+        if (isset($_POST['username'] == $user['username'] && $_POST['password'] == $user['password'])) {
+            $dbUsername = $user['username'];
+            $dbPassword = $user['password'];
+        }
+        // $username = $_POST['username'];
+        // $password = $_POST['password'];
     }
     if ($username === $dbUsername && $password === $dbPassword) {
         $_SESSION['username'] = $username;
@@ -42,6 +34,5 @@ session_start();
         echo '<a href="login.php">Back to Login</a>';
     }
 ?>
-
 </body>
 </html>
