@@ -29,12 +29,24 @@ session_start();
         <tr>
             <th>Datum</th>
             <th>Vårdgivare</th>
-            <th>Sammanfattning</th>
+            <th>Identitet</th>
+            <th>Vårdorsak</th>
+            <th>Diagnoser<th>
+            <th>Undersökningar</th>
+            <th>Behandlingar</th>
+            <th>Information och beslut</th>
+            <th>Avböjd vård (Ja/Nej)</th>
+            <th>Antecknad av</th>
         </tr>
         <tr>
             <td>2025-11-20</td>
             <td>Mölndals Vårdcentral</td>
-            <td>Kort anteckning om besöket...</td>
+            <td>Doris Dorisson (2015-08-17)</td>
+            <td>Ont i halsen</td>
+            <td>Viral halsinfektion</td>
+            <td>Informerad om behandling: beslut om egenvård</td>
+            <td>Nej</td>
+            <td>Dr. Karl Svensson</td>
         </tr>
     </table>
 
