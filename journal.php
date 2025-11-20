@@ -5,6 +5,22 @@ session_start();
 //    header("Location: login.php");
 //    exit;
 //} 
+
+// Tillfällig data 
+$journaler = [
+    [
+        "datum" => "2025-11-20",
+        "vardgivare" => "Mölndals Vårdcentral",
+        "identitet" => "Doris Dorisson (2015-08-17)",
+        "vardorsak" => "Ont i halsen",
+        "diangoser" => "Viral halsinfektion",
+        "undersökning" => "Halsundersökning",
+        "behandling" => "Egenvård",
+        "info_beslut" => "Informerad om behandling: beslut om egenvård",
+        "avbojd_vard" => "Nej",
+        "antecknad_av" => "Dr. Karl Svensson"
+    ]
+]
 ?> 
 <!DOCTYPE html>
 <html lang="sv">
@@ -31,23 +47,27 @@ session_start();
             <th>Vårdgivare</th>
             <th>Identitet</th>
             <th>Vårdorsak</th>
-            <th>Diagnoser<th>
+            <th>Diagnoser</th>
             <th>Undersökningar</th>
             <th>Behandlingar</th>
             <th>Information och beslut</th>
             <th>Avböjd vård (Ja/Nej)</th>
             <th>Antecknad av</th>
         </tr>
-        <tr>
-            <td>2025-11-20</td>
-            <td>Mölndals Vårdcentral</td>
-            <td>Doris Dorisson (2015-08-17)</td>
-            <td>Ont i halsen</td>
-            <td>Viral halsinfektion</td>
-            <td>Informerad om behandling: beslut om egenvård</td>
-            <td>Nej</td>
-            <td>Dr. Karl Svensson</td>
-        </tr>
+        <?php foreach ($journaler as $journal): ?>
+            <tr>
+                <td><?php echo $journal['datum']; ?></td>
+                <td><?php echo $journal['vardgivare']; ?></td>
+                <td><?php echo $journal['identitet']; ?></td>
+                <td><?php echo $journal['vardorsak']; ?></td>
+                <td><?php echo $journal['diagnoser']; ?></td>
+                <td><?php echo $journal['undersokning']; ?></td>
+                <td><?php echo $journal['behandling']; ?></td>
+                <td><?php echo $journal['info_beslut']; ?></td>
+                <td><?php echo $journal['avbojd_vard']; ?></td>
+                <td><?php echo $journal['antecknad_av']; ?></td>
+            </tr>
+        <?php endforeach; ?>
     </table>
 
     <!-- Provsvar-tabell -->
