@@ -20,9 +20,9 @@ session_start();
         | <a href="logout.php">Logga ut</a>
     </div>
     <hr>
-
-    <h1>Min journal</h1>
 -->
+    <h1>Min journal</h1>
+
     <!-- Journal-tabell -->
     <h2>Journalanteckningar</h2>
     <table border="1">
