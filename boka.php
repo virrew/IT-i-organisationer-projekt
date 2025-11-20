@@ -120,24 +120,19 @@ session_start();
 </head>
 <body>
 
-<h1>Bokningsformulär</h1>
-
+<h1>Boka tid hos oss ssk</h1>
+<!-- Todo: Gör kontroll på maxord -->
 <form method="post" action="process_booking.php">
   <input type="hidden" name="patientname" value="<?php echo htmlspecialchars($_SESSION['username']); ?>">
-  <label for="description">Ge en kort beskrivning av dina besvär <i>Max 150 ord</i></label><br>
-  <input type="text" id="description" name="description" required><br><br>
+  <label for="field1">Ge en kort beskrivning av dina besvär <i>Max 150 ord</i></label><br>
+  <input type="text" id="field1" name="field1" required><br><br>
   
-  <label for="email">E-post:</label><br>
-  <input type="email" id="email" name="email" required><br><br>
+  <label for="field2">Hur länge har du haft besvären?<i>Max 50 ord<i></label><br>
+  <input type="text" id="field2" name="field2" required><br><br>
   
-  <label for="date">Datum för bokning:</label><br>
-  <input type="date" id="date" name="date" required><br><br>
-  
-  <label for="time">Tid för bokning:</label><br>
-  <input type="time" id="time" name="time" required><br><br>
-  
+  <label for="field3">Har du sökt vård för detta tidigare? Ja/nej, om ja vart.</label><br>
+  <input type="text" id="field3" name="field3" required><br><br>
   <input type="submit" value="Boka tid">
-
 
 </body>
 </html>
