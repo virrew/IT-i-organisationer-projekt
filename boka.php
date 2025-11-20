@@ -123,8 +123,9 @@ session_start();
 <h1>Bokningsformulär</h1>
 
 <form method="post" action="process_booking.php">
-  <label for="name">Namn:</label><br>
-  <input type="text" id="name" name="name" required><br><br>
+  <input type="hidden" name="patientname" value="<?php echo htmlspecialchars($_SESSION['username']); ?>">
+  <label for="description">Ge en kort beskrivning av dina besvär <i>Max 150 ord</i></label><br>
+  <input type="text" id="description" name="description" required><br><br>
   
   <label for="email">E-post:</label><br>
   <input type="email" id="email" name="email" required><br><br>

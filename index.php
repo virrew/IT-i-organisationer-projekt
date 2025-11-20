@@ -29,5 +29,6 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
     } 
 } 
 ?> 
+<!-- http://193.93.250.83:8080/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient%22,%20%22=%22,%20%22G5Torkeli%20Knipa%22]] -->
 </body> 
 </html>
