@@ -45,7 +45,6 @@ echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
 $ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=[%22first_name%22,%20%22name%22]&filters=[[%22first_name%22,%22LIKE%22,%22%G6%%22]]'); 
-
 // man kan även specificera vilka fält man vill se
 // urlencode krävs när du har specialtecken eller mellanslag  
 // $ch = curl_init($baseurl . 'api/resource/User?fields='. urlencode('["name", "first_name", "last_login"]'));
@@ -94,23 +93,37 @@ foreach($response['data'] AS $key => $value){
   echo $value["name"]."<br>";
 }
 
+// Hämta Patienter baserat på LIKE-sökning
+$patient_url = $baseurl . 'api/resource/Patient?fields=["patient_name"]&filters=[["patient_name","LIKE","%G6%"]]';
+
+$ch = curl_init($patient_url);
+
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+
+curl_close($ch);
+
+echo "<div style='background-color:lightgray; border:1px solid black'>";
+echo '<pre>';
+print_r($response);
+echo '</pre>';
+echo "</div>";
+
+echo "<strong>Patientlista:</strong><br>";
+foreach ($response['data'] as $patient) {
+    echo $patient["patient_name"] . "<br>";
+}
+
 ?>
 
-<?php
-session_start();
-
-//   FETCH('http://193.93.250.83:8080/api/resource/Healthcare%20Practitioner?fields=[%22first_name%22,%20%22name%22]&filters=[[%22first_name%22,%22LIKE%22,%22%G6%%22]]', {
-//     headers: {
-//         'Authorization': '49faecfb2c53bd2:7fe935b2a6dbd0b'
-//     }
-//     })
-//     .then(r => r.json())
-//     .then(r => {
-//     console.log(r);
-//})
-
-
-?>
 <!doctype html>
 <html lang="sv">
 <head>
@@ -120,24 +133,19 @@ session_start();
 </head>
 <body>
 
-<h1>Bokningsformulär</h1>
-
+<h1>Boka tid hos oss ssk</h1>
+<!-- Todo: Gör kontroll på maxord -->
 <form method="post" action="process_booking.php">
   <input type="hidden" name="patientname" value="<?php echo htmlspecialchars($_SESSION['username']); ?>">
-  <label for="description">Ge en kort beskrivning av dina besvär <i>Max 150 ord</i></label><br>
-  <input type="text" id="description" name="description" required><br><br>
+  <label for="field1">Ge en kort beskrivning av dina besvär <i> Max 150 ord</i></label><br>
+  <input type="text" id="field1" name="field1" required><br><br>
   
-  <label for="email">E-post:</label><br>
-  <input type="email" id="email" name="email" required><br><br>
+  <label for="field2">Hur länge har du haft besvären?<i> Max 50 ord</i></label><br>
+  <input type="text" id="field2" name="field2" required><br><br>
   
-  <label for="date">Datum för bokning:</label><br>
-  <input type="date" id="date" name="date" required><br><br>
-  
-  <label for="time">Tid för bokning:</label><br>
-  <input type="time" id="time" name="time" required><br><br>
-  
+  <label for="field3">Har du sökt vård för detta tidigare? <i>Ja/nej, om ja vart?</i></label><br>
+  <input type="text" id="field3" name="field3" required><br><br>
   <input type="submit" value="Boka tid">
-
 
 </body>
 </html>
