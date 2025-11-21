@@ -44,7 +44,7 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-$ch = curl_init($baseurl . 'api/resource/Medication%20Request?fields=[%22practitioner_name%22]&filters=[[%22practitioner_name%22,%22LIKE%22,%22%G6%%22]]'); 
+$ch = curl_init($baseurl . 'api/resource/Medication%20Request?fields=[%22practitioner_name%22,%22patient_name%22,%22medication_item%22]&filters=[[%22patient_name%22,%22LIKE%22,%22%G6%%22]]'); 
 
 // man kan även specificera vilka fält man vill se
 // urlencode krävs när du har specialtecken eller mellanslag  
@@ -92,38 +92,6 @@ echo "</div>";
 echo "<strong>LISTA:</strong><br>";
 foreach($response['data'] AS $key => $value){
   echo $value["practitioner_name"]."<br>";
-}
-
- //Hämtar patienter som har utskrivna recept
-
- $patient_url = $baseurl . 'api/resource/Medication%20Request?fields=[%22patient_name%22]&filters[[%22patient_name%22,%20%22LIKE%22,%20%22%G6%%22]]';
-
-$ch = curl_init($patient_url);
-
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-
-curl_close($ch);
-
-// Visa responsen för debugging
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '<pre>';
-print_r($response);
-echo '</pre>';
-echo "</div>";
-
-// Loopar igenom patienterna
-echo "<strong>Patientlista:</strong><br>";
-foreach ($response['data'] as $patient) {
-    echo $patient["patient_name"] . "<br>";
 }
 ?>
 
