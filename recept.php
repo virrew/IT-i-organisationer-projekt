@@ -58,13 +58,13 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-$fields = ["practitioner_name", "patient_name", "medication_item"];
+$fields = ["practitioner_name", "patient_name", "medication_item", "status", "order_date", "quantity", "dosage_form", "dosage"];
 $filters = [
     ["patient_name", "=", $patient_name]
 ];
 
 // Definierar vilka fält som ska hämtas från Medication Request
-$fields = ["practitioner_name", "patient_name", "medication_item"];
+$fields = ["practitioner_name", "patient_name", "medication_item", "status", "order_date", "quantity", "dosage_form", "dosage"];
 
 // Filtrera baserat på inloggad patients namn
 $filters = [
@@ -136,101 +136,89 @@ echo "</div>";
     <p>Översikt över dina aktiva och utgångna recept</p>
     </section>
 
-    <!-- Sektion: Aktiva recept -->
+    <!-- Sektion: Aktiva recept, genererar recept eftersom patienten får fler recept -->
     <section class="recept-list">
   <h2>Aktiva recept</h2>
 
-  <?php foreach ($response['data'] as $r): ?>
+  <?php
+  // Dela upp recept i aktiva och utgångna
+$aktiva = [];
+$utgangna = [];
+
+// För att veta om receptet är aktivt eller utgånget
+if (!empty($response['data'])) {
+    foreach ($response['data'] as $r) {
+        $status = strtolower($r['status'] ?? '');
+
+        if (strpos($status, 'ended') !== false) {
+            $utgangna[] = $r;
+        } else {
+            $aktiva[] = $r;
+        }
+    }
+}
+?>
+  <?php foreach ($aktiva as $r): ?>
     <article class="recept-card">
       <div class="recept-card-header">
-        <h3 class="recept-namn"><?= htmlspecialchars($r['medication_item'] ?? 'Okänt läkemedel') ?></h3>
-        <span class="recept-status">Aktivt</span>
+        <h3 class="recept-namn">Läkemedel: <?= htmlspecialchars($r['medication_item'] ?? 'Okänt läkemedel') ?></h3>
+        <span class="recept-status">Status: <?= htmlspecialchars($r['status'] ?? 'Okänd status') ?></span><br>
+        <span class="recept-antal">Antal: <?= htmlspecialchars($r['quantity'] ?? 'Okänt antal') ?></span><br>
+        
       </div>
 
       <div class="recept-info">
-        <div class="styrka">–</div>
-        <div class="dosering">–</div>
+        <!-- Lägg till mer information om dosering här, typ vilken stryka på preparatet -->
+        <span class="recept-antal">Dosering: <?= htmlspecialchars($r['dosage_form'] ?? 'Okänd dosering') ?></span><br>
+        <span class="recept-antal">När du ska ta: <?= htmlspecialchars($r['dosage'] ?? 'Okänd dosering') ?></span><br>
       </div>
 
       <div class="recept-meta">
         <div class="forskrivare">
           <span class="label">Förskrivare</span>
-          <span class="value"><?= htmlspecialchars($r['practitioner_name'] ?? 'Okänd läkare') ?></span>
+          <span class="value">Utfärdare: <?= htmlspecialchars($r['practitioner_name'] ?? 'Okänd läkare') ?></span><br>
+          <span class="utfardat">Utfärdat datum: <?= htmlspecialchars($r['order_date'] ?? 'Okänt datum') ?></span><br>
         </div>
 
         <div class="giltig-tom">
           <span class="label">Patient</span>
-          <span class="value"><?= htmlspecialchars($r['patient_name'] ?? 'Okänd patient') ?></span>
+          <span class="value"><?= htmlspecialchars($r['patient_name'] ?? 'Okänd patient') ?></span><br>
         </div>
       </div>
     </article>
   <?php endforeach; ?>
 </section>
-
-
-        <!-- RECEPTKORT 2 -->
-        <article class="recept-card">
-
-            <div class="recept-card-header">
-                <h3 class="recept-namn">Enalapril Sandoz</h3>
-                <span class="recept-status">Aktivt</span>
-            </div>
-
-            <div class="recept-info">
-                <div class="styrka">10 mg</div>
-                <div class="dosering">1 tablett 1 gång dagligen</div>
-            </div>
-
-            <div class="recept-meta">
-                <div class="forskrivare">
-                    <span class="label">Förskrivare</span>
-                    <span class="value">Dr. Erik Andersson</span>
-                </div>
-
-                <div class="giltig-tom">
-                    <span class="label">Giltig t.o.m.</span>
-                    <span class="value">1 november 2025</span>
-                </div>
-
-                <div class="utfardat">
-                    <span class="label">Utfärdat</span>
-                    <span class="value">1 november 2024</span>
-                </div>
-            </div>
-        </article>
-
-    </section>
-
+    <!-- Sektion: Utgångna recept -->
     <h2>Utgångna recept</h2>
-        <!-- RECEPTKORT 1 -->
-          <article class="recept-card">
+          <?php foreach ($utgangna as $r): ?>
+    <article class="recept-card">
+      <div class="recept-card-header">
+        <h3 class="recept-namn">Läkemedel: <?= htmlspecialchars($r['medication_item'] ?? 'Okänt läkemedel') ?></h3>
+        <span class="recept-status">Status: <?= htmlspecialchars($r['status'] ?? 'Okänd status') ?></span><br>
+        <span class="recept-antal">Antal: <?= htmlspecialchars($r['quantity'] ?? 'Okänt antal') ?></span><br>
+        
+      </div>
 
-            <div class="recept-card-header">
-                <h3 class="recept-namn">Enalapril Sandoz</h3>
-                <span class="recept-status">Aktivt</span>
-            </div>
+      <div class="recept-info">
+        <!-- Lägg till mer information om dosering här, typ vilken stryka på preparatet -->
+        <span class="recept-antal">Dosering: <?= htmlspecialchars($r['dosage_form'] ?? 'Okänd dosering') ?></span><br>
+        <span class="recept-antal">När du ska ta: <?= htmlspecialchars($r['dosage'] ?? 'Okänd dosering') ?></span><br>
+      </div>
 
-            <div class="recept-info">
-                <div class="styrka">10 mg</div>
-                <div class="dosering">1 tablett 1 gång dagligen</div>
-            </div>
+      <div class="recept-meta">
+        <div class="forskrivare">
+          <span class="label">Förskrivare</span>
+          <span class="value"><?= htmlspecialchars($r['practitioner_name'] ?? 'Okänd läkare') ?></span><br>
+          <span class="utfardat">Utfärdat datum: <?= htmlspecialchars($r['order_date'] ?? 'Okänt datum') ?></span><br>
+        </div>
 
-            <div class="recept-meta">
-                <div class="forskrivare">
-                    <span class="label">Förskrivare</span>
-                    <span class="value">Dr. Erik Andersson</span>
-                </div>
-
-                <div class="giltig-tom">
-                    <span class="label">Giltig t.o.m.</span>
-                    <span class="value">1 november 2025</span>
-                </div>
-
-                <div class="utfardat">
-                    <span class="label">Utfärdat</span>
-                    <span class="value">1 november 2024</span>
-                </div>
-            </div>
-        </article>
+        <div class="giltig-tom">
+          <span class="label">Patient</span>
+          <span class="value"><?= htmlspecialchars($r['patient_name'] ?? 'Okänd patient') ?></span><br>
+        </div>
+      </div>
+    </article>
+  <?php endforeach; ?>
+</section>
 </body>
 </html>
