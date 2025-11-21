@@ -130,6 +130,156 @@ echo "</div>";
     <title>Recept</title>
 </head>
 <body>
+    <style>
+/* === Grundlayout === */
+body {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f6f8fb;
+  margin: 0;
+  padding: 0;
+  color: #222;
+}
+
+/* === Sidhuvud === */
+.header {
+  background-color: #0077b6;
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.header p {
+  font-size: 1.1rem;
+  margin-top: 8px;
+  opacity: 0.9;
+}
+
+/* === Sektioner === */
+.recept-list {
+  margin: 40px auto;
+  max-width: 900px;
+  padding: 0 20px 30px;
+}
+
+.recept-list h2 {
+  border-bottom: 3px solid #0077b6;
+  padding-bottom: 8px;
+  margin-bottom: 25px;
+  color: #003049;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* === Receptkort === */
+.recept-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  padding: 20px 25px;
+  margin-bottom: 25px;
+  transition: all 0.2s ease;
+  border-left: 6px solid #0077b6;
+}
+
+.recept-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* === Header på kortet === */
+.recept-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.recept-namn {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #023e8a;
+  font-weight: 600;
+}
+
+.recept-status {
+  background-color: #d8f3dc;
+  color: #1b4332;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* === Info och metadata === */
+.recept-info,
+.recept-meta {
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.recept-info span,
+.recept-meta span {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.label {
+  font-weight: bold;
+  color: #333;
+}
+
+.value {
+  color: #555;
+}
+
+/* === Utgångna recept === */
+.recept-card.expired {
+  background-color: #fff0f0;
+  border: 1px solid #ffcccc;
+  opacity: 0.9;
+  border-left: 6px solid #c1121f;
+}
+
+.recept-card.expired .recept-status {
+  background-color: #ffe5e5;
+  color: #c1121f;
+}
+
+/* === “Inga recept”-text === */
+.recept-list p {
+  background-color: #f1f1f1;
+  padding: 12px;
+  border-radius: 8px;
+  color: #555;
+  font-style: italic;
+  text-align: center;
+  margin-top: 15px;
+}
+
+/* === Små förbättringar === */
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+h2::before {
+  content: "💊";
+  font-size: 1.3rem;
+}
+.recept-list:last-of-type h2::before {
+  content: "⚠️";
+}
+    </style>
+
 
     <section class="header">
     <h1>Mina recept</h1>
