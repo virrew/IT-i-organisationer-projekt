@@ -63,15 +63,15 @@ $filters = [
     ["patient_name", "=", $patient_name]
 ];
 
-// 🔹 Definiera vilka fält som ska hämtas
+// Definierar vilka fält som ska hämtas från Medication Request
 $fields = ["practitioner_name", "patient_name", "medication_item"];
 
-// 🔹 Filtrera baserat på inloggad patients namn
+// Filtrera baserat på inloggad patients namn
 $filters = [
     ["patient_name", "LIKE", "%$patient_name%"]
 ];
 
-// 🔹 Bygg URL på ett säkert sätt
+// Enklare sätt att bygga URL:en
 $url = $baseurl . 'api/resource/Medication%20Request?' .
     'fields=' . urlencode(json_encode($fields)) .
     '&filters=' . urlencode(json_encode($filters));
