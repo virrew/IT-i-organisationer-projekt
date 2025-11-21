@@ -1,4 +1,5 @@
 <?php
+session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -44,7 +45,7 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=[%22first_name%22,%20%22name%22]&filters=[[%22first_name%22,%22LIKE%22,%22%G6%%22]]'); 
+$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["first_name","last_name"]&filters=[["first_name","LIKE","%G6%"]]'); 
 // man kan även specificera vilka fält man vill se
 // urlencode krävs när du har specialtecken eller mellanslag  
 // $ch = curl_init($baseurl . 'api/resource/User?fields='. urlencode('["name", "first_name", "last_login"]'));
@@ -65,8 +66,8 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 
 $response = curl_exec($ch);
-//echo $response;
 $response = json_decode($response, true);
+$practitioners = $response['data'] ?? [];
 
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
@@ -82,7 +83,7 @@ if (!empty($error_no)) {
   echo "<hr>";
   echo "</div>";
 }
-echo "<div style='background-color:lightgray; border:1px solid black'>";
+echo "<div style='background-color:white; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
@@ -108,17 +109,18 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 $response = curl_exec($ch);
 $response = json_decode($response, true);
+$patients = $response['data'] ?? [];
 
 curl_close($ch);
 
-echo "<div style='background-color:lightgray; border:1px solid black'>";
+echo "<div style='background-color:white; border:1px solid black'>";
 echo '<pre>';
 print_r($response);
 echo '</pre>';
 echo "</div>";
 
 echo "<strong>Patientlista:</strong><br>";
-foreach ($response['data'] as $patient) {
+foreach ($patients['data'] as $patient) {
     echo $patient["patient_name"] . "<br>";
 }
 
@@ -132,20 +134,38 @@ foreach ($response['data'] as $patient) {
 <title>Boka tid</title>
 </head>
 <body>
+<h1>Välj en tid</h1>
+<?php
+if (!empty($error_no)) {
+  echo "<div style='background-color:red'>";
+  echo '$error_no<br>';
+  var_dump($error_no);
+  echo "<hr>";
+  echo '$error<br>';
+  var_dump($error);
+  echo "<hr>";
+  echo "</div>";
+}
+echo '<form method="post" novalidate>';
+$session_user = $_SESSION['username'] ?? 'Guest';
+echo '<input type="hidden" name="patient" value="' . htmlspecialchars($session_user) . '">';
 
-<h1>Boka tid hos oss ssk</h1>
-<!-- Todo: Gör kontroll på maxord -->
-<form method="post" action="process_booking.php">
-  <input type="hidden" name="patientname" value="<?php echo htmlspecialchars($_SESSION['username']); ?>">
-  <label for="field1">Ge en kort beskrivning av dina besvär <i> Max 150 ord</i></label><br>
-  <input type="text" id="field1" name="field1" required><br><br>
-  
-  <label for="field2">Hur länge har du haft besvären?<i> Max 50 ord</i></label><br>
-  <input type="text" id="field2" name="field2" required><br><br>
-  
-  <label for="field3">Har du sökt vård för detta tidigare? <i>Ja/nej, om ja vart?</i></label><br>
-  <input type="text" id="field3" name="field3" required><br><br>
-  <input type="submit" value="Boka tid">
+// Välj vårdgivare
+echo '<label for="practitioner">Välj vårdgivare:</label><br>';
+echo '<select name="practitioner" required>';
+foreach ($practitioners as $practitioner) {
+    echo '<option value="' . htmlspecialchars($practitioner["name"]) . '">';
+    echo htmlspecialchars($practitioner["first_name"] . ' ' . $practitioner["last_name"]);
+    echo '</option>';
+}
+echo '</select><br><br>';
+echo '<br><label>Datum</label><input type="date" name="appointment_date" required>';
+echo '<br><label>Tid</label><input type="time" name="appointment_time" required>';
+echo '<br><label>Varaktighet (min)</label><input type="number" name="duration" min="1" value="30">';
+echo '<br><label>Anteckningar</label><textarea name="notes"></textarea>';
 
+echo '<br><button type="submit">Välj</button>';
+echo '</form>';
+?>
 </body>
 </html>
