@@ -1,6 +1,29 @@
 <?php
 session_start();
-?>
+
+if(isset($_POST['username']) && isset($_POST['password'])) { 
+    $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025'); 
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
+    $stmt = $pdo->prepare('SELECT username, password FROM logindetails WHERE username = :username AND password = :password'); 
+    $stmt->execute([ 
+        ':username' => $_POST['username'], 
+        ':password' => $_POST['password']
+    ]); 
+    $user = $stmt->fetch(PDO::FETCH_ASSOC); 
+    if ($user) { 
+    $_SESSION['username'] = $user['username']; 
+    $_SESSION['patient_name'] = $user['username'];
+    $_SESSION['logged_in'] = true; // 🔹 Viktigt!
+
+    header('Location: index.php'); // 🔹 Skicka användaren till startsidan
+    exit;
+} 
+    } else { 
+        echo "Invalid username or password.<br>"; 
+        echo '<a href="login.php">Back to Login</a>'; 
+    } 
+?> 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +32,7 @@ session_start();
     <title>Document</title>
 </head>
 <body>
-    <form action="index.php" method="POST">
+    <form action="login.php" method="POST">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
         <br>

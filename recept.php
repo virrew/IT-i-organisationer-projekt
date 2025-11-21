@@ -1,4 +1,14 @@
 <?php
+session_start();
+
+// Kontrollera att användaren är inloggad
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
+    header('Location: login.php');
+    exit;
+}
+// Hämta patientnamnet från sessionen
+$patient_name = $_SESSION['patient_name'];
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -44,7 +54,17 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-$ch = curl_init($baseurl . 'api/resource/Medication%20Request?fields=[%22practitioner_name%22,%22patient_name%22,%22medication_item%22]&filters=[[%22patient_name%22,%22LIKE%22,%22%G6%%22]]'); 
+$fields = ["practitioner_name", "patient_name", "medication_item"];
+$filters = [
+    ["patient_name", "=", $patient_name]
+];
+
+$url = $baseurl . 'api/resource/Medication%20Request?' .
+    'fields=' . urlencode(json_encode($fields)) .
+    '&filters=' . urlencode(json_encode($filters));
+
+$ch = curl_init($url);
+
 
 // man kan även specificera vilka fält man vill se
 // urlencode krävs när du har specialtecken eller mellanslag  
@@ -87,12 +107,6 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-
-//här väljer jag att loopa över alla poster i [data] och för varje resultat så skriver jag ut name
-echo "<strong>LISTA:</strong><br>";
-foreach($response['data'] AS $key => $value){
-  echo $value["practitioner_name"]."<br>";
-}
 ?>
 
 <!DOCTYPE html>
@@ -111,41 +125,35 @@ foreach($response['data'] AS $key => $value){
 
     <!-- Sektion: Aktiva recept -->
     <section class="recept-list">
-        <h2>Aktiva recept</h2>
+  <h2>Aktiva recept</h2>
 
-        <!-- RECEPTKORT 1 -->
-        <article class="recept-card">
+  <?php foreach ($response['data'] as $r): ?>
+    <article class="recept-card">
+      <div class="recept-card-header">
+        <h3 class="recept-namn"><?= htmlspecialchars($r['medication_item'] ?? 'Okänt läkemedel') ?></h3>
+        <span class="recept-status">Aktivt</span>
+      </div>
 
-            <!-- översta raden: namn + status -->
-            <div class="recept-card-header">
-                <h3 class="recept-namn">Metformin Actavis</h3>
-                <span class="recept-status">Aktivt</span>
-            </div>
+      <div class="recept-info">
+        <div class="styrka">–</div>
+        <div class="dosering">–</div>
+      </div>
 
-            <!-- styrka och dosering -->
-            <div class="recept-info">
-                <div class="styrka">500 mg</div>
-                <div class="dosering">2 tabletter 2 gånger dagligen</div>
-            </div>
+      <div class="recept-meta">
+        <div class="forskrivare">
+          <span class="label">Förskrivare</span>
+          <span class="value"><?= htmlspecialchars($r['practitioner_name'] ?? 'Okänd läkare') ?></span>
+        </div>
 
-            <!-- förskrivare och giltighet -->
-            <div class="recept-meta">
-                <div class="forskrivare">
-                    <span class="label">Förskrivare</span>
-                    <span class="value">Dr. Anna Svensson</span>
-                </div>
+        <div class="giltig-tom">
+          <span class="label">Patient</span>
+          <span class="value"><?= htmlspecialchars($r['patient_name'] ?? 'Okänd patient') ?></span>
+        </div>
+      </div>
+    </article>
+  <?php endforeach; ?>
+</section>
 
-                <div class="giltig-tom">
-                    <span class="label">Giltig t.o.m.</span>
-                    <span class="value">15 oktober 2025</span>
-                </div>
-
-                <div class="utfardat">
-                    <span class="label">Utfärdat</span>
-                    <span class="value">15 oktober 2024</span>
-                </div>
-            </div>
-        </article>
 
         <!-- RECEPTKORT 2 -->
         <article class="recept-card">
