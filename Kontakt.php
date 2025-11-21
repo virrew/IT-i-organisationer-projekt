@@ -18,10 +18,10 @@
             
             <p>Fick du möjlighet att ställa frågorna du önskade?</p>
             <input type="radio" id="Yes" name="Quest" value="Yes">
-            <label for="Yes">Yes</label><br>
+            <label for="Yes">Ja</label><br>
             
             <input type="radio" id="No" name="Quest" value="No">
-            <label for="No">No</label><br>
+            <label for="No">Nej</label><br>
             
         
         </fieldset>
