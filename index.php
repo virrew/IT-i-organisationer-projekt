@@ -1,6 +1,6 @@
 <?php 
 session_start(); 
-if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) { // För att skicka ut användare som inte har ett konto
     header('Location: login.php');
     exit;
 }

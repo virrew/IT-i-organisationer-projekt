@@ -13,9 +13,9 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
     if ($user) { 
     $_SESSION['username'] = $user['username']; 
     $_SESSION['patient_name'] = $user['username'];
-    $_SESSION['logged_in'] = true; // 🔹 Viktigt!
+    $_SESSION['logged_in'] = true; 
 
-    header('Location: index.php'); // 🔹 Skicka användaren till startsidan
+    header('Location: index.php'); //Skicka användaren till index.php efter inloggning
     exit;
 } 
     } else { 
@@ -32,7 +32,8 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
     <title>Document</title>
 </head>
 <body>
-    <form action="login.php" method="POST">
+
+    <form action="login.php" method="POST"> <!--Postar inloggningsformuläret till sig själv för att kunna skapa sessionen, headerlocation sköter förlyttningen till index.php-->
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
         <br>
