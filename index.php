@@ -15,7 +15,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 <body> 
     <h1>Welcome</h1> 
 
-
+<!-- La till en navigationsbar för att testa att session fungerar till min receptsida-->
 <nav style="background-color:#004466; color:white; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; font-family:sans-serif;">
     <div style="font-size:1.2rem; font-weight:bold;">
          Mölndals Vårdcentral
