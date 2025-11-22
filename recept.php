@@ -308,6 +308,7 @@ if (!empty($response['data'])) {
     }
 }
 ?>
+<!-- Sektion: Aktiva recept -->
   <?php foreach ($aktiva as $r): ?>
     <article class="recept-card">
       <div class="recept-card-header">
@@ -326,7 +327,7 @@ if (!empty($response['data'])) {
       <div class="recept-meta">
         <div class="forskrivare">
           <span class="label">Förskrivare</span>
-          <span class="value">Utfärdare: <?= htmlspecialchars($r['practitioner_name'] ?? 'Okänd läkare') ?></span><br>
+          <span class="value"><?= htmlspecialchars($r['practitioner_name'] ?? 'Okänd läkare') ?></span><br>
           <span class="utfardat">Utfärdat datum: <?= htmlspecialchars($r['order_date'] ?? 'Okänt datum') ?></span><br>
         </div>
 
