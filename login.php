@@ -12,7 +12,7 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
     $user = $stmt->fetch(PDO::FETCH_ASSOC); 
     if ($user) { 
     $_SESSION['username'] = $user['username']; 
-    $_SESSION['patient_name'] = $user['username'];
+    $_SESSION['patient_name'] = $user['username']; // Todo: Lägging er egna ERP variabel för patientnamn
     $_SESSION['logged_in'] = true; 
 
     header('Location: index.php'); //Skicka användaren till index.php efter inloggning
