@@ -139,25 +139,25 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
 </head>
 <body>
 
-    <h1>Welcome to Mölndalsvårdcentral</h1>
+    <h1>Välkommen till Mölndalsvårdcentral</h1>
 
     <div class="form-container">
-        <h2>Login</h2>
+        <h2>Logga in för att ta del av våra tjänster</h2>
 
         <!-- LOGIN FORM -->
         <form action="login.php" method="POST"><!--Postar inloggningsformuläret till sig själv för att kunna skapa sessionen, headerlocation sköter förlyttningen till index.php-->
-            <label class="form-label" for="username">Username:</label>
+            <label class="form-label" for="username">Användarnamn:</label>
             <input type="text" id="username" name="username" class="form-input" required>
 
-            <label class="form-label" for="password">Password:</label>
+            <label class="form-label" for="password">Lösenord:</label>
             <input type="password" id="password" name="password" class="form-input" required>
 
-            <button type="submit" class="btn-primary">Login</button>
+            <button type="submit" class="btn-primary">Logga in</button>
         </form>
 
         <!-- REGISTER BUTTON -->
         <form action="register.php" method="POST">
-            <button type="submit" class="btn-secondary">New patient? Register here</button>
+            <button type="submit" class="btn-secondary">Ny patient? Registrera här</button>
         </form>
     </div>
 

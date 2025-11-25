@@ -102,21 +102,21 @@ error_reporting(E_ALL);
     <form action="register.php" method="POST">
 
         <div class="form-group">
-            <label for="ssn" class="form-label">Social security number:</label>
+            <label for="ssn" class="form-label">Personnummer:</label>
             <input type="text" id="ssn" name="ssn" class="form-input" required>
         </div>
 
         <div class="form-group">
-            <label for="username" class="form-label">Username:</label>
+            <label for="username" class="form-label">Användarnamn:</label>
             <input type="text" id="username" name="username" class="form-input" required>
         </div>
 
         <div class="form-group">
-            <label for="password" class="form-label">Password:</label>
+            <label for="password" class="form-label">Lösenord:</label>
             <input type="password" id="password" name="password" class="form-input" required>
         </div>
 
-        <button type="submit" class="btn-primary">Register</button>
+        <button type="submit" class="btn-primary">Registrera</button>
     </form>
 </div>
 
