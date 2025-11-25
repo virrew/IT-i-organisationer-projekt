@@ -9,7 +9,7 @@
 <body>
 
 
-<h1>Formulär för bemötand<h1>
+<h1>Formulär för bemötande<h1>
 
 <form method="post" action="kontakt.php">
 
