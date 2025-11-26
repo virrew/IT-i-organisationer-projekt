@@ -328,7 +328,10 @@ echo "</div>";
 
 </head>
 <body>
-
+    <section class="header">
+    <h1>Mina recept</h1>
+    <p>Översikt över dina aktiva och utgångna recept</p>
+    </section>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-brand">
@@ -352,12 +355,6 @@ echo "</div>";
             <?php endif; ?>
         </div>
     </nav>
-
-    <section class="header">
-    <h1>Mina recept</h1>
-    <p>Översikt över dina aktiva och utgångna recept</p>
-    </section>
-
     <!-- Sektion: Aktiva recept, genererar recept eftersom patienten får fler recept -->
     <section class="recept-list">
   <h2>Aktiva recept</h2>
