@@ -58,13 +58,13 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-$fields = ["practitioner_name", "patient_name", "medication_item", "status", "order_date", "quantity", "dosage_form", "dosage"];
+$fields = ["practitioner_name", "patient_name", "medication_item", "status", "order_date", "quantity", "dosage_form", "dosage", "period"];
 $filters = [
     ["patient_name", "=", $patient_name]
 ];
 
 // Definierar vilka fält som ska hämtas från Medication Request
-$fields = ["practitioner_name", "patient_name", "medication_item", "status", "order_date", "quantity", "dosage_form", "dosage"];
+$fields = ["practitioner_name", "patient_name", "medication_item", "status", "order_date", "quantity", "dosage_form", "dosage", "period"];
 
 // Filtrera baserat på inloggad patients namn
 $filters = [
@@ -344,12 +344,12 @@ echo "</div>";
             <a href="boka.php">Mina bokningar</a>
             <a href="journal.php">Min journal</a>
             <a href="Kontakt.php">Kontakt</a>
+            <a href="logout.php">Logga ut</a>
             <!-- Tyckte det såg konstigt ut med att personens namn stod där uppe, kommenterar bort så länge
-            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-                <span class="nav-user">
-                    <?= htmlspecialchars($_SESSION['username']) ?> 
-                </span> -->
-                <a href="logout.php">Logga ut</a>
+      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+        <span class="nav-user">
+          <?= htmlspecialchars($_SESSION['username']) ?>
+        </span> -->
             <?php else: ?>
                 <a href="login.php">Logga in</a>
             <?php endif; ?>
@@ -384,7 +384,6 @@ if (!empty($response['data'])) {
         <h3 class="recept-namn">Läkemedel: <?= htmlspecialchars($r['medication_item'] ?? 'Okänt läkemedel') ?></h3>
         <span class="recept-status">Status: <?= htmlspecialchars($r['status'] ?? 'Okänd status') ?></span><br>
         <span class="recept-antal">Antal: <?= htmlspecialchars($r['quantity'] ?? 'Okänt antal') ?></span><br>
-        
       </div>
 
       <div class="recept-info">
@@ -415,8 +414,7 @@ if (!empty($response['data'])) {
       <div class="recept-card-header">
         <h3 class="recept-namn">Läkemedel: <?= htmlspecialchars($r['medication_item'] ?? 'Okänt läkemedel') ?></h3>
         <span class="recept-status">Status: <?= htmlspecialchars($r['status'] ?? 'Okänd status') ?></span><br>
-        <span class="recept-antal">Antal: <?= htmlspecialchars($r['quantity'] ?? 'Okänt antal') ?></span><br>
-        
+        <span class="recept-antal">Antal: <?= htmlspecialchars($r['quantity'] ?? 'Okänt antal') ?></span><br>        
       </div>
 
       <div class="recept-info">
