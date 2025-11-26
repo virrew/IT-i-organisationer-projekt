@@ -1,5 +1,23 @@
 <?php
 session_start();
+
+// Från formuläret:
+$contact_field1 = trim($_POST['field1'] ?? '');
+$contact_field2 = trim($_POST['field2'] ?? '');
+$contact_field3 = trim($_POST['field3'] ?? '');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Spara bara om alla fält är ifyllda
+    if ($contact_field1 !== '' && $contact_field2 !== '' && $contact_field3 !== '') {
+        $_SESSION['contact_data'] = [
+            'field1' => $contact_field1,
+            'field2' => $contact_field2,
+            'field3' => $contact_field3
+        ];
+    }
+}
+$contactData = $_SESSION['contact_data'] ?? null;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -232,26 +250,37 @@ $session_user = $_SESSION['username'] ?? 'Guest';
   </style>
 </head>
 <body>
-  <nav class="navbar">
+    <nav class="navbar">
     <div class="nav-brand">Mölndals Vårdcentral</div>
-
     <div class="nav-links">
       <a href="index.php">Hem</a>
       <a href="recept.php">Mina recept</a>
-      <a href="boka.php">Mina bokningar</a>
+      <a href="bokningar.php">Mina bokningar</a>
       <a href="journal.php">Min journal</a>
       <a href="Kontakt.php">Kontakt</a>
-      <!-- Tyckte det såg konstigt ut med att personens namn stod där uppe, kommenterar bort så länge
       <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-        <span class="nav-user">
-          <?= htmlspecialchars($_SESSION['username']) ?>
-        </span> -->
-        <a href="logout.php">Logga ut</a>
+      <?= htmlspecialchars($_SESSION['username']) ?>
+      <a href="logout.php">Logga ut</a>
       <?php else: ?>
-        <a href="login.php">Logga in</a>
+      <a href="login.php">Logga in</a>
       <?php endif; ?>
     </div>
-  </nav>
+    </nav>
+
+  <?php if ($contactData): ?>
+  <div class="container" style="background: var(--mint-green); border: 2px solid var(--primary-blue); margin-bottom: 24px;">
+      <h2 style="color: var(--primary-blue); margin-top:0;">Information du skickade in</h2>
+
+      <p><strong>Beskrivning av besvären:</strong><br>
+          <?php echo htmlspecialchars($contactData['field1']); ?></p>
+
+      <p><strong>Hur länge du haft besvären:</strong><br>
+          <?php echo htmlspecialchars($contactData['field2']); ?></p>
+
+      <p><strong>Tidigare vårdkontakt:</strong><br>
+          <?php echo htmlspecialchars($contactData['field3']); ?></p>
+  </div>
+  <?php endif; ?>
 
   <div class="container">
     <h1>Välj en tid</h1>
