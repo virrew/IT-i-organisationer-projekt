@@ -152,17 +152,14 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
             <label class="form-label" for="password">Lösenord:</label>
             <input type="password" id="password" name="password" class="form-input" required>
 
-            <button type="submit" class="btn-primary" onclick="return confirm('Starta BankID');">
-    Logga in
-</button>
-
+            <button type="submit" class="btn-primary" onclick="return confirm('Starta BankID');"> <!-- Bank-ID simulering -->
+                Logga in
+            </button>
         </form>
 
         <!-- REGISTER BUTTON -->
         <form action="register.php" method="POST">
-            <button type="submit" class="btn-secondary">Ny patient? Registrera här</button>
-
-            
+            <button type="submit" class="btn-secondary">Ny patient? Registrera här</button>  
         </form>
     </div>
 
