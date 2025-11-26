@@ -128,158 +128,230 @@ echo "</div>";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recept</title>
-</head>
-<body>
-    <style>
+<style>
+    /* === Globala färger === */
+    :root {
+        --primary-blue: #1F6F78;
+        --primary-blue-light: #C2EBE8;
+
+        --mint-green: #E7FFF3;
+        --accent-orange: #FCA06A;
+        --info-blue: #0A5360;
+        --warning-red: #D9534F;
+
+        --white: #FFFFFF;
+        --gray-light: #F5F5F5;
+        --text-dark: #0E2A2C;
+}
+
 /* === Grundlayout === */
-body {
-  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f6f8fb;
-  margin: 0;
-  padding: 0;
-  color: #222;
+    body {
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--gray-light);
+        margin: 0;
+        padding: 0;
+        color: var(--text-dark);
 }
 
 /* === Sidhuvud === */
-.header {
-  background-color: #0077b6;
-  color: white;
-  padding: 40px 20px;
-  text-align: center;
+    .header {
+        background-color: var(--primary-blue);
+        color: var(--white);
+        padding: 40px 20px;
+        text-align: center;
 }
 
-.header h1 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 600;
+    .header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
 }
 
-.header p {
-  font-size: 1.1rem;
-  margin-top: 8px;
-  opacity: 0.9;
+    .header p {
+        font-size: 1.1rem;
+        margin-top: 8px;
+        opacity: 0.95;
 }
 
 /* === Sektioner === */
-.recept-list {
-  margin: 40px auto;
-  max-width: 900px;
-  padding: 0 20px 30px;
+    .recept-list {
+        margin: 40px auto;
+        max-width: 900px;
+        padding: 0 20px 30px;
 }
 
-.recept-list h2 {
-  border-bottom: 3px solid #0077b6;
-  padding-bottom: 8px;
-  margin-bottom: 25px;
-  color: #003049;
-  font-size: 1.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+    .recept-list h2 {
+        border-bottom: 3px solid var(--primary-blue);
+        padding-bottom: 8px;
+        margin-bottom: 25px;
+        color: var(--primary-blue);
+        font-size: 1.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
 }
 
 /* === Receptkort === */
-.recept-card {
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-  padding: 20px 25px;
-  margin-bottom: 25px;
-  transition: all 0.2s ease;
-  border-left: 6px solid #0077b6;
+    .recept-card {
+        background-color: var(--white);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        padding: 20px 25px;
+        margin-bottom: 25px;
+        transition: all 0.2s ease;
+        border-left: 6px solid var(--primary-blue);
 }
 
-.recept-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.15);
+    .recept-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 /* === Header på kortet === */
-.recept-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
+    .recept-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
 }
 
-.recept-namn {
-  font-size: 1.2rem;
-  margin: 0;
-  color: #023e8a;
-  font-weight: 600;
+    .recept-namn {
+        font-size: 1.2rem;
+        margin: 0;
+        color: var(--primary-blue);
+        font-weight: 600;
 }
 
-.recept-status {
-  background-color: #d8f3dc;
-  color: #1b4332;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.9rem;
+    .recept-status {
+        background-color: var(--mint-green);
+        color: var(--info-blue);
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.9rem;
 }
 
 /* === Info och metadata === */
-.recept-info,
-.recept-meta {
-  margin-top: 10px;
-  line-height: 1.6;
+    .recept-info,
+    .recept-meta {
+        margin-top: 10px;
+        line-height: 1.6;
 }
 
-.recept-info span,
-.recept-meta span {
-  display: inline-block;
-  margin-right: 5px;
+    .recept-info span,
+    .recept-meta span {
+        display: inline-block;
+        margin-right: 5px;
 }
 
-.label {
-  font-weight: bold;
-  color: #333;
+    .label {
+        font-weight: bold;
+        color: var(--text-dark);
 }
 
-.value {
-  color: #555;
+    .value {
+        color: var(--text-dark);
 }
-
 /* === Utgångna recept === */
-.recept-card.expired {
-  background-color: #fff0f0;
-  border: 1px solid #ffcccc;
-  opacity: 0.9;
-  border-left: 6px solid #c1121f;
+    .recept-card.expired {
+        background-color: #fff5f5;
+        border-left-color: var(--warning-red);
 }
 
-.recept-card.expired .recept-status {
-  background-color: #ffe5e5;
-  color: #c1121f;
+    .recept-card.expired .recept-status {
+        background-color: #ffe4e4;
+        color: var(--warning-red);
 }
-
 /* === “Inga recept”-text === */
-.recept-list p {
-  background-color: #f1f1f1;
-  padding: 12px;
-  border-radius: 8px;
-  color: #555;
-  font-style: italic;
-  text-align: center;
-  margin-top: 15px;
+    .recept-list p {
+        background-color: var(--white);
+        padding: 12px;
+        border-radius: 8px;
+        color: var(--text-dark);
+        font-style: italic;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-top: 15px;
+}
+/* === Ikoner före rubrik === */
+    h2 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
 }
 
-/* === Små förbättringar === */
-h2 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    h2::before {
+        content: "💊";
+        font-size: 1.3rem;
 }
 
-h2::before {
-  content: "💊";
-  font-size: 1.3rem;
+    .recept-list:last-of-type h2::before {
+        content: "⚠️";
 }
-.recept-list:last-of-type h2::before {
-  content: "⚠️";
-}
-    </style>
 
+        /* NAVBAR */
+        .navbar {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-user {
+            font-size: 0.95rem;
+        }
+</style>
+
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            Mölndals Vårdcentral
+        </div>
+
+        <div class="nav-links"> 
+            <a href="index.php">Hem</a>
+            <a href="recept.php">Mina recept</a>
+            <a href="boka.php">Mina bokningar</a>
+            <a href="journal.php">Min journal</a>
+            <a href="Kontakt.php">Kontakt</a>
+            <!-- Tyckte det såg konstigt ut med att personens namn stod där uppe, kommenterar bort så länge
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+                <span class="nav-user">
+                    <?= htmlspecialchars($_SESSION['username']) ?> 
+                </span> -->
+                <a href="logout.php">Logga ut</a>
+            <?php else: ?>
+                <a href="login.php">Logga in</a>
+            <?php endif; ?>
+        </div>
+    </nav>
 
     <section class="header">
     <h1>Mina recept</h1>
@@ -338,10 +410,10 @@ if (!empty($response['data'])) {
       </div>
     </article>
   <?php endforeach; ?>
-</section>
+
     <!-- Sektion: Utgångna recept -->
     <h2>Utgångna recept</h2>
-          <?php foreach ($utgangna as $r): ?>
+    <?php foreach ($utgangna as $r): ?>
     <article class="recept-card">
       <div class="recept-card-header">
         <h3 class="recept-namn">Läkemedel: <?= htmlspecialchars($r['medication_item'] ?? 'Okänt läkemedel') ?></h3>
