@@ -4,6 +4,72 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) { // För att ski
     header('Location: login.php');
     exit;
 }
+$patient = $_SESSION['patient'];
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+$cookiepath = "/tmp/cookies.txt";
+$tmeout = 3600; // (3600=1hr)
+$baseurl = 'http://193.93.250.83:8080/';
+
+try {
+  $ch = curl_init($baseurl . 'api/method/login');
+} catch (Exception $e) {
+  echo 'Caught exception: ', $e->getMessage(), "\n";
+}
+
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+
+$error_no = curl_errno($ch);
+$error = curl_error($ch);
+curl_close($ch);
+
+$bokningar = $baseurl . '/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient_name%22,%22LIKE%22,%22%G6%%22]]';
+$fields = [
+    "name",
+    "appointment_date",
+    "appointment_time",
+    "duration",
+    "patient",
+    "patient_name",
+    "practitioner",
+    "practitioner_name",
+    "appointment_type",
+    "notes",
+    "status"
+];
+
+$filters = [
+    ["patient_name", "LIKE", "%$patient%"]
+];
+
+$url = $baseurl . '/api/resource/Patient%20Appointment?' .
+    'fields=' . urlencode(json_encode($fields)) .
+    '&filters=' . urlencode(json_encode($filters));
+
+$ch = curl_init($patient_url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+$patients = $response['data'] ?? [];
+curl_close($ch);
 ?> 
 <!DOCTYPE html>
 <html lang="sv">
