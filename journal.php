@@ -110,7 +110,7 @@ $journaler = [
         "vardgivare" => "Mölndals Vårdcentral",
         "identitet" => "Doris Dorisson (2015-08-17)",
         "vardorsak" => "Ont i halsen",
-        "diangoser" => "Viral halsinfektion",
+        "diagnoser" => "Viral halsinfektion",
         "undersökning" => "Halsundersökning",
         "behandling" => "Egenvård",
         "info_beslut" => "Informerad om behandling: beslut om egenvård",
@@ -195,12 +195,18 @@ $journaler = [
         padding: 12px;
         text-align: left;
         font-size: 0.95rem;
+        word-break: break-word;
+        white-space: normal;
+        overflow-wrap: break-word;
     }
 
     td {
         padding: 10px;
         border-bottom: 1px solid var(--primary-blue-light);
         font-size: 0.9rem;
+        word-break: break-word;
+        white-space: normal;
+        overflow-wrap: break-word;
     }
 
     tr:nth-child(even) {
@@ -254,16 +260,16 @@ $journaler = [
 
         <?php foreach ($journaler as $journal): ?>
             <tr>
-                <td><?php echo $journal['datum']; ?></td>
-                <td><?php echo $journal['vardgivare']; ?></td>
-                <td><?php echo $journal['identitet']; ?></td>
-                <td><?php echo $journal['vardorsak']; ?></td>
-                <td><?php echo $journal['diagnoser']; ?></td>
-                <td><?php echo $journal['undersokning']; ?></td>
-                <td><?php echo $journal['behandling']; ?></td>
-                <td><?php echo $journal['info_beslut']; ?></td>
-                <td><?php echo $journal['avbojd_vard']; ?></td>
-                <td><?php echo $journal['antecknad_av']; ?></td>
+                <td><?php echo htmlspecialchars ($journal['datum'] ?? ''); ?></td> <!-- $journal['nyckel'] ?? '' gör att det blir tomt om ingen nyckel finns -->
+                <td><?php echo htmlspecialchars ($journal['vardgivare'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['identitet'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['vardorsak'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['diagnoser']?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['undersokning']?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['behandling']?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['info_beslut']?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['avbojd_vard']?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['antecknad_av']?? ''); ?></td>
             </tr>
         <?php endforeach; ?>
     </table>
