@@ -8,16 +8,22 @@
     :root {
         --primary-blue: #1F6F78;
         --primary-blue-light: #C2EBE8;
-
         --mint-green: #E7FFF3;
         --accent-orange: #FCA06A;
         --info-blue: #0A5360;
         --warning-red: #D9534F;
-
         --white: #FFFFFF;
         --gray-light: #F5F5F5;
         --text-dark: #0E2A2C;
         --shadow-primary: rgba(31,111,120,0.25);
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--gray-light);
+      margin: 0;
+      padding: 0;
+      color: var(--text-dark);
     }
 
     /* NAVBAR */
@@ -47,126 +53,78 @@
       text-decoration: none;
       font-weight: 500;
     }
+    .nav-links a:hover { text-decoration: underline; }
 
-    .nav-links a:hover {
-      text-decoration: underline;
-    }
 
-    .nav-user {
-      font-size: 0.95rem;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--gray-light);
-      margin: 0;
-      padding: 0;
-      color: var(--text-dark);
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 24px auto;
+    /* FORM CONTAINER */
+    .form-container {
+      max-width: 700px;
+      margin: 60px auto;
       background: var(--white);
-      border-radius: 12px;
-      padding: 28px;
+      padding: 35px;
+      border-radius: 14px;
       border: 2px solid var(--primary-blue);
-      box-shadow: 0 6px 30px rgba(0,0,0,0.06);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.07);
     }
 
     h1 {
-      margin: 0 0 12px;
-      font-size: 1.5rem;
-      color: var(--primary-blue);
-    }
-
-    p {
       margin: 0 0 20px;
-      color: var(--text-dark);
-      font-size: 1rem;
-    } 
-
-    form.booking {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      align-items: start;
+      font-size: 1.8rem;
+      color: var(--primary-blue);
+      text-align: center;
     }
+
+    /* FORM INPUTS */
+    .field { margin-bottom: 20px; }
 
     label {
       display: block;
       margin-bottom: 6px;
       font-weight: 600;
-      font-size: 0.92rem;
+      font-size: 0.96rem;
       color: var(--text-dark);
     }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      
-    }
-
     input[type="text"],
-    input[type="date"],
-    input[type="time"],
-    input[type="number"],
-    select,
     textarea {
-      padding: 10px 12px;
+      width: 100%;
+      padding: 12px 14px;
       border: 1px solid var(--primary-blue-light);
       border-radius: 8px;
-      background: white;
-      outline: none;
-      font-size: 0.95rem;
-      transition: box-shadow .15s, border-color .15s;
+      background: #ffffff;
+      font-size: 1rem;
+      transition: 0.15s;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus, textarea:focus {
       border-color: var(--primary-blue);
       box-shadow: 0 4px 14px var(--shadow-primary);
+      outline: none;
     }
 
-    textarea { min-height: 110px; resize: vertical; padding-top: 10px; }
-    .full { grid-column: 1 / -1; }
     .btn-row {
       display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-top: 6px;
+      justify-content: center;
+      margin-top: 10px;
     }
 
     button.btn {
       background: var(--primary-blue);
       color: #fff;
       border: none;
-      padding: 10px 14px;
+      padding: 12px 18px;
       font-weight: 600;
       border-radius: 10px;
       cursor: pointer;
       box-shadow: 0 6px 18px rgba(31,111,120,0.25);
-      transition: transform .06s ease, box-shadow .12s ease, opacity .12s;
+      transition: transform .06s ease, box-shadow .12s ease;
     }
 
     button.btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(31,111,120,0.35);
     }
-
-    .error {
-      background: #fee2e2;
-      color: #7f1d1d;
-      padding: 10px 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      border: 1px solid rgba(239,68,68,0.1);
-    }
-
-    .select-wrap { position: relative; }
-    select option { padding: 8px; }
-  </style>
+</style>
 </head>
 <body>
   <nav class="navbar">
@@ -187,7 +145,7 @@
     </div>
   </nav>
   
-  <div class="bokningsformulär container-like">
+  <div class="form-container">
     <h1>Boka tid hos oss</h1>
     <!-- Todo: Gör kontroll på maxord -->
     <form id="intake-form" method="post" action="boka.php">
