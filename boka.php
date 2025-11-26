@@ -255,18 +255,17 @@ $session_user = $_SESSION['username'] ?? 'Guest';
     <div class="nav-links">
       <a href="index.php">Hem</a>
       <a href="recept.php">Mina recept</a>
-      <a href="boka.php">Mina bokningar</a>
+      <a href="bokningar.php">Mina bokningar</a>
       <a href="journal.php">Min journal</a>
       <a href="Kontakt.php">Kontakt</a>
       <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-      <!-- Namnet i navbaren är bortkommenterat -->
-      <!-- <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span> -->
+      <?= htmlspecialchars($_SESSION['username']) ?>
       <a href="logout.php">Logga ut</a>
       <?php else: ?>
       <a href="login.php">Logga in</a>
       <?php endif; ?>
     </div>
-  </nav>
+    </nav>
 
   <?php if ($contactData): ?>
   <div class="container" style="background: var(--mint-green); border: 2px solid var(--primary-blue); margin-bottom: 24px;">
