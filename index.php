@@ -58,7 +58,7 @@ $url = $baseurl . '/api/resource/Patient%20Appointment?' .
     'fields=' . urlencode(json_encode($fields)) .
     '&filters=' . urlencode(json_encode($filters));
 
-$ch = curl_init($patient_url);
+$ch = curl_init($url);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
@@ -217,6 +217,27 @@ curl_close($ch);
                 Mölndals vårdcentral.
             </p>
         </div>
+    </div>
+
+    <div>
+        Dina kommande bokningar:
+        <?php
+        if (empty($patients)) {
+            echo "<p>Inga kommande bokningar.</p>";
+        } else {
+            echo "<ul>";
+            foreach ($patients as $appointment) {
+                echo "<li>";
+                echo "Datum: " . htmlspecialchars($appointment['appointment_date']) . ", Tid: " . htmlspecialchars($appointment['appointment_time']) . ", Typ: " . htmlspecialchars($appointment['appointment_type']) . ", Status: " . htmlspecialchars($appointment['status']);
+                echo "</li>";
+            }
+            echo "</ul>";
+        }
+        ?>
+    </div>
+    <div>
+        Gör en bokning här:
+        <a href="kontaktformulär.php" class="btn-primary">Boka tid</a>
     </div>
 
 <!-- http://193.93.250.83:8080/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient%22,%20%22=%22,%20%22G5Torkeli%20Knipa%22]] -->
