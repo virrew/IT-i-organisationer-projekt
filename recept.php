@@ -129,7 +129,7 @@ echo "</div>";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recept</title>
 <style>
-    /* === Globala färger === */
+    /*  Globala färger  */
     :root {
         --primary-blue: #1F6F78;
         --primary-blue-light: #C2EBE8;
@@ -144,7 +144,7 @@ echo "</div>";
         --text-dark: #0E2A2C;
 }
 
-/* === Grundlayout === */
+/*  Grundlayout  */
     body {
         font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background-color: var(--gray-light);
@@ -153,12 +153,13 @@ echo "</div>";
         color: var(--text-dark);
 }
 
-/* === Sidhuvud === */
+/*  Sidhuvud  */
     .header {
         background-color: var(--primary-blue);
         color: var(--white);
         padding: 40px 20px;
         text-align: center;
+        margin-top: 0;       /* standard */
 }
 
     .header h1 {
@@ -173,7 +174,7 @@ echo "</div>";
         opacity: 0.95;
 }
 
-/* === Sektioner === */
+/*  Sektioner  */
     .recept-list {
         margin: 40px auto;
         max-width: 900px;
@@ -190,7 +191,7 @@ echo "</div>";
         letter-spacing: 0.5px;
 }
 
-/* === Receptkort === */
+/*  Receptkort  */
     .recept-card {
         background-color: var(--white);
         border-radius: 12px;
@@ -206,7 +207,7 @@ echo "</div>";
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* === Header på kortet === */
+/*  Header på kortet  */
     .recept-card-header {
         display: flex;
         justify-content: space-between;
@@ -231,7 +232,7 @@ echo "</div>";
         font-size: 0.9rem;
 }
 
-/* === Info och metadata === */
+/*  Info och metadata  */
     .recept-info,
     .recept-meta {
         margin-top: 10px;
@@ -252,7 +253,7 @@ echo "</div>";
     .value {
         color: var(--text-dark);
 }
-/* === Utgångna recept === */
+/*  Utgångna recept  */
     .recept-card.expired {
         background-color: #fff5f5;
         border-left-color: var(--warning-red);
@@ -262,7 +263,7 @@ echo "</div>";
         background-color: #ffe4e4;
         color: var(--warning-red);
 }
-/* === “Inga recept”-text === */
+/*  “Inga recept”-text  */
     .recept-list p {
         background-color: var(--white);
         padding: 12px;
@@ -273,7 +274,7 @@ echo "</div>";
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         margin-top: 15px;
 }
-/* === Ikoner före rubrik === */
+/*  Ikoner före rubrik  */
     h2 {
         display: flex;
         align-items: center;
@@ -290,48 +291,44 @@ echo "</div>";
 }
 
         /* NAVBAR */
-        .navbar {
-            background: var(--primary-blue);
-            color: var(--white);
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-        }
+    .navbar {
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
 
-        .nav-brand {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
+    .nav-brand {
+        font-size: 1.2rem;
+        font-weight: bold;
+}
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+}
 
-        .nav-links a {
-            color: var(--white);
-            text-decoration: none;
-            font-weight: 500;
-        }
+    .nav-links a {
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 500;
+}
 
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
+    .nav-links a:hover {
+        text-decoration: underline;
+}
 
-        .nav-user {
-            font-size: 0.95rem;
-        }
+    .nav-user {
+        font-size: 0.95rem;
+}
 </style>
 
 </head>
 <body>
-    <section class="header">
-    <h1>Mina recept</h1>
-    <p>Översikt över dina aktiva och utgångna recept</p>
-    </section>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-brand">
@@ -345,16 +342,19 @@ echo "</div>";
             <a href="journal.php">Min journal</a>
             <a href="Kontakt.php">Kontakt</a>
             <a href="logout.php">Logga ut</a>
-            <!-- Tyckte det såg konstigt ut med att personens namn stod där uppe, kommenterar bort så länge
-      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-        <span class="nav-user">
-          <?= htmlspecialchars($_SESSION['username']) ?>
-        </span> -->
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+            <?= htmlspecialchars($_SESSION['username']) ?>
+            <a href="logout.php">Logga ut</a>
             <?php else: ?>
-                <a href="login.php">Logga in</a>
+            <a href="login.php">Logga in</a>
             <?php endif; ?>
         </div>
     </nav>
+
+   <!-- <section class="header"> Fixa detta nångång
+        <h1>Mina recept</h1>
+        <p>Översikt över dina aktiva och utgångna recept</p>
+    </section> -->
     <!-- Sektion: Aktiva recept, genererar recept eftersom patienten får fler recept -->
     <section class="recept-list">
   <h2>Aktiva recept</h2>
@@ -435,6 +435,10 @@ if (!empty($response['data'])) {
           <span class="value"><?= htmlspecialchars($r['patient_name'] ?? 'Okänd patient') ?></span><br>
         </div>
       </div>
+      <!-- Här: knappen utan funktion -->
+    <button type="button" class="btn-renew-disabled">
+        Begär nytt recept (Eller kan den bara vara visuell?)
+    </button>
     </article>
   <?php endforeach; ?>
 </section>
