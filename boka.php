@@ -232,23 +232,20 @@ $session_user = $_SESSION['username'] ?? 'Guest';
   </style>
 </head>
 <body>
-  <nav class="navbar">
+    <nav class="navbar">
     <div class="nav-brand">Mölndals Vårdcentral</div>
-
     <div class="nav-links">
       <a href="index.php">Hem</a>
       <a href="recept.php">Mina recept</a>
       <a href="boka.php">Mina bokningar</a>
       <a href="journal.php">Min journal</a>
       <a href="Kontakt.php">Kontakt</a>
-      <!-- Tyckte det såg konstigt ut med att personens namn stod där uppe, kommenterar bort så länge
       <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-        <span class="nav-user">
-          <?= htmlspecialchars($_SESSION['username']) ?>
-        </span> -->
-        <a href="logout.php">Logga ut</a>
+      <!-- Namnet i navbaren är bortkommenterat -->
+      <!-- <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span> -->
+      <a href="logout.php">Logga ut</a>
       <?php else: ?>
-        <a href="login.php">Logga in</a>
+      <a href="login.php">Logga in</a>
       <?php endif; ?>
     </div>
   </nav>
