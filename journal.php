@@ -195,9 +195,6 @@ $journaler = [
         padding: 12px;
         text-align: left;
         font-size: 0.95rem;
-        word-break: break-word;
-        white-space: normal;
-        overflow-wrap: break-word;
     }
 
     td {
