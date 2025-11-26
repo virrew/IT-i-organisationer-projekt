@@ -64,6 +64,7 @@ $fields = ["practitioner_name", "patient_name", "medication_item", "status", "or
 
 // Filtrera baserat på inloggad patients namn
 $filters = [
+    ["patient_name", "LIKE", "%G6%"],
     ["patient_name", "LIKE", "%$patient_name%"]
 ];
 
