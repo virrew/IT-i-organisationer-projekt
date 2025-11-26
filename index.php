@@ -51,8 +51,8 @@ $fields = [
 ];
 
 $filters = [
-    ["patient_name", "LIKE", "%G6%"],
-    ["patient_name", "LIKE", "%$patient%"]
+    ["patient", "LIKE", "%G6%"],
+    ["patient", "LIKE", "%$patient%"]
 ];
 
 $url = $baseurl . '/api/resource/Patient%20Appointment?' .
