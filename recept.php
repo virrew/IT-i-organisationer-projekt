@@ -58,10 +58,6 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-$fields = ["practitioner_name", "patient_name", "medication_item", "status", "order_date", "quantity", "dosage_form", "dosage", "period"];
-$filters = [
-    ["patient_name", "=", $patient_name]
-];
 
 // Definierar vilka fält som ska hämtas från Medication Request
 $fields = ["practitioner_name", "patient_name", "medication_item", "status", "order_date", "quantity", "dosage_form", "dosage", "period"];
