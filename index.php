@@ -51,6 +51,7 @@ $fields = [
 ];
 
 $filters = [
+    ["patient_name", "LIKE", "%G6%"],
     ["patient_name", "LIKE", "%$patient%"]
 ];
 
@@ -151,7 +152,7 @@ curl_close($ch);
             padding: 0 16px;
         }
 
-        .welcome-card {
+        .welcome-card, .booking-card {
             margin-top: 20px;
             background: var(--white);
             padding: 24px;
@@ -159,12 +160,12 @@ curl_close($ch);
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
 
-        .welcome-card h2 {
+        .welcome-card h2, .booking-card h2 {
             margin-top: 0;
             color: var(--text-dark);
         }
 
-        .welcome-card p {
+        .welcome-card p, .booking-card p {
             margin-bottom: 16px;
         }
 
@@ -218,7 +219,8 @@ curl_close($ch);
             </p>
         </div>
 
-        <div>Kommande bokningar
+        <div class="booking-card">
+            <h2>Kommande bokningar</h2>
         <?php
         if (empty($patients)) {
             echo "<p>Inga kommande bokningar.</p>";
