@@ -148,13 +148,13 @@ $journaler = [
     }
 
     .container {
-        max-width: 900px;
-        margin: 24px auto;
+        max-width: 1100px;
+        margin: 32px auto;
         background: var(--white);
-        border-radius: 12px;
-        padding: 28px;
+        border-radius: 14px;
+        padding: 36px;
         border: 2px solid var(--primary-blue);
-        box-shadow: 0 6px 30px rgba(0,0,0,0.06);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
     }
 
     .navbar {
