@@ -217,13 +217,13 @@ curl_close($ch);
                 Mölndals vårdcentral.
             </p>
         </div>
-    </div>
 
-    <div>
-        Dina kommande bokningar:
+        <div>Kommande bokningar
         <?php
         if (empty($patients)) {
             echo "<p>Inga kommande bokningar.</p>";
+            echo "<p>Gör en bokning här:</p>";
+            echo "<a href='kontaktformulär.php' class='btn-primary'>Boka tid</a>"; 
         } else {
             echo "<ul>";
             foreach ($patients as $appointment) {
@@ -234,10 +234,6 @@ curl_close($ch);
             echo "</ul>";
         }
         ?>
-    </div>
-    <div>
-        Gör en bokning här:
-        <a href="kontaktformulär.php" class="btn-primary">Boka tid</a>
     </div>
 
 <!-- http://193.93.250.83:8080/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient%22,%20%22=%22,%20%22G5Torkeli%20Knipa%22]] -->
