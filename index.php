@@ -71,6 +71,7 @@ $response = curl_exec($ch);
 $response = json_decode($response, true);
 $patients = $response['data'] ?? [];
 curl_close($ch);
+print_r($url);
 ?> 
 <!DOCTYPE html>
 <html lang="sv">
@@ -186,6 +187,7 @@ curl_close($ch);
             transform: translateY(-1px);
             box-shadow: 0 5px 12px rgba(0,0,0,0.2);
         }
+
     </style>
 </head>
 <body>
