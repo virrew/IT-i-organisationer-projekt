@@ -1,12 +1,20 @@
         <?php
+//Ser till att alla fel visas, tas bort när sidan är klar
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+
+//Väg och tid för cookie, görs inget på en viss tid ..
 $cookiepath = "/tmp/cookies.txt";
 $tmeout = 3600; // (3600=1hr)
-// här sätter ni er domän
+
+
+// URL som jag ska jobba med
 $baseurl = 'http://193.93.250.83:8080/'; 
 
+
+//metod för inloggning
 try {
   $ch = curl_init($baseurl . 'api/method/login');
 } catch (Exception $e) {
@@ -14,22 +22,38 @@ try {
 }
 
 curl_setopt($ch, CURLOPT_POST, true);
+
 //  ----------  Här sätter ni era login-data ------------------ //
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"", "pwd":""}');  fyll i 
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24amala@student.his.se", "pwd":"VisslanChess15"}');  
+
+// Atäller in hur det ska skickas
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+
+//Kolalr erp
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+
+//Sätter cookies
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+
+//Timeout sätts och return transfer
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+
 //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+//Får svar om inlogg lyckats
 $response = curl_exec($ch);
 $response = json_decode($response, true);
 
+//Kollar efter fel vid inlogg
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
+
+//Skriver ut vad som är fel när det är fel.
 if (!empty($error_no)) {
   echo "<div style='background-color:red'>";
   echo '$error_no<br>';
@@ -40,10 +64,14 @@ if (!empty($error_no)) {
   echo "<hr>";
   echo "</div>";
 }
+
+//skriver ut response
 echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
+
+
 $ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=[%22first_name%22,%20%22name%22]&filters=[[%22first_name%22,%22LIKE%22,%22%G6%%22]]'); länk grejer ändra
 
 // man kan även specificera vilka fält man vill se
