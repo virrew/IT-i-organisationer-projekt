@@ -72,7 +72,23 @@ echo print_r($response) . "</pre><br>";
 echo "</div>";
 
 
-$ch = curl_init($baseurl . 'api/resource/'); länk grejer ändra
+$fields = urlencode('["first_name","name"]');
+$filters = urlencode('[["first_name","LIKE","%G6%"]]');
+
+$ch = curl_init(
+    $baseurl . "api/resource/Healthcare Practitioner?fields=$fields&filters=$filters"
+);
+
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+curl_close($ch);
+
 
 // man kan även specificera vilka fält man vill se
 // urlencode krävs när du har specialtecken eller mellanslag  
