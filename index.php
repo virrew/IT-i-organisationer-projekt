@@ -38,22 +38,17 @@ curl_close($ch);
 $bokningar = $baseurl . '/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient_name%22,%22LIKE%22,%22%G6%%22]]';
 $fields = [
     "name",
-    "appointment_date",
-    "appointment_time",
-    "duration",
-    "patient",
-    "patient_name",
-    "practitioner",
-    "practitioner_name",
     "appointment_type",
-    "notes",
-    "status"
+    "company",
+    "date",
+    "title",
+    "practitioner",
 ];
 
 $filters = [
-    ["patient", "LIKE", "%G6%"],
-    ["patient", "LIKE", "%$patient%"]
+    ["patient_name", "LIKE", "%$patient%"]
 ];
+
 
 $url = $baseurl . '/api/resource/Patient%20Appointment?' .
     'fields=' . urlencode(json_encode($fields)) .
@@ -71,7 +66,6 @@ $response = curl_exec($ch);
 $response = json_decode($response, true);
 $patients = $response['data'] ?? [];
 curl_close($ch);
-print_r($url);
 ?> 
 <!DOCTYPE html>
 <html lang="sv">
