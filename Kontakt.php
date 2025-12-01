@@ -234,15 +234,43 @@ echo "</div>";
 </form>
 
 <?php
+
+$age = $_POST['age'];
+$gender = $_POST['gender'];
+$able = $_POST['able'];
+$easy = $_POST['easy'];
+$happy = $_POST['happy'];
+$meet = $_POST['meet'];
+$time = $_POST['time'];
+$info = $_POST['info'];
+$understand = $_POST['understand'];
+$explain = $_POST['explain'];
+$did = $_POST['did'];
+$extra = $_POST['extra'];
+
+
+$postfields = '{
+"age":"'.$_POST['age'].'",
+"gender":"'.$_POST['gender'].'",
+"able":"'.$_POST['able'].'",
+"easy":"'.$_POST['easy'].'",
+"happy":"'.$_POST['happy'].'",
+"meet":"'.$_POST['meet'].'",
+"time":"'.$_POST['time'].'",
+"info":"'.$_POST['info'].'",
+"understand":"'.$_POST['understand'].'",
+"explain":"'.$_POST['explain'].'",
+"did":"'.$_POST['did'].'",
+"extra":"'.$_POST['extra'].'"
+}'
+
 $ch = curl_init(
     $baseurl . "api/resource/G6FeedbackForm"
 );
 
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{
-"":"",
 
-}');
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
