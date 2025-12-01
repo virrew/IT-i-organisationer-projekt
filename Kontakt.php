@@ -127,8 +127,12 @@ echo "</div>";
 
 //här väljer jag att loopa över alla poster i [data] och för varje resultat så skriver jag ut name
 echo "<strong>LISTA:</strong><br>";
-foreach($response['data'] AS $key => $value){
-  echo $value["name"]."<br>";
+if (isset($response['data']) && is_array($response['data'])) {
+    foreach ($response['data'] as $row) {
+        echo $row['name'] . "<br>";
+    }
+} else {
+    echo "Inga data kunde hämtas.";
 }
 
 ?>
