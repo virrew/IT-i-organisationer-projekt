@@ -72,7 +72,7 @@ echo print_r($response) . "</pre><br>";
 echo "</div>";
 
 
-$fields = urlencode('fields=["*"]');
+$fields = urlencode(json_encode(["*"]));
 
 $ch = curl_init(
     $baseurl . "api/resource/Healthcare Practitioner?fields=$fields"
