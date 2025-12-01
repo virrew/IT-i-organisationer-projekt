@@ -73,51 +73,6 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-
-
-$fields = urlencode(json_encode(["*"]));
-
-$ch = curl_init(
-    $baseurl . "api/resource/G6FeedbackForm?fields=$fields"
-);
-
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
-curl_close($ch);
-
-
-if (!empty($error_no)) {
-  echo "<div style='background-color:red'>";
-  echo '$error_no<br>';
-  var_dump($error_no);
-  echo "<hr>";
-  echo '$error<br>';
-  var_dump($error);
-  echo "<hr>";
-  echo "</div>";
-}
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
-
-//här väljer jag att loopa över alla poster i [data] och loopar sedan igen för alla rader inom det
-    foreach ($response['data'] as $array) {
-      foreach($array as $a => $row)
-        echo $row . "<br>";
-    }
- 
-
-
 ?>
 <head>
 <meta charset="utf-8">
