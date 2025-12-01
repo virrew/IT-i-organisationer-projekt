@@ -228,7 +228,7 @@ echo "</div>";
         
         </fieldset>
         <label for="extra">Är det något från de ovannämnda frågorna som du specifikt vill utveckla? </label><br>
-   <textarea maxlength="500" id="extra"></textarea>
+   <textarea name="extra" maxlength="500" id="extra"></textarea>
 
   <input type="submit" value="Skicka in">
 </form>
@@ -247,7 +247,7 @@ $postfields = '{
 "explain":"'.$_POST['explain'].'",
 "did":"'.$_POST['did'].'",
 "extra":"'.$_POST['extra'].'"
-}'
+}';
 
 $ch = curl_init(
     $baseurl . "api/resource/G6FeedbackForm"
