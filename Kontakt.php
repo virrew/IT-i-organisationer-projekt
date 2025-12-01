@@ -234,21 +234,6 @@ echo "</div>";
 </form>
 
 <?php
-
-$age = $_POST['age'];
-$gender = $_POST['gender'];
-$able = $_POST['able'];
-$easy = $_POST['easy'];
-$happy = $_POST['happy'];
-$meet = $_POST['meet'];
-$time = $_POST['time'];
-$info = $_POST['info'];
-$understand = $_POST['understand'];
-$explain = $_POST['explain'];
-$did = $_POST['did'];
-$extra = $_POST['extra'];
-
-
 $postfields = '{
 "age":"'.$_POST['age'].'",
 "gender":"'.$_POST['gender'].'",
