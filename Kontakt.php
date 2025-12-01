@@ -152,106 +152,89 @@ echo "insert into tabell(name, owner, creation, modified, modif) values()"
 
 <h1>Formulär för bemötande<h1>
 
-<form method="post" action="kontakt.php">
 
-  <input type="number" id="age" name="age">
-            <label for="age">Hur gammal är du?</label><br>
-            
-            <input type="text" id="gender" name="gender">
-            <label for="gender">Kön...</label><br>
+<?php
 
+echo "<form method='post' action='kontakt.php'>";
 
-   <fieldset>
-            <legend>Allmänt om ditt besök på vårdcentralen</legend>
-            
-            
-            <p>Fick du möjlighet att ställa frågorna du önskade?</p>
-            <input type="radio" id="Yes" name="Quest" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="Quest" value="No">
-            <label for="No">Nej</label><br>
-            
+echo "<input type='number' id='age' name='age'>";
+echo "<label for='age'>Hur gammal är du?</label><br>";
 
+echo "<input type='text' id='gender' name='gender'>";
+echo "<label for='gender'>Kön...</label><br>";
 
-            <p>Var det enkelt att ta till sig informationen under vårdmötet?</p>
-            <input type="radio" id="Yes" name="info" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="info" value="No">
-            <label for="No">Nej</label><br>
-            
+echo "<fieldset>";
+echo "<legend>Allmänt om ditt besök på vårdcentralen</legend>";
 
-            
-            <p>Är du nöjd med det sätt du kan komma i kontakt med vårdcentralen?</p>
-            <input type="radio" id="Yes" name="nojd" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="nojd" value="No">
-            <label for="No">Nej</label><br>
-            
+echo "<p>Fick du möjlighet att ställa frågorna du önskade?</p>";
+echo "<input type='radio' id='Yes1' name='Quest' value='Yes'>";
+echo "<label for='Yes1'>Ja</label><br>";
+echo "<input type='radio' id='No1' name='Quest' value='No'>";
+echo "<label for='No1'>Nej</label><br>";
 
-            
-            <p>Fick du besöka vårdcentralen inom en rimlig tid?</p>
-            <input type="radio" id="Yes" name="rimlig" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="rimlig" value="No">
-            <label for="No">Nej</label><br>
-            
+echo "<p>Var det enkelt att ta till sig informationen under vårdmötet?</p>";
+echo "<input type='radio' id='Yes2' name='info' value='Yes'>";
+echo "<label for='Yes2'>Ja</label><br>";
+echo "<input type='radio' id='No2' name='info' value='No'>";
+echo "<label for='No2'>Nej</label><br>";
 
-            
-            <p>Var väntan i väntrummet längre än 20 min?</p>
-            <input type="radio" id="Yes" name="rum" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="rum" value="No">
-            <label for="No">Nej</label><br>
-        
-        </fieldset>
+echo "<p>Är du nöjd med det sätt du kan komma i kontakt med vårdcentralen?</p>";
+echo "<input type='radio' id='Yes3' name='nojd' value='Yes'>";
+echo "<label for='Yes3'>Ja</label><br>";
+echo "<input type='radio' id='No3' name='nojd' value='No'>";
+echo "<label for='No3'>Nej</label><br>";
 
-         <fieldset>
-            <legend>Information och kunskap</legend>
-            
-            
-            <p>Fick du tillräckligt med information om din behandling och eventuella bieffekter?</p>
-            <input type="radio" id="Yes" name="be" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="be" value="No">
-            <label for="No">Nej</label><br>
-            
+echo "<p>Fick du besöka vårdcentralen inom en rimlig tid?</p>";
+echo "<input type='radio' id='Yes4' name='rimlig' value='Yes'>";
+echo "<label for='Yes4'>Ja</label><br>";
+echo "<input type='radio' id='No4' name='rimlig' value='No'>";
+echo "<label for='No4'>Nej</label><br>";
 
-            <p>Om du ställde frågor till vårdpersonalen fick du svar som du förstod?</p>
-            <input type="radio" id="Yes" name="stod" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="stod" value="No">
-            <label for="No">Nej</label><br>
+echo "<p>Var väntan i väntrummet längre än 20 min?</p>";
+echo "<input type='radio' id='Yes5' name='rum' value='Yes'>";
+echo "<label for='Yes5'>Ja</label><br>";
+echo "<input type='radio' id='No5' name='rum' value='No'>";
+echo "<label for='No5'>Nej</label><br>";
 
+echo "</fieldset>";
 
+echo "<fieldset>";
+echo "<legend>Information och kunskap</legend>";
 
-            <p>Förklarade läkaren/sjuksköterskan/annan vårdpersonal behandlingen på ett sätt som du förstod?</p>
-            <input type="radio" id="Yes" name="klar" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="klar" value="No">
-            <label for="No">Nej</label><br>
-            
+echo "<p>Fick du tillräckligt med information om din behandling och eventuella bieffekter?</p>";
+echo "<input type='radio' id='Yes6' name='be' value='Yes'>";
+echo "<label for='Yes6'>Ja</label><br>";
+echo "<input type='radio' id='No6' name='be' value='No'>";
+echo "<label for='No6'>Nej</label><br>";
 
-            
-            <p>Blev du informerade om ett kommande världsförlopp?</p>
-            <input type="radio" id="Yes" name="kommande" value="Yes">
-            <label for="Yes">Ja</label><br>
-            
-            <input type="radio" id="No" name="kommande" value="No">
-            <label for="No">Nej</label><br>
-        
-        </fieldset>
-        <label for="extra">Är det något från de ovannämnda frågorna som du specifikt vill utveckla? </label><br>
-   <textarea maxlength="500" id="extra"></textarea>
+echo "<p>Om du ställde frågor till vårdpersonalen fick du svar som du förstod?</p>";
+echo "<input type='radio' id='Yes7' name='stod' value='Yes'>";
+echo "<label for='Yes7'>Ja</label><br>";
+echo "<input type='radio' id='No7' name='stod' value='No'>";
+echo "<label for='No7'>Nej</label><br>";
 
-  <input type="submit" value="Skicka in">
+echo "<p>Förklarade läkaren/sjuksköterskan/annan vårdpersonal behandlingen på ett sätt som du förstod?</p>";
+echo "<input type='radio' id='Yes8' name='klar' value='Yes'>";
+echo "<label for='Yes8'>Ja</label><br>";
+echo "<input type='radio' id='No8' name='klar' value='No'>";
+echo "<label for='No8'>Nej</label><br>";
+
+echo "<p>Blev du informerad om ett kommande vårdförlopp?</p>";
+echo "<input type='radio' id='Yes9' name='kommande' value='Yes'>";
+echo "<label for='Yes9'>Ja</label><br>";
+echo "<input type='radio' id='No9' name='kommande' value='No'>";
+echo "<label for='No9'>Nej</label><br>";
+
+echo "</fieldset>";
+
+echo "<label for='extra'>Är det något från de ovannämnda frågorna som du specifikt vill utveckla?</label><br>";
+echo "<textarea maxlength='500' id='extra' name='extra'></textarea>";
+
+echo "<input type='submit' value='Skicka in'>";
+
+echo "</form>";
+
+?>
 
 </body>
 </html>
