@@ -234,6 +234,7 @@ echo "</div>";
 </form>
 
 <?php
+if(isset($_POST['age'])){
 $postfields = '{
 "age":"'.$_POST['age'].'",
 "gender":"'.$_POST['gender'].'",
@@ -280,6 +281,9 @@ if (!empty($error_no)) {
   echo "<hr>";
   echo "</div>";
 }
+
+}
+
 
 ?>
 
