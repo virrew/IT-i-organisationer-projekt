@@ -131,7 +131,7 @@ echo "</div>";
 
 
 
-<form method="post" action="kontakt.php">
+<form method="post" action="http://193.93.250.83/wwwit-utv/Grupp6/Kontakt.php">
 
   <input type="number" id="age" name="age">
             <label for="age">Hur gammal är du?</label><br>
