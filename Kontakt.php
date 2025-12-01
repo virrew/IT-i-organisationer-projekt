@@ -1,4 +1,7 @@
-        <?php
+
+<!doctype html>
+<html lang="sv">
+          <?php
 //Ser till att alla fel visas, tas bort när sidan är klar
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -136,8 +139,6 @@ if (isset($response['data']) && is_array($response['data'])) {
 }
 
 ?>
-<!doctype html>
-<html lang="sv">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
