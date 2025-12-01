@@ -75,7 +75,7 @@ echo "</div>";
 $fields = urlencode(json_encode(["*"]));
 
 $ch = curl_init(
-    $baseurl . "api/resource/Healthcare Practitioner?fields=$fields"
+    $baseurl . "api/resource/G6FeedbackForm?fields=$fields"
 );
 
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
