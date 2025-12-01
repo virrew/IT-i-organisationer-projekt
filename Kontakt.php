@@ -131,12 +131,15 @@ echo "</div>";
 //här väljer jag att loopa över alla poster i [data] och för varje resultat så skriver jag ut name
 echo "<strong>LISTA:</strong><br>";
 if (isset($response['data']) && is_array($response['data'])) {
-    foreach ($response['data'] as $row) {
-        echo $row['name'] . "<br>";
+    foreach ($response['data'] as $array) {
+      foreach($array as $a => $row)
+        echo $row . "<br>";
     }
 } else {
     echo "Inga data kunde hämtas.";
 }
+
+echo "insert into tabell(name, owner, creation, modified, modif) values()"
 
 ?>
 <head>
