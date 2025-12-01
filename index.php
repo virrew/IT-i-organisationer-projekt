@@ -4,6 +4,68 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) { // För att ski
     header('Location: login.php');
     exit;
 }
+$patient = $_SESSION['patient'];
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+$cookiepath = "/tmp/cookies.txt";
+$tmeout = 3600; // (3600=1hr)
+$baseurl = 'http://193.93.250.83:8080/';
+
+try {
+  $ch = curl_init($baseurl . 'api/method/login');
+} catch (Exception $e) {
+  echo 'Caught exception: ', $e->getMessage(), "\n";
+}
+
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+
+$error_no = curl_errno($ch);
+$error = curl_error($ch);
+curl_close($ch);
+
+$bokningar = $baseurl . '/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient_name%22,%22LIKE%22,%22%G6%%22]]';
+$fields = [
+    "name",
+    "appointment_type",
+    "company",
+    "date",
+    "title",
+    "practitioner",
+];
+
+$filters = [
+    ["patient_name", "LIKE", "%$patient%"]
+];
+
+
+$url = $baseurl . '/api/resource/Patient%20Appointment?' .
+    'fields=' . urlencode(json_encode($fields)) .
+    '&filters=' . urlencode(json_encode($filters));
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+$patients = $response['data'] ?? [];
+curl_close($ch);
 ?> 
 <!DOCTYPE html>
 <html lang="sv">
@@ -85,7 +147,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) { // För att ski
             padding: 0 16px;
         }
 
-        .welcome-card {
+        .welcome-card, .booking-card {
             margin-top: 20px;
             background: var(--white);
             padding: 24px;
@@ -93,12 +155,12 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) { // För att ski
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
 
-        .welcome-card h2 {
+        .welcome-card h2, .booking-card h2 {
             margin-top: 0;
             color: var(--text-dark);
         }
 
-        .welcome-card p {
+        .welcome-card p, .booking-card p {
             margin-bottom: 16px;
         }
 
@@ -119,32 +181,27 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) { // För att ski
             transform: translateY(-1px);
             box-shadow: 0 5px 12px rgba(0,0,0,0.2);
         }
+
     </style>
 </head>
 <body>
 
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="nav-brand">
-            Mölndals Vårdcentral
-        </div>
-
-        <div class="nav-links"> 
-            <a href="index.php">Hem</a>
-            <a href="recept.php">Mina recept</a>
-            <a href="boka.php">Mina bokningar</a>
-            <a href="journal.php">Min journal</a>
-            <a href="Kontakt.php">Kontakt</a>
-            <!-- Tyckte det såg konstigt ut med att personens namn stod där uppe, kommenterar bort så länge
-            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-                <span class="nav-user">
-                    <?= htmlspecialchars($_SESSION['username']) ?> 
-                </span> -->
-                <a href="logout.php">Logga ut</a>
-            <?php else: ?>
-                <a href="login.php">Logga in</a>
-            <?php endif; ?>
-        </div>
+    <div class="nav-brand">Mölndals Vårdcentral</div>
+    <div class="nav-links">
+      <a href="index.php">Hem</a>
+      <a href="recept.php">Mina recept</a>
+      <a href="bokningar.php">Mina bokningar</a>
+      <a href="journal.php">Min journal</a>
+      <a href="Kontakt.php">Kontakt</a>
+      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+      <?= htmlspecialchars($_SESSION['username']) ?>
+      <a href="logout.php">Logga ut</a>
+      <?php else: ?>
+      <a href="login.php">Logga in</a>
+      <?php endif; ?>
+    </div>
     </nav>
 
     <div class="page-container">
@@ -157,6 +214,24 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) { // För att ski
                 Mölndals vårdcentral.
             </p>
         </div>
+
+        <div class="booking-card">
+            <h2>Kommande bokningar</h2>
+        <?php
+        if (empty($patients)) {
+            echo "<p>Inga kommande bokningar.</p>";
+            echo "<p>Gör en bokning här:</p>";
+            echo "<a href='kontaktformulär.php' class='btn-primary'>Boka tid</a>"; 
+        } else {
+            echo "<ul>";
+            foreach ($patients as $appointment) {
+                echo "<li>";
+                echo "Datum: " . htmlspecialchars($appointment['appointment_date']) . ", Tid: " . htmlspecialchars($appointment['appointment_time']) . ", Typ: " . htmlspecialchars($appointment['appointment_type']) . ", Status: " . htmlspecialchars($appointment['status']);
+                echo "</li>";
+            }
+            echo "</ul>";
+        }
+        ?>
     </div>
 
 <!-- http://193.93.250.83:8080/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient%22,%20%22=%22,%20%22G5Torkeli%20Knipa%22]] -->
