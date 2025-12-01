@@ -65,18 +65,17 @@ if (!empty($error_no)) {
   echo "</div>";
 }
 
-//skriver ut response
+//skriver ut response, status
 echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
 
 
-$fields = urlencode('["first_name","name"]');
-$filters = urlencode('[["first_name","LIKE","%G6%"]]');
+$fields = urlencode('fields=["*"]');
 
 $ch = curl_init(
-    $baseurl . "api/resource/Healthcare Practitioner?fields=$fields&filters=$filters"
+    $baseurl . "api/resource/Healthcare Practitioner?fields=$fields"
 );
 
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -89,12 +88,6 @@ $response = curl_exec($ch);
 $response = json_decode($response, true);
 curl_close($ch);
 
-
-// man kan även specificera vilka fält man vill se
-// urlencode krävs när du har specialtecken eller mellanslag  
-// $ch = curl_init($baseurl . 'api/resource/User?fields='. urlencode('["name", "first_name", "last_login"]'));
-// det funkerar lika bra att ta bort mellanslaget i denna fråga
-// $ch = curl_init($baseurl . 'api/resource/User?fields=["name","first_name","last_login"]');
 
 //jag kör en get request, ibland vill man kanske köra en annan typ av request, och ibland så beöver man ha med postfields
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
