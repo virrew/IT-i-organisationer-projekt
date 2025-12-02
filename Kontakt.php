@@ -79,20 +79,73 @@ echo "</div>";
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kontaktsida</title>
 <style>
-    
+:root {
+        --primary-blue: #1F6F78;
+        --primary-blue-light: #C2EBE8;
 
+        --mint-green: #E7FFF3;
+        --accent-orange: #FCA06A;
+        --info-blue: #0A5360;
+        --warning-red: #D9534F;
+
+        --white: #FFFFFF;
+        --gray-light: #F5F5F5;
+        --text-dark: #0E2A2C;
+}
+
+  body{
+font-size: 150%;
+background-color: var(--gray-light);
+  }
+  h1, legend{
+     text-align: center;
+  }
+
+    form{
+       border-style: solid;
+  border-color: var(--primary-blue);
+  border-radius: 50px;
+  padding: 20px;
+  width: 50%;
+  margin: auto auto;
+  background-color: white;
+    }
+
+    fieldset{
+  margin-top: 20px;
+ border-radius: 50px;
+ border-color: var( --primary-blue-light);
+    }
+
+    textarea{
+      width: 100%;
+      border-radius: 20px;
+    }
+
+    input[type="submit"]{
+      display: block;
+      margin: 0 auto;
+      background-color: var(--primary-blue);
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    input[type="submit"]:hover{
+      transform: translateY(-2px);
+    }
 
   </style>
 </head>
 <body>
 
 
-<h1>Formulär för bemötande</h1>
+
 
 
 
 <form method="post" action="http://193.93.250.83/wwwit-utv/Grupp6/Kontakt.php">
-
+<h1>Formulär för bemötande</h1>
   <input type="number" id="age" name="age">
             <label for="age">Hur gammal är du?</label><br>
             
