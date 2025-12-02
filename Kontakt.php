@@ -114,11 +114,6 @@ echo "</div>";
       color: var(--text-dark);
     }
 
-    fieldset{
-      display: flex;
-      flex-direction: column;
-    }
-
     input[type="text"],
     input[type="radio"],
     input[type="number"]
