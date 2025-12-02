@@ -99,13 +99,6 @@ echo "</div>";
       font-size: 1rem;
     } 
 
-    form{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
     label{
       display: block;
       margin-bottom: 6px;
