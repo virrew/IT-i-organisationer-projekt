@@ -109,7 +109,7 @@ echo "</div>";
 
     input[type="text"],
     input[type="radio"],
-    input[type="number"]
+    input[type="number"],
     textarea {
       padding: 10px 12px;
       border: 1px solid var(--primary-blue-light);
