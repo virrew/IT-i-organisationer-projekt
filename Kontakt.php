@@ -78,6 +78,169 @@ echo "</div>";
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kontaktsida</title>
+<style>
+    :root {
+        --primary-blue: #1F6F78;
+        --primary-blue-light: #C2EBE8;
+
+        --mint-green: #E7FFF3;
+        --accent-orange: #FCA06A;
+        --info-blue: #0A5360;
+        --warning-red: #D9534F;
+
+        --white: #FFFFFF;
+        --gray-light: #F5F5F5;
+        --text-dark: #0E2A2C;
+        --shadow-primary: rgba(31,111,120,0.25);
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background: var(--primary-blue);
+      color: var(--white);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    .nav-brand {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+
+    .nav-user {
+      font-size: 0.95rem;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--gray-light);
+      margin: 0;
+      padding: 0;
+      color: var(--text-dark);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 24px auto;
+      background: var(--white);
+      border-radius: 12px;
+      padding: 28px;
+      border: 2px solid var(--primary-blue);
+      box-shadow: 0 6px 30px rgba(0,0,0,0.06);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 1.5rem;
+      color: var(--primary-blue);
+    }
+
+    p {
+      margin: 0 0 20px;
+      color: var(--text-dark);
+      font-size: 1rem;
+    } 
+
+    form.booking {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    select,
+    textarea {
+      padding: 10px 12px;
+      border: 1px solid var(--primary-blue-light);
+      border-radius: 8px;
+      background: white;
+      outline: none;
+      font-size: 0.95rem;
+      transition: box-shadow .15s, border-color .15s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 4px 14px var(--shadow-primary);
+    }
+
+    textarea { min-height: 110px; resize: vertical; padding-top: 10px; }
+    .full { grid-column: 1 / -1; }
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    button.btn {
+      background: var(--primary-blue);
+      color: #fff;
+      border: none;
+      padding: 10px 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(31,111,120,0.25);
+      transition: transform .06s ease, box-shadow .12s ease, opacity .12s;
+    }
+
+    button.btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(31,111,120,0.35);
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #7f1d1d;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(239,68,68,0.1);
+    }
+
+    .select-wrap { position: relative; }
+    select option { padding: 8px; }
+  </style>
 </head>
 <body>
 
