@@ -79,46 +79,9 @@ echo "</div>";
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kontaktsida</title>
 <style>
-    body {
-      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--gray-light);
-      margin: 0;
-      padding: 0;
-      color: var(--text-dark);
-    }
+    
 
-    h1 {
-      margin: 0 0 12px;
-      font-size: 1.5rem;
-      color: var(--primary-blue);
-    }
 
-    p {
-      margin: 0 0 20px;
-      color: var(--text-dark);
-      font-size: 1rem;
-    } 
-
-    label{
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      font-size: 0.92rem;
-      color: var(--text-dark);
-    }
-
-    input[type="text"],
-    input[type="radio"],
-    input[type="number"],
-    textarea {
-      padding: 10px 12px;
-      border: 1px solid var(--primary-blue-light);
-      border-radius: 8px;
-      background: white;
-      outline: none;
-      font-size: 0.95rem;
-      transition: box-shadow .15s, border-color .15s;
-    }
   </style>
 </head>
 <body>
