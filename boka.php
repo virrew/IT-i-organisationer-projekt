@@ -399,8 +399,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
 
   <!-- Behövs för ERPNext -->
   <input type="hidden" name="patient" value="<?php echo htmlspecialchars($session_user); ?>">
-  <input type="hidden" name="patient_name" value="<?php echo htmlspecialchars($_SESSION['patient_name']); ?>">
-  <input type="hidden" name="patient_sex" value="<?php echo htmlspecialchars($_SESSION['patient_sex']); ?>">
+  <input type="hidden" name="patient_name" value="<?php echo htmlspecialchars($session_user); ?>">
 
   <!-- Appointment Type -->
   <div class="field">
@@ -408,7 +407,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
     <select id="appointment_type" name="appointment_type" required>
       <option value="Nurse Visit">Sjuksköterskebesök</option>
       <option value="Doctor Visit">Läkarbesök</option>
-      <option value="Consultation">Konsultation</option>
     </select>
   </div>
 
@@ -418,12 +416,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
     <div class="select-wrap">
       <select id="healthcare_practitioner" name="healthcare_practitioner" required>
         <?php foreach ($practitioners as $p): ?>
+          <?php
+            $practitioner_id = $p['name'] ?? '';
+            $first = $p['first_name'] ?? '';
+            $last = $p['last_name'] ?? '';
+            $full_name = trim("$first $last");
+            $department = $p['department'] ?? 'Allmänt';
+          ?>
           <option 
-            value="<?php echo htmlspecialchars($p['name']); ?>"
-            data-practitioner-name="<?php echo htmlspecialchars($p['first_name'].' '.$p['last_name']); ?>"
-            data-department="<?php echo htmlspecialchars($p['department'] ?? 'Allmänt'); ?>"
+              value="<?php echo htmlspecialchars($practitioner_id); ?>"
+              data-practitioner-name="<?php echo htmlspecialchars($full_name); ?>"
+              data-department="<?php echo htmlspecialchars($department); ?>"
           >
-            <?php echo htmlspecialchars(trim($p['first_name'].' '.$p['last_name'])); ?>
+              <?php echo htmlspecialchars($full_name); ?>
           </option>
         <?php endforeach; ?>
       </select>
