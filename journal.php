@@ -106,22 +106,6 @@ session_start();
 //    header("Location: login.php");
 //    exit;
 //} 
-
-// Tillfällig data 
-$journaler = [
-    [
-        "datum" => "2025-11-20",
-        "vardgivare" => "Mölndals Vårdcentral",
-        "identitet" => "Doris Dorisson (2015-08-17)",
-        "vardorsak" => "Ont i halsen",
-        "diagnoser" => "Viral halsinfektion",
-        "undersökning" => "Halsundersökning",
-        "behandling" => "Egenvård",
-        "info_beslut" => "Informerad om behandling: beslut om egenvård",
-        "avbojd_vard" => "Nej",
-        "antecknad_av" => "Dr. Karl Svensson"
-    ]
-]
 ?> 
 <!DOCTYPE html>
 <html lang="sv">
