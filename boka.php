@@ -78,6 +78,47 @@ $patients = $response['data'] ?? [];
 curl_close($ch);
 
 $session_user = $_SESSION['username'] ?? 'Guest';
+
+$ch = curl_init($baseurl . 'api/resource/Patient Appointment?fields=["appointment_date","appointment_time","practitioner_name","patient_name"]&filters=[["patient_name","=","' . $session_user . '"]]');
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"appointment_date":"$field1",
+                                        "appointment_time":"field2",
+                                        "practitioner_name":"$field3",
+                                        "patient_name":"' . $session_user . '"}');
+
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+
+$error_no = curl_errno($ch);
+$error = curl_error($ch);
+curl_close($ch);
+
+      // alla fält som behövs:
+      // appointment_type
+      // appointment_date
+      // appointment_time
+      // healthcare_practitioner
+      // practitioner_name
+      // department
+      // duration
+      // patient
+      // patient_name
+      // patient_sex
+
+      // Sedan klickas check availability och då behövs dessa fält fyllas i:
+
+      // Medical department (department)
+      // practitioner
+      // appointment_date
+      // appointment_time (från klockan 8-15 (kolla availability))
+
 ?>
 <!doctype html>
 <html lang="sv">
@@ -306,24 +347,7 @@ $session_user = $_SESSION['username'] ?? 'Guest';
         </div>
       </div>
 
-      <!-- alla fält som behövs:
-      appointment_type
-      appointment_date
-      appointment_time
-      healthcare_practitioner
-      practitioner_name
-      department
-      duration
-      patient
-      patient_name
-      patient_sex
 
-      Sedan klickas check availability och då behövs dessa fält fyllas i:
-
-      Medical department (department)
-      practitioner
-      appointment_date
-      appointment_time (från klockan 8-15 (kolla availability)) -->
 
       <div class="field">
         <label for="appointment_date">Datum</label>
