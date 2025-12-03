@@ -1,21 +1,22 @@
 <?php
 session_start();
 
-// Från formuläret:
-$contact_field1 = trim($_POST['field1'] ?? '');
-$contact_field2 = trim($_POST['field2'] ?? '');
-$contact_field3 = trim($_POST['field3'] ?? '');
+// // Från formuläret:
+// $contact_field1 = trim($_POST['field1'] ?? '');
+// $contact_field2 = trim($_POST['field2'] ?? '');
+// $contact_field3 = trim($_POST['field3'] ?? '');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Spara bara om alla fält är ifyllda
-    if ($contact_field1 !== '' && $contact_field2 !== '' && $contact_field3 !== '') {
-        $_SESSION['contact_data'] = [
-            'field1' => $contact_field1,
-            'field2' => $contact_field2,
-            'field3' => $contact_field3
-        ];
-    }
-}
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//     // Spara bara om alla fält är ifyllda
+//     if ($contact_field1 !== '' && $contact_field2 !== '' && $contact_field3 !== '') {
+//         $_SESSION['contact_data'] = [
+//             'field1' => $contact_field1,
+//             'field2' => $contact_field2,
+//             'field3' => $contact_field3
+//         ];
+//     }
+// }
+
 $contactData = $_SESSION['contact_data'] ?? null;
 
 ini_set('display_errors', 1);
@@ -32,6 +33,9 @@ try {
   echo 'Caught exception: ', $e->getMessage(), "\n";
 }
 
+/* -----------------------------
+   LOGIN TO ERPNext
+------------------------------*/
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}');
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
@@ -47,6 +51,9 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
+/* -----------------------------
+   FETCH HEALTHCARE PRACTITIONERS
+------------------------------*/
 $ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["first_name","last_name"]&filters=[["first_name","LIKE","%G6%"]]');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
@@ -63,6 +70,9 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
+/* -----------------------------
+   FETCH PATIENT INFO
+------------------------------*/
 $patient_url = $baseurl . 'api/resource/Patient?fields=["patient_name"]&filters=[["patient_name","LIKE","%G6%"]]';
 $ch = curl_init($patient_url);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -79,26 +89,65 @@ curl_close($ch);
 
 $session_user = $_SESSION['username'] ?? 'Guest';
 
-$ch = curl_init($baseurl . 'api/resource/Patient Appointment?fields=["appointment_date","appointment_time","practitioner_name","patient_name"]&filters=[["patient_name","=","' . $session_user . '"]]');
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"appointment_date":"$field1",
-                                        "appointment_time":"field2",
-                                        "practitioner_name":"$field3",
-                                        "patient_name":"' . $session_user . '"}');
+/* -----------------------------
+   PROCESS BOOKING FORM (POST)
+------------------------------*/
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) {
 
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    // Bygg data-arrayen
+    $data = [
+        "appointment_type"        => $_POST["appointment_type"],
+        "appointment_date"        => $_POST["appointment_date"],
+        "appointment_time"        => $_POST["appointment_time"],
+        "healthcare_practitioner" => $_POST["healthcare_practitioner"],
+        "practitioner"            => $_POST["healthcare_practitioner"], 
+        "practitioner_name"       => $_POST["practitioner_name"],
+        "department"              => $_POST["department"],
+        "duration"                => $_POST["duration"],
+        "patient"                 => $session_user,
+        "patient_name"            => $_SESSION["patient_name"],
+        "patient_sex"             => $_SESSION["patient_sex"],
+        "notes"                   => $_POST["notes"]
+    ];
 
-$response = curl_exec($ch);
-$response = json_decode($response, true);
+    $json = json_encode($data, JSON_UNESCAPED_SLASHES);
 
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
-curl_close($ch);
+    // POST till ERPNext
+    $ch = curl_init($baseurl . 'api/resource/Patient%20Appointment');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Accept: application/json'
+    ]);
+
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+    $error_no = curl_errno($ch);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    $result = json_decode($response, true);
+
+    if ($error_no) {
+        die("<h3>Tekniskt fel vid bokning:</h3><pre>$error</pre>");
+    }
+
+    if (!isset($result["data"])) {
+        echo "<h3>ERPNext kunde inte skapa bokningen:</h3>";
+        echo "<pre>" . print_r($result, true) . "</pre>";
+        exit;
+    }
+
+    $appointment_id = $result["data"]["name"];
+    header("Location: bokning_klar.php?id=" . urlencode($appointment_id));
+    exit;
+}
 
       // alla fält som behövs:
       // appointment_type
@@ -308,6 +357,25 @@ curl_close($ch);
     </div>
     </nav>
 
+      <!-- alla fält som behövs:
+      appointment_type
+      appointment_date
+      appointment_time
+      healthcare_practitioner
+      practitioner_name
+      department
+      duration
+      patient
+      patient_name
+      patient_sex
+
+      Sedan klickas check availability och då behövs dessa fält fyllas i:
+
+      Medical department (department)
+      practitioner
+      appointment_date
+      appointment_time (från klockan 8-15 (kolla availability)) -->
+
   <?php if ($contactData): ?>
   <div class="container" style="background: var(--mint-green); border: 2px solid var(--primary-blue); margin-bottom: 24px;">
       <h2 style="color: var(--primary-blue); margin-top:0;">Information du skickade in</h2>
@@ -325,57 +393,93 @@ curl_close($ch);
 
   <div class="container">
     <h1>Välj en tid</h1>
-
-    <!-- Ifall man vill se vem som är inloggad -->
     <p class="lead">Inloggad som: <strong><?php echo htmlspecialchars($session_user); ?></strong></p>
 
-    <form class="booking" method="post" novalidate>
-      <input type="hidden" name="patient" value="<?php echo htmlspecialchars($session_user); ?>">
+<form class="booking" method="post" novalidate>
 
-      <div class="field">
-        <label for="practitioner">Välj sjuksköterska 
-          <i> Ifall sjuksköterska bedömer att ärende kräver läkarbedömning kommer bokning ske</i>
-        </label>
-        <div class="select-wrap">
-          <select id="practitioner" name="practitioner" required>
-            <?php foreach ($practitioners as $practitioner): ?>
-              <option value="<?php echo htmlspecialchars($practitioner['name'] ?? ($practitioner['first_name'].' '.$practitioner['last_name'])); ?>">
-                <?php echo htmlspecialchars(trim(($practitioner['first_name'] ?? '').' '.($practitioner['last_name'] ?? ''))); ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
-        </div>
-      </div>
+  <!-- Behövs för ERPNext -->
+  <input type="hidden" name="patient" value="<?php echo htmlspecialchars($session_user); ?>">
+  <input type="hidden" name="patient_name" value="<?php echo htmlspecialchars($_SESSION['patient_name']); ?>">
+  <input type="hidden" name="patient_sex" value="<?php echo htmlspecialchars($_SESSION['patient_sex']); ?>">
 
+  <!-- Appointment Type -->
+  <div class="field">
+    <label for="appointment_type">Typ av besök</label>
+    <select id="appointment_type" name="appointment_type" required>
+      <option value="Nurse Visit">Sjuksköterskebesök</option>
+      <option value="Doctor Visit">Läkarbesök</option>
+      <option value="Consultation">Konsultation</option>
+    </select>
+  </div>
 
+  <!-- Healthcare Practitioner -->
+  <div class="field">
+    <label for="healthcare_practitioner">Välj sjuksköterska</label>
+    <div class="select-wrap">
+      <select id="healthcare_practitioner" name="healthcare_practitioner" required>
+        <?php foreach ($practitioners as $p): ?>
+          <option 
+            value="<?php echo htmlspecialchars($p['name']); ?>"
+            data-practitioner-name="<?php echo htmlspecialchars($p['first_name'].' '.$p['last_name']); ?>"
+            data-department="<?php echo htmlspecialchars($p['department'] ?? 'Allmänt'); ?>"
+          >
+            <?php echo htmlspecialchars(trim($p['first_name'].' '.$p['last_name'])); ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+  </div>
 
-      <div class="field">
-        <label for="appointment_date">Datum</label>
-        <input id="appointment_date" type="date" name="appointment_date" required>
-      </div>
+  <!-- Practitioner Name (fylls automatiskt via JS) -->
+  <input type="hidden" name="practitioner_name" id="practitioner_name">
 
-      <div class="field">
-        <label for="appointment_time">Tid</label>
-        <input id="appointment_time" type="time" name="appointment_time" required>
-      </div>
+  <!-- Department (fylls automatiskt via JS) -->
+  <input type="hidden" name="department" id="department">
 
-      <div class="field">
-        <label for="duration">Varaktighet (min)</label>
-        <input id="duration" type="number" name="duration" min="1" value="30">
-      </div>
+  <!-- Appointment Date -->
+  <div class="field">
+    <label for="appointment_date">Datum</label>
+    <input id="appointment_date" type="date" name="appointment_date" required>
+  </div>
 
-      <div class="field">
-        <label for="notes">Anteckningar</label>
-        <textarea id="notes" name="notes" placeholder="Skriv eventuella kommentarer här..."></textarea>
-      </div>
+  <!-- Appointment Time -->
+  <div class="field">
+    <label for="appointment_time">Tid</label>
+    <input id="appointment_time" type="time" name="appointment_time" min="08:00" max="15:00" required>
+  </div>
 
-      <div class="field full">
-        <div class="btn-row">
-          <button class="btn" type="submit">Välj</button>
-          <div style="flex:1"></div>
-        </div>
-      </div>
-    </form>
+  <!-- Duration -->
+  <div class="field">
+    <label for="duration">Varaktighet (min)</label>
+    <input id="duration" type="number" name="duration" min="1" value="30" required>
+  </div>
+
+  <!-- Notes -->
+  <div class="field full">
+    <label for="notes">Anteckningar</label>
+    <textarea id="notes" name="notes" placeholder="Skriv eventuella kommentarer här..."></textarea>
+  </div>
+
+  <div class="field full">
+    <div class="btn-row">
+      <button class="btn" type="submit">Boka</button>
+    </div>
+  </div>
+
+</form>
+
+<script>
+  // Fyll practitioner_name + department automatiskt när man väljer vårdgivare
+  document.getElementById('healthcare_practitioner').addEventListener('change', function () {
+      let selected = this.options[this.selectedIndex];
+      document.getElementById('practitioner_name').value = selected.dataset.practitionerName;
+      document.getElementById('department').value = selected.dataset.department;
+  });
+  
+  // Kör direkt vid laddning
+  document.getElementById('healthcare_practitioner').dispatchEvent(new Event('change'));
+</script>
+
   </div>
 </body>
 </html>
