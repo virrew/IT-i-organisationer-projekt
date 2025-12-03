@@ -44,7 +44,11 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-$ch = curl_init($baseurl . 'api/resource/Patient%20Medical%20Record?fields=[%22*%22]&filters=[[%22patient%22,%22LIKE%22,%22%G6%%22]]'); 
+
+$fields = urldecode('["*"]');
+$filters = urldecode('[["patient","LIKE","%G6%"]]');
+
+$ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
 // man kan även specificera vilka fält man vill se
 // urlencode krävs när du har specialtecken eller mellanslag  
@@ -245,28 +249,25 @@ $journaler = [
         <tr>
             <th>Datum</th>
             <th>Vårdgivare</th>
-            <th>Identitet</th>
-            <th>Vårdorsak</th>
+            <th>Patient</th>
             <th>Diagnoser</th>
-            <th>Undersökningar</th>
+            <th>Status</th>
+            <th>Provsvar</th>
             <th>Behandlingar</th>
-            <th>Information och beslut</th>
-            <th>Avböjd vård (Ja/Nej)</th>
-            <th>Antecknad av</th>
         </tr>
 
-        <?php foreach ($journaler as $journal): ?>
+        <?php  
+        $journaler = $response['data'] ?? [];
+
+        foreach ($journaler as $journal): ?>
             <tr>
-                <td><?php echo htmlspecialchars ($journal['datum'] ?? ''); ?></td> <!-- $journal['nyckel'] ?? '' gör att det blir tomt om ingen nyckel finns -->
-                <td><?php echo htmlspecialchars ($journal['vardgivare'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['identitet'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['vardorsak'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['diagnoser']?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['undersokning']?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['behandling']?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['info_beslut']?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['avbojd_vard']?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['antecknad_av']?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['communication_date'] ?? ''); ?></td> <!-- $journal['nyckel'] ?? '' gör att det blir tomt om ingen nyckel finns -->
+                <td><?php echo htmlspecialchars ($journal['owner'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['patient'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['subject'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['status']?? ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['reference_doctype'] ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['reference_name']?? ''); ?></td>
             </tr>
         <?php endforeach; ?>
     </table>
