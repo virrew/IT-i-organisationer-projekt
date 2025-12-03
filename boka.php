@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
         "duration"                => $_POST["duration"],
         "patient"                 => $session_user,
         "patient_name"            => $_SESSION["patient_name"],
-        "patient_sex"             => $_SESSION["patient_sex"],
+        // "patient_sex"             => $_SESSION["patient_sex"],
         "notes"                   => $_POST["notes"]
     ];
 
