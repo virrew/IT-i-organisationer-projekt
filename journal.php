@@ -1,11 +1,11 @@
 <?php 
 session_start();
- if (!isset($_SESSION['patient'])) {
+ if (!isset($_SESSION['patient_name'])) {
     // Om ingen är inloggad, skicka användaren till login
     header("Location: login.php");
     exit;
 }
-$patient = $_SESSION['patient'];
+$patient = $_SESSION['patient_name'];
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -54,7 +54,7 @@ echo print_r($response) . "</pre><br>";
 echo "</div>";
 
 $fields = urlencode('["*"]');
-$filters = urlencode(json_encode([["patient","LIKE","%G6%"], ["patient", "=", $patient]])); //Jämför g6patienter med den inloggade
+$filters = urlencode(json_encode([["patient","LIKE","%G6%"], ["patient", "=", $patient]])); //Jämför bara patienter med G6 och den inloggade patienten, därför visas endast den inloggades journal
 
 $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
@@ -244,7 +244,6 @@ $journaler = $response['data'] ?? [];
             <th>Behandlingar</th>
         </tr>
   
-
        <?php  foreach ($journaler as $journal): ?>
             <tr>
                 <td><?php echo htmlspecialchars ($journal['communication_date'] ?? ''); ?></td> <!-- $journal['nyckel'] ?? '' gör att det blir tomt om ingen nyckel finns -->
