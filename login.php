@@ -14,7 +14,7 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
     $user = $stmt->fetch(PDO::FETCH_ASSOC); 
     if ($user) { 
     $_SESSION['username'] = $user['username'];
-    $_SESSION['patient'] = "G6" . $user['username']; //Journal
+    $_SESSION['patient'] = $user['username']; //Journal
     $_SESSION['patient_name'] = $user['username']; // Todo: Lägging er egna ERP variabel för patientnamn
     $_SESSION['logged_in'] = true; 
 
