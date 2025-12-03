@@ -292,7 +292,9 @@ $session_user = $_SESSION['username'] ?? 'Guest';
       <input type="hidden" name="patient" value="<?php echo htmlspecialchars($session_user); ?>">
 
       <div class="field">
-        <label for="practitioner">Välj vårdgivare</label>
+        <label for="practitioner">Välj sjuksköterska 
+          <i> Ifall sjuksköterska bedömer att ärende kräver läkarbedömning kommer bokning ske</i>
+        </label>
         <div class="select-wrap">
           <select id="practitioner" name="practitioner" required>
             <?php foreach ($practitioners as $practitioner): ?>
@@ -303,6 +305,25 @@ $session_user = $_SESSION['username'] ?? 'Guest';
           </select>
         </div>
       </div>
+
+      <!-- alla fält som behövs:
+      appointment_type
+      appointment_date
+      appointment_time
+      healthcare_practitioner
+      practitioner_name
+      department
+      duration
+      patient
+      patient_name
+      patient_sex
+
+      Sedan klickas check availability och då behövs dessa fält fyllas i:
+
+      Medical department (department)
+      practitioner
+      appointment_date
+      appointment_time (från klockan 8-15 (kolla availability)) -->
 
       <div class="field">
         <label for="appointment_date">Datum</label>
