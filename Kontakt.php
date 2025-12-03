@@ -72,7 +72,7 @@ echo print_r($response) . "</pre><br>";
 echo "</div>";
 
 
-$patient_url = $baseurl . 'api/resource/Healthcare%20Practitioner?fields=["first_name","last_name"]&filters=[["first_name","LIKE","%G6%"]]';
+$patient_url = $baseurl . 'api/resource/Patient?fields=["patient_name"]&filters=[["patient_name","LIKE","%G6%"]]';
 $ch = curl_init($patient_url);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
@@ -90,7 +90,43 @@ echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
 
+
+
+
+
+
+$fields = urlencode('["appointment_date","patient_name","status","duration","appointment_based_on_check_in"]');
+$filters = urlencode('[["patient_name","LIKE","%G6%"]]');
+
+$bokningar = $baseurl . '/api/resource/Patient%20Appointment?fields=' . $fields . '&filters=' . $filters;
+
+
+$ch = curl_init($bokningar);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+curl_close($ch);
+
+echo "<div style='background-color:lightgray; border:1px solid black'>";
+echo '$response<br><pre>';
+echo print_r($response) . "</pre><br>";
+echo "</div>";
 ?>
+
+
+
+
+
+
+
+
+
 <?php
 if(isset($_POST['age'])){
    $postfields = json_encode([
