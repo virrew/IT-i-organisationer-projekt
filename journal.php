@@ -53,8 +53,12 @@ echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
 
+// Filtrerar så att endast journalet för den inloggade patienten visas
 $fields = urlencode('["*"]');
-$filters = urlencode(json_encode([["patient","LIKE","%G6%"], ["patient", "=", $patient]])); //Jämför bara patienter med G6 och den inloggade patienten, därför visas endast den inloggades journal
+$filters_array = [
+    ["patient", "=", $patient] // Jämför exakt med session patient_name
+];
+$filters = urlencode(json_encode($filters_array))
 
 $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
@@ -66,7 +70,6 @@ $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fiel
 
 //jag kör en get request, ibland vill man kanske köra en annan typ av request, och ibland så beöver man ha med postfields
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
@@ -76,9 +79,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-
 $response = curl_exec($ch);
-//echo $response;
 $response = json_decode($response, true);
 
 $error_no = curl_errno($ch);
