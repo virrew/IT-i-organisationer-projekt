@@ -394,6 +394,15 @@ if (!empty($response['data'])) {
           <span class="label">Förskrivare</span>
           <span class="value"><?= htmlspecialchars($r['practitioner_name'] ?? 'Okänd läkare') ?></span><br>
           <span class="utfardat">Utfärdat datum: <?= htmlspecialchars($r['order_date'] ?? 'Okänt datum') ?></span><br>
+          <?php if (!empty($r['order_date']) && !empty($r['period'])): ?>
+          <?php
+                $end_date = new DateTime($r['order_date']);
+                $end_date->modify('+' . $r['period']);
+            ?>
+          <span class="utfardat">
+                Giltigt t.o.m: <?= $end_date->format('Y-m-d'); ?>
+          </span><br>
+          <?php endif; ?>
         </div>
 
         <div class="giltig-tom">
@@ -425,6 +434,15 @@ if (!empty($response['data'])) {
           <span class="label">Förskrivare</span>
           <span class="value"><?= htmlspecialchars($r['practitioner_name'] ?? 'Okänd läkare') ?></span><br>
           <span class="utfardat">Utfärdat datum: <?= htmlspecialchars($r['order_date'] ?? 'Okänt datum') ?></span><br>
+          <?php if (!empty($r['order_date']) && !empty($r['period'])): ?>
+          <?php
+                $end_date = new DateTime($r['order_date']);
+                $end_date->modify('+' . $r['period']);
+            ?>
+          <span class="utfardat">
+                Giltigt t.o.m: <?= $end_date->format('Y-m-d'); ?>
+          </span><br>
+          <?php endif; ?>
         </div>
 
         <div class="giltig-tom">
