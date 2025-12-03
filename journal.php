@@ -56,8 +56,7 @@ echo "</div>";
 // Filtrerar så att endast journalet för den inloggade patienten visas
 $fields = urlencode('["*"]');
 $filters_array = [
- //["patient", "LIKE", "G6%"],
- ["patient", "=", $patient] // Jämför exakt med session patient_name
+ ["patient", "=", $patient]
 ];
 $filters = urlencode(json_encode($filters_array));
 
