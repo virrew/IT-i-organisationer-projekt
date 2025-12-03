@@ -45,8 +45,8 @@ echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
 
-$fields = urldecode('["*"]');
-$filters = urldecode('[["patient","LIKE","%G6%"]]');
+$fields = urlencode('["*"]');
+$filters = urlencode('[["patient","LIKE","%G6%"]]');
 
 $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
@@ -250,7 +250,7 @@ session_start();
                 <td><?php echo htmlspecialchars ($journal['patient'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars ($journal['subject'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars ($journal['status']?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['reference_doctype'] ''); ?></td>
+                <td><?php echo htmlspecialchars ($journal['reference_doctype'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars ($journal['reference_name']?? ''); ?></td>
             </tr>
         <?php endforeach; ?>
