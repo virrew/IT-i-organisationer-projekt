@@ -44,7 +44,7 @@ echo "<div style='background-color:lightgray; border:1px solid black'>";
 echo '$response<br><pre>';
 echo print_r($response) . "</pre><br>";
 echo "</div>";
-$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=[%22first_name%22,%20%22name%22]&filters=[[%22first_name%22,%22LIKE%22,%22%G6%%22]]'); 
+$ch = curl_init($baseurl . 'api/resource/Patient%20Medical%20Record?fields=[%22*%22]&filters=[[%22patient%22,%22LIKE%22,%22%G6%%22]]'); 
 
 // man kan även specificera vilka fält man vill se
 // urlencode krävs när du har specialtecken eller mellanslag  
