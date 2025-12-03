@@ -1,11 +1,11 @@
 <?php 
 session_start();
- if (!isset($_SESSION['patient_name'])) {
+ if (!isset($_SESSION['patient'])) {
     // Om ingen är inloggad, skicka användaren till login
     header("Location: login.php");
     exit;
 }
-$patient = $_SESSION['patient_name'];
+$patient = $_SESSION['patient'];
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
