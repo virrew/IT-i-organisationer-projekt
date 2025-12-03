@@ -1,21 +1,19 @@
 <?php
 session_start();
 
-// // Från formuläret:
-// $contact_field1 = trim($_POST['field1'] ?? '');
-// $contact_field2 = trim($_POST['field2'] ?? '');
-// $contact_field3 = trim($_POST['field3'] ?? '');
+$contact_field1 = trim($_POST['field1'] ?? '');
+$contact_field2 = trim($_POST['field2'] ?? '');
+$contact_field3 = trim($_POST['field3'] ?? '');
 
-// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//     // Spara bara om alla fält är ifyllda
-//     if ($contact_field1 !== '' && $contact_field2 !== '' && $contact_field3 !== '') {
-//         $_SESSION['contact_data'] = [
-//             'field1' => $contact_field1,
-//             'field2' => $contact_field2,
-//             'field3' => $contact_field3
-//         ];
-//     }
-// }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['field1'])) {
+    if ($contact_field1 !== '' && $contact_field2 !== '' && $contact_field3 !== '') {
+        $_SESSION['contact_data'] = [
+            'field1' => $contact_field1,
+            'field2' => $contact_field2,
+            'field3' => $contact_field3
+        ];
+    }
+}
 
 $contactData = $_SESSION['contact_data'] ?? null;
 
@@ -54,7 +52,7 @@ curl_close($ch);
 /* -----------------------------
    FETCH HEALTHCARE PRACTITIONERS
 ------------------------------*/
-$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["first_name","last_name"]&filters=[["first_name","LIKE","%G6%"]]');
+$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
@@ -69,11 +67,15 @@ $practitioners = $response['data'] ?? [];
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
+// $practitioners = json_decode($response, true)['data'] ?? [];
 
 /* -----------------------------
    FETCH PATIENT INFO
 ------------------------------*/
-$patient_url = $baseurl . 'api/resource/Patient?fields=["patient_name"]&filters=[["patient_name","LIKE","%G6%"]]';
+$fields = urlencode('["name","patient_name","sex"]');
+$filters = urlencode('[["patient_name","LIKE","%G6%"]]');
+
+$patient_url = $baseurl . "api/resource/Patient?fields=$fields&filters=$filters";
 $ch = curl_init($patient_url);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
@@ -87,28 +89,53 @@ $response = json_decode($response, true);
 $patients = $response['data'] ?? [];
 curl_close($ch);
 
-$session_user = $_SESSION['username'] ?? 'Guest';
+// $patients = json_decode($patient_response, true)['data'] ?? [];
+
+if (!empty($patients)) {
+    $_SESSION['patient_id']   = $patients[0]['name'] ?? '';
+    $_SESSION['patient_name'] = $patients[0]['patient_name'] ?? '';
+    $_SESSION['patient_sex']  = $patients[0]['sex'] ?? '';
+} else {
+    die("Kunde inte hitta patientdata.");
+}
+$session_user = $_SESSION['username'] ?? '';
 
 /* -----------------------------
    PROCESS BOOKING FORM (POST)
 ------------------------------*/
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) {
+// Fixa time-format om det saknar sekunder
+$time = $_POST["appointment_time"];
+if (strlen($time) == 5) { // HH:MM
+    $time .= ":00";
+}
+
+// Hämta practitioner-id och name
+$practitioner_id = $_POST["healthcare_practitioner"] ?? '';
+$practitioner_name = $_POST["practitioner_name"] ?? '';
+$department = $_POST["department"] ?? '';
+
+// Patient-ID (från ERPNext, inte användarnamn)
+    $patient_id   = $_SESSION["patient_id"];
+    $patient_name = $_SESSION["patient_name"];
+    $patient_sex  = $_SESSION["patient_sex"];
 
     // Bygg data-arrayen
     $data = [
-        "appointment_type"        => $_POST["appointment_type"],
-        "appointment_date"        => $_POST["appointment_date"],
-        "appointment_time"        => $_POST["appointment_time"],
-        "healthcare_practitioner" => $_POST["healthcare_practitioner"],
-        "practitioner"            => $_POST["healthcare_practitioner"], 
-        "practitioner_name"       => $_POST["practitioner_name"],
-        "department"              => $_POST["department"],
-        "duration"                => $_POST["duration"],
-        "patient"                 => $session_user,
-        "patient_name"            => $_SESSION["patient_name"],
-        // "patient_sex"             => $_SESSION["patient_sex"],
-        "notes"                   => $_POST["notes"]
-    ];
+    "appointment_type"        => $_POST["appointment_type"],
+    "appointment_date"        => $_POST["appointment_date"],
+    "appointment_time"        => $time,                  // fast time format
+    "healthcare_practitioner" => $practitioner_id,       // FIX
+    "practitioner"            => $practitioner_id,       // FIX
+    "practitioner_name"       => $practitioner_name,
+    "department"              => $department,
+    "duration"                => intval($_POST["duration"]),
+    "patient"                 => $_SESSION["patient_id"],
+    "patient_name"            => $patient_name,
+    "patient_sex"             => $patient_sex,
+    "notes"                   => $_POST["notes"] ?? ""
+];
 
     $json = json_encode($data, JSON_UNESCAPED_SLASHES);
 
@@ -138,17 +165,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
         die("<h3>Tekniskt fel vid bokning:</h3><pre>$error</pre>");
     }
 
-    if (!isset($result["data"])) {
-        echo "<h3>ERPNext kunde inte skapa bokningen:</h3>";
-        echo "<pre>" . print_r($result, true) . "</pre>";
-        exit;
-    }
+if (!isset($result["data"])) {
+    echo "<h3>ERPNext kunde inte skapa bokningen:</h3>";
 
-    $appointment_id = $result["data"]["name"];
-    header("Location: bokning_klar.php?id=" . urlencode($appointment_id));
+    echo "<h4>JSON som skickas:</h4>";
+    var_dump($json);
+
+    echo "<h4>Svar från ERPNext:</h4>";
+    echo "<pre>" . print_r($result, true) . "</pre>";
     exit;
 }
 
+
+    $appointment_id = $result["data"]["name"];
+    header("Location: index.php");
+    exit;
+}
       // alla fält som behövs:
       // appointment_type
       // appointment_date
@@ -167,7 +199,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
       // practitioner
       // appointment_date
       // appointment_time (från klockan 8-15 (kolla availability))
-
 ?>
 <!doctype html>
 <html lang="sv">
@@ -400,15 +431,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
   <!-- Behövs för ERPNext -->
   <input type="hidden" name="patient" value="<?php echo htmlspecialchars($session_user); ?>">
   <input type="hidden" name="patient_name" value="<?php echo htmlspecialchars($session_user); ?>">
+  <input type="hidden" name="patient_sex" value="<?php echo htmlspecialchars($_SESSION['patient_sex'] ?? ''); ?>">
 
   <!-- Appointment Type -->
   <div class="field">
     <label for="appointment_type">Typ av besök</label>
     <select id="appointment_type" name="appointment_type" required>
-      <option value="Nurse Visit">Sjuksköterskebesök</option>
-      <option value="Doctor Visit">Läkarbesök</option>
+      <option value="G6Dietistbesök">Sjuksköterskebesök</option>
+      <option value="G6Läkarbesök">Läkarbesök</option>
+      <option value="G6Provtagning">Provtagning</option>
+      <option value="G6Fysioterapi">Fysioterapi</option>
+      <option value="G6Samtalsterapi">Samtalsterapi</option>
     </select>
   </div>
+
+<!-- Todo: hämta endast G6 ("appointment_type": "G6Samtalsterapi") -->
 
   <!-- Healthcare Practitioner -->
   <div class="field">
@@ -416,20 +453,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
     <div class="select-wrap">
       <select id="healthcare_practitioner" name="healthcare_practitioner" required>
         <?php foreach ($practitioners as $p): ?>
-          <?php
-            $practitioner_id = $p['name'] ?? '';
-            $first = $p['first_name'] ?? '';
-            $last = $p['last_name'] ?? '';
-            $full_name = trim("$first $last");
-            $department = $p['department'] ?? 'Allmänt';
-          ?>
-          <option 
-              value="<?php echo htmlspecialchars($practitioner_id); ?>"
-              data-practitioner-name="<?php echo htmlspecialchars($full_name); ?>"
-              data-department="<?php echo htmlspecialchars($department); ?>"
-          >
-              <?php echo htmlspecialchars($full_name); ?>
-          </option>
+        <?php
+        $practitioner_id = $p['name'] ?? '';
+        $first = $p['first_name'] ?? '';
+        $last = $p['last_name'] ?? '';
+        $full_name = trim("$first $last");
+        $department = $p['department'] ?? 'Allmänt';
+        ?>
+        <option 
+            value="<?php echo htmlspecialchars($practitioner_id); ?>"
+            data-practitioner-name="<?php echo htmlspecialchars($full_name); ?>"
+            data-department="<?php echo htmlspecialchars($department); ?>"
+        >
+            <?php echo htmlspecialchars($full_name); ?>
+        </option>
         <?php endforeach; ?>
       </select>
     </div>
