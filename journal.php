@@ -58,7 +58,7 @@ $fields = urlencode('["*"]');
 $filters_array = [
     ["patient", "=", $patient] // Jämför exakt med session patient_name
 ];
-$filters = urlencode(json_encode($filters_array))
+$filters = urlencode(json_encode($filters_array));
 
 $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
