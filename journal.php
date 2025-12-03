@@ -1,10 +1,18 @@
-<?php
+<?php 
+session_start();
+ if (!isset($_SESSION['patient'])) {
+    // Om ingen är inloggad, skicka användaren till login
+    header("Location: login.php");
+    exit;
+}
+$patient = $_SESSION['patient'];
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 $cookiepath = "/tmp/cookies.txt";
 $tmeout = 3600; // (3600=1hr)
-// här sätter ni er domän
 $baseurl = 'http://193.93.250.83:8080/'; 
 
 try {
@@ -46,7 +54,7 @@ echo print_r($response) . "</pre><br>";
 echo "</div>";
 
 $fields = urlencode('["*"]');
-$filters = urlencode('[["patient","LIKE","%G6%"]]');
+$filters = urlencode(json_encode([["patient","LIKE","%G6%"], ["patient", "=", $patient]])); //Jämför g6patienter med den inloggade
 
 $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
@@ -77,6 +85,7 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
+// Felhantering
 if (!empty($error_no)) {
   echo "<div style='background-color:red'>";
   echo '$error_no<br>';
@@ -98,15 +107,10 @@ foreach($response['data'] AS $key => $value){
   echo $value["name"]."<br>";
 }
 
+// Journaldata
+$journaler = $response['data'] ?? [];
+
 ?>
-<?php 
-session_start();
-// if (!isset($_SESSION['patient_namn'])) {
-    // Om ingen är inloggad, skicka användaren till login
-//    header("Location: login.php");
-//    exit;
-//} 
-?> 
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -239,11 +243,9 @@ session_start();
             <th>Provsvar</th>
             <th>Behandlingar</th>
         </tr>
+  
 
-        <?php  
-        $journaler = $response['data'] ?? [];
-
-        foreach ($journaler as $journal): ?>
+       <?php  foreach ($journaler as $journal): ?>
             <tr>
                 <td><?php echo htmlspecialchars ($journal['communication_date'] ?? ''); ?></td> <!-- $journal['nyckel'] ?? '' gör att det blir tomt om ingen nyckel finns -->
                 <td><?php echo htmlspecialchars ($journal['owner'] ?? ''); ?></td>
