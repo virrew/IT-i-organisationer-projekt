@@ -56,9 +56,9 @@ echo "</div>";
 if(isset($_POST['field1'])){
 $postfields = json_encode([
     "patientname" => $_POST['patientname'] ?? '',
-    "field1"      => $_POST['field1'] ?? '',
-    "field2"      => $_POST['field2'] ?? '',
-    "field3"      => $_POST['field3'] ?? ''
+    "field1" => $_POST['field1'] ?? '',
+    "field2" => $_POST['field2'] ?? '',
+    "field3" => $_POST['field3'] ?? ''
 ]);
 $ch = curl_init(
     $baseurl . "api/resource/G6Kontaktform"
