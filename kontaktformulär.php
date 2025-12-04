@@ -1,3 +1,104 @@
+  <?php
+  session_start();
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
+$cookiepath = "/tmp/cookies.txt";
+$tmeout = 3600; // (3600=1hr)
+
+$baseurl = 'http://193.93.250.83:8080/'; 
+
+
+try {
+  $ch = curl_init($baseurl . 'api/method/login');
+} catch (Exception $e) {
+  echo 'Caught exception: ',  $e->getMessage(), "\n";
+}
+
+curl_setopt($ch, CURLOPT_POST, true);
+
+//  ----------  Här sätter ni era login-data ------------------ //
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24amala@student.his.se", "pwd":"VisslanChess15"}');  
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+
+$error_no = curl_errno($ch);
+$error = curl_error($ch);
+curl_close($ch);
+
+if (!empty($error_no)) {
+  echo "<div style='background-color:red'>";
+  echo '$error_no<br>';
+  var_dump($error_no);
+  echo "<hr>";
+  echo '$error<br>';
+  var_dump($error);
+  echo "<hr>";
+  echo "</div>";
+}
+
+echo "<div style='background-color:lightgray; border:1px solid black'>";
+echo '$response<br><pre>';
+echo print_r($response) . "</pre><br>";
+echo "</div>";
+
+
+if(isset($_POST['field1'])){
+$postfields = json_encode([
+    "patientname" => $_POST['patientname'] ?? '',
+    "field1" => $_POST['field1'] ?? '',
+    "field2" => $_POST['field2'] ?? '',
+    "field3" => $_POST['field3'] ?? ''
+]);
+$ch = curl_init(
+    $baseurl . "api/resource/G6Kontaktform"
+);
+
+
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+$response = json_decode($response, true);
+
+$error_no = curl_errno($ch);
+$error = curl_error($ch);
+curl_close($ch);
+
+
+if(!empty($error_no)) {
+        echo "<div style='background-color:red; padding:10px'>";
+        echo "CURL ERROR ($error_no): $error";
+        echo "</div>";
+        exit;
+    }
+
+    // cURL lyckades → omdirigera användaren
+    header("Location: boka.php");
+    exit;
+
+
+
+}
+
+
+?>
+
 <!doctype html>
 <html lang="sv">
 <head>
@@ -148,7 +249,7 @@
   <div class="form-container">
     <h1>Boka tid hos oss</h1>
     <!-- Todo: Gör kontroll på maxord -->
-    <form id="intake-form" method="post" action="boka.php">
+    <form id="intake-form" method="post" action="kontaktformulär.php">
       <input type="hidden" name="patientname" value="<?php echo htmlspecialchars($_SESSION['username']); ?>">
 
       <div class="field">
