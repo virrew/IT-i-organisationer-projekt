@@ -56,12 +56,12 @@ echo "</div>";
 
 // Filtrerar så att endast journalet för den inloggade patienten visas
 $fields = urlencode('["*"]');
-$filters_array = [
-    ["patient", "LIKE", $patient]
-];
-$filters = urlencode(json_encode($filters_array));
-//$filters = urlencode('[["patient","LIKE","%G6%"]]');
 
+$filters_array = '[
+ ["patient", "=", '. $patient . ']
+]';
+$filters = urlencode($filters_array);
+echo $filters_array;
 $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
 // man kan även specificera vilka fält man vill se
