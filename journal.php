@@ -5,7 +5,8 @@ session_start();
     header("Location: login.php");
     exit;
 }
-$patient = $_SESSION['patient'];
+
+$patient = $_SESSION['patient']; // Inloggad patient
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -56,9 +57,10 @@ echo "</div>";
 // Filtrerar så att endast journalet för den inloggade patienten visas
 $fields = urlencode('["*"]');
 $filters_array = [
- ["patient", "=", $patient]
+    ["patient", "LIKE", $patient]
 ];
 $filters = urlencode(json_encode($filters_array));
+//$filters = urlencode('[["patient","LIKE","%G6%"]]');
 
 $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
@@ -76,7 +78,6 @@ curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 $response = curl_exec($ch);
@@ -245,17 +246,21 @@ $journaler = $response['data'] ?? [];
             <th>Behandlingar</th>
         </tr>
   
-       <?php  foreach ($journaler as $journal): ?>
-            <tr>
-                <td><?php echo htmlspecialchars ($journal['communication_date'] ?? ''); ?></td> <!-- $journal['nyckel'] ?? '' gör att det blir tomt om ingen nyckel finns -->
-                <td><?php echo htmlspecialchars ($journal['owner'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['patient'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['subject'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['status']?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['reference_doctype'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars ($journal['reference_name']?? ''); ?></td>
-            </tr>
-        <?php endforeach; ?>
+        <?php if (!empty($journaler)): ?>
+            <?php  foreach ($journaler as $journal): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars ($journal['communication_date'] ?? ''); ?></td> <!-- $journal['nyckel'] ?? '' gör att det blir tomt om ingen nyckel finns -->
+                    <td><?php echo htmlspecialchars ($journal['owner'] ?? ''); ?></td>
+                    <td><?php echo htmlspecialchars ($journal['patient'] ?? ''); ?></td>
+                    <td><?php echo htmlspecialchars ($journal['subject'] ?? ''); ?></td>
+                    <td><?php echo htmlspecialchars ($journal['status']?? ''); ?></td>
+                    <td><?php echo htmlspecialchars ($journal['reference_doctype'] ?? ''); ?></td>
+                    <td><?php echo htmlspecialchars ($journal['reference_name']?? ''); ?></td>
+                </tr>
+            <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="7">Ingen journaldata hittades för dig.</td></tr>
+            <?php endif; ?>
     </table>
 
     <!-- Provsvar-tabell -->
