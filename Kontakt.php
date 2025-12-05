@@ -233,7 +233,7 @@ background-color: var(--gray-light);
             <label for="age">Hur gammal är du?</label><br>
             
             <input type="text" id="gender" name="gender" required>
-            <label for="gender">Kön...</label><br>
+            <label for="gender">Kön</label><br>
 
 
    <fieldset>
