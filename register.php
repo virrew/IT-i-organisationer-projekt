@@ -3,11 +3,13 @@
 // Fungerande register-sida som skapar Patient i ERPNext.
 // All POST-logik körs innan någon HTML-output skickas.
 
+
 // Starta session tidigt
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 
 /* ================================
    HANTERA POST (registrering)
@@ -23,10 +25,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
     $password  = trim($_POST["password"] ?? "");
     $status    = trim($_POST["status"] ?? "Active");
 
+
     // Prefixa G6 framför förnamnet om det inte redan finns
     if ($firstname !== "" && strpos($firstname, "G6") !== 0) {
         $firstname = "G6" . $firstname;
     }
+
 
     // Validering av obligatoriska fält
     if ($firstname === "" || $lastname === "" || $sex === "" || $ssn === "" || $username === "" || $password === "") {
@@ -34,11 +38,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
         die("<h3 style='color:red;'>Något obligatoriskt fält saknas. Vänligen fyll i formuläret korrekt.</h3>");
     }
 
+
     // Fullständigt patientnamn som ERPNext förväntar sig
     $patient_name = $firstname . " " . $lastname;
 
+
     // Spara patient_name i session (kan användas i andra sidor)
     $_SESSION['patient_name'] = $patient_name;
+
 
     /* ================================
        Logga in i ERPNext (session cookie)
@@ -46,6 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
     $baseurl = "http://193.93.250.83:8080/";
     $cookiepath = "/tmp/cookies.txt";
     $tmeout = 30;
+
 
     $login_ch = curl_init($baseurl . "api/method/login");
     curl_setopt($login_ch, CURLOPT_POST, true);
@@ -56,14 +64,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
     curl_setopt($login_ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($login_ch, CURLOPT_TIMEOUT, $tmeout);
 
+
     $login_response = curl_exec($login_ch);
     $login_errno = curl_errno($login_ch);
     $login_error = curl_error($login_ch);
     curl_close($login_ch);
 
+
     if ($login_errno) {
         die("<h3>Tekniskt fel vid login mot ERPNext:</h3><pre>$login_error</pre>");
     }
+
 
     /* ================================
        Bygg payload för Patient
@@ -78,7 +89,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
         "status"       => $status
     ];
 
+
     $json = json_encode($patient_data, JSON_UNESCAPED_SLASHES);
+
 
     /* ================================
        POST till ERPNext: skapa Patient
@@ -95,23 +108,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 
+
     $erp_response = curl_exec($ch);
     $curl_errno = curl_errno($ch);
     $curl_error = curl_error($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
+
     if ($curl_errno) {
         die("<h3>Tekniskt fel vid POST mot ERPNext:</h3><pre>$curl_error</pre>");
     }
 
+
     $erp_result = json_decode($erp_response, true);
+
 
     // Godkända scenarion: HTTP 200/201 eller svar som innehåller data/message
     $success = false;
     if ($http_code == 200 || $http_code == 201) $success = true;
     if (isset($erp_result['data'])) $success = true;
     if (isset($erp_result['message'])) $success = true;
+
 
     if (!$success) {
         // Visa debug-info så du ser varför det misslyckades
@@ -122,6 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
         exit;
     }
 
+
     // Om ERPNext returnerar patientens id (name), spara det i session
     if (isset($erp_result['data']['name'])) {
         $_SESSION['patient_id'] = $erp_result['data']['name'];
@@ -130,11 +149,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
         // För att vara säker kan vi försöka hämta patient via patient_name senare om behövs.
     }
 
+
     // Registrering klar — redirect till startsida eller profil
     header("Location: index.php");
     exit;
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="sv">
@@ -192,17 +213,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
 </head>
 <body>
 
+
 <h1>Mölndals vårdcentral — Registrera konto</h1>
+
 
 <div class="form-container">
     <h2 style="margin-top:0; color:var(--primary-blue);">Registreringsformulär</h2>
+
 
     <form action="register.php" method="POST" autocomplete="off">
         <label class="form-label">Förnamn</label>
         <input class="form-input" type="text" name="firstname" required placeholder="Ex: Karl">
 
+
         <label class="form-label">Efternamn</label>
         <input class="form-input" type="text" name="lastname" required placeholder="Ex: Karlsson">
+
 
         <label class="form-label">Kön</label>
         <select class="form-input" name="sex" required>
@@ -211,25 +237,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
             <option value="Female">Kvinna</option>
         </select>
 
+
         <label class="form-label">Födelsedatum</label>
         <input class="form-input" type="date" name="dob">
+
 
         <label class="form-label">Personnummer (ÅÅÅÅMMDD-XXXX)</label>
         <input class="form-input" type="text" name="ssn" required pattern="[0-9]{8}-[0-9]{4}" placeholder="20000101-1234">
 
+
         <label class="form-label">Användarnamn</label>
         <input class="form-input" type="text" name="username" required>
+
 
         <label class="form-label">Lösenord</label>
         <input class="form-input" type="password" name="password" required>
 
+
         <input type="hidden" name="status" value="Active">
 
+
         <div class="hint">Obs: Förnamnet kommer automatiskt få prefixet <strong>G6</strong> när det sparas.</div>
+
 
         <button class="btn-primary" type="submit">Registrera</button>
     </form>
 </div>
 
+
 </body>
 </html>
+
+
+
