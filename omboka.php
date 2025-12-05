@@ -10,7 +10,7 @@ $timeout = 3600;
 /* ===== 1. LOGGAR IN ===== */
 $ch = curl_init($baseurl . "api/method/login");
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se","pwd":"HisLeo25!"}');
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"e24halal@student.his.se","pwd":"Mustafa65@1999!"}');
 curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
@@ -21,8 +21,13 @@ curl_close($ch);
 
 /* ===== 2. HÄMTAR ALLA BOKNINGAR ===== */
 $appointments = [];
+$fields = urlencode('["appointment_date","patient_name","status","duration","appointment_based_on_check_in"]');
+$filters = urlencode('[["patient_name","LIKE","%G6%"]]');
 
-$ch = curl_init($baseurl . 'api/resource/Patient%20Appointment?fields=["name","appointment_date","appointment_time","patient","practitioner"]');
+$bokningar = $baseurl . '/api/resource/Patient%20Appointment?fields=' . $fields . '&filters=' . $filters;
+
+
+$ch = curl_init($bokningar);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
 curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
@@ -37,7 +42,7 @@ if (!empty($data["data"])) {
     $appointments = $data["data"];
 }
 
-/* ===== 3. OM POST  OMBOKA ===== */
+/* ===== 3. OM POST OMBOKA ===== */
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -50,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         "appointment_time" => $new_time
     ];
 
-    $update_url = $baseurl . "api/resource/Patient%20Appointment/" . $appointment_name;
+    $update_url = $baseurl . "'/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient_name%22,%22LIKE%22,%22%G6%%22]]';" . $appointment_name;
 
     $ch = curl_init($update_url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
