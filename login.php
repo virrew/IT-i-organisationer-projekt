@@ -1,33 +1,84 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-if($_SERVER['REQUEST_METHOD'] === 'POST'){ // Kollar om formuläret är postat, alltså om användaren försöker logga in. Annrs går koden direkt till else satsen och visar "Invalid username or password"
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-if(isset($_POST['username']) && isset($_POST['password'])) { 
-    $pdo = new PDO('mysql:dbname=grupp6;host=localhost', 'sqllab', 'Armadillo#2025'); 
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
-    $stmt = $pdo->prepare('SELECT username, password FROM logindetails WHERE username = :username AND password = :password'); 
-    $stmt->execute([ 
-        ':username' => $_POST['username'], 
-        ':password' => $_POST['password']
-    ]); 
-    $user = $stmt->fetch(PDO::FETCH_ASSOC); 
-    if ($user) { 
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['patient'] = $user['username']; //Journal
-    $_SESSION['patient_name'] = $user['username']; // Todo: Lägging er egna ERP variabel för patientnamn
-    $_SESSION['logged_in'] = true; 
+    if (!empty($_POST['username']) && !empty($_POST['password'])) {
 
-    header('Location: index.php'); //Skicka användaren till index.php efter inloggning
-    exit;
-} 
-     else { 
-        echo "Invalid username or password.<br>"; 
-        echo '<a href="login.php">Back to Login</a>'; 
-        } 
+        // DB-anslutning
+        $pdo = new PDO(
+            'mysql:dbname=grupp6;host=localhost;charset=utf8mb4',
+            'sqllab',
+            'Armadillo#2025',
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+
+        // Hämta användaren på username
+        $sql = "SELECT ssn, erpid, username, password 
+                FROM logindetails 
+                WHERE username = :username";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':username' => $_POST['username']]);
+        
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Kontrollera om användaren finns
+        if ($user) {
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['logged_in'] = true;
+
+            $erpid = $user['erpid'];
+            $_SESSION['patient_id'] = $erpid; // ex: HLC-PAT-2025-00018
+
+            // Hämta patientens name från ERPNext
+
+            $baseurl = "http://193.93.250.83:8080/";
+            $cookiepath = "/tmp/cookies_login.txt";
+
+            $login = curl_init($baseurl . "api/method/login");
+            curl_setopt($login, CURLOPT_POST, true);
+            curl_setopt($login, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se","pwd":"HisLeo25!"}');
+            curl_setopt($login, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($login, CURLOPT_COOKIEJAR, $cookiepath);
+            curl_setopt($login, CURLOPT_COOKIEFILE, $cookiepath);
+            curl_setopt($login, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($login);
+            curl_close($login);
+
+            $ch = curl_init($baseurl . "api/resource/Patient/" . urlencode($erpid));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            $patientResponse = curl_exec($ch);
+            curl_close($ch);
+
+            $patient = json_decode($patientResponse, true);
+
+            // Spara patientens "name"
+            if (isset($patient['data']['name'])) {
+                $_SESSION['patient_name'] = $patient['data']['name'];
+                $_SESSION['patient_sex']  = $patient['data']['sex'] ?? "";
+                $_SESSION['patient_dob']  = $patient['data']['dob'] ?? "";
+            } else {
+                $_SESSION['patient_name'] = $_SESSION['username'];
+            }
+
+            header("Location: index.php");
+            exit;
+        }
+
+        // Misslyckad inloggning
+        echo "<p style='color:red; text-align:center;'>Fel användarnamn eller lösenord.</p>";
+        echo '<p style="text-align:center;"><a href="login.php">Försök igen</a></p>';
+        exit;
     }
 }
-?> 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -36,8 +87,7 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mölndalsvårdcentral - Login</title>
 
-        <style>
-        /* :root är högsta nivån i CSS och används för att definiera globala variabler */
+    <style>
         :root {
             --primary-blue: #1F6F78;
             --primary-blue-light: #C2EBE8;
