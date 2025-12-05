@@ -1,237 +1,88 @@
 <?php
+// register.php
+// Fungerande register-sida som skapar Patient i ERPNext.
+// All POST-logik körs innan någon HTML-output skickas.
+
+// Starta session tidigt
+session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <style>
-            :root { /* :root är högsta nivån i CSS och används för att definiera globala variabler */
-        
-            --primary-blue: #1F6F78;
-            --primary-blue-light: #C2EBE8;
-            
-            --mint-green: #E7FFF3;
-            --accent-orange: #FCA06A;
-            --info-blue: #0A5360;
-            --warning-red: #D9534F;
-            
-            --white: #FFFFFF;
-            --gray-light: #F5F5F5;
-            --text-dark: #0E2A2C;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background: var(--gray-light);
-            font-family: Arial, sans-serif;
-            color: var(--text-dark);
-        }
-
-        h1, h2 {
-            text-align: center;
-        }
-
-        h1 {
-            margin-top: 30px;
-            color: var(--primary-blue);
-        }
-
-        .form-container {
-            max-width: 400px;
-            margin: 40px auto;
-            background: var(--white);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        }
-
-        .form-container h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: var(--primary-blue);
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 18px;
-            border-radius: 6px;
-            border: 1px solid var(--primary-blue-light);
-            background: var(--mint-green);
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary-blue);
-            border: none;
-            border-radius: 6px;
-            color: var(--white);
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-primary:hover {
-            background: var(--info-blue);
-        }
-    </style>
-</head>
-<body>
-
-    <h1>Mölndalsvårdcentral</h1>
-    <div class="form-container">
-    <h2>Registrerings formulär</h2>
-
-    <form action="register.php" method="POST">
-
-    <div class="form-group">
-        <label for="firstname" class="form-label">Förnamn:</label>
-        <input type="text" id="firstname" name="firstname" class="form-input" required>
-    </div>
-
-    <div class="form-group">
-        <label for="lastname" class="form-label">Efternamn:</label>
-        <input type="text" id="lastname" name="lastname" class="form-input" required>
-    </div>
-
-    <div class="form-group">
-        <label for="sex" class="form-label">Kön:</label>
-        <select id="sex" name="sex" class="form-input" required>
-            <option value="">Välj kön...</option>
-            <option value="Male">Man</option>
-            <option value="Female">Kvinna</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="dob" class="form-label">Födelsedatum:</label>
-        <input type="date" id="dob" name="dob" class="form-input">
-    </div>
-
-    <div class="form-group">
-        <label for="ssn" class="form-label">Personnummer (ÅÅÅÅMMDD-XXXX):</label>
-        <input type="text" id="ssn" name="ssn" class="form-input" required pattern="[0-9]{8}-[0-9]{4}">
-    </div>
-
-    <div class="form-group">
-        <label for="username" class="form-label">Användarnamn:</label>
-        <input type="text" id="username" name="username" class="form-input" required>
-    </div>
-
-    <div class="form-group">
-        <label for="password" class="form-label">Lösenord:</label>
-        <input type="password" id="password" name="password" class="form-input" required>
-    </div>
-
-    <input type="hidden" name="status" value="Active">
-
-    <button type="submit" class="btn-primary">Registrera</button>
-    </form>
-</div>
-
-<?php
-
-// =========================
-// 1. Kolla om POST skickats
-// =========================
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    // Hämta inmatade värden
+/* ================================
+   HANTERA POST (registrering)
+   ================================ */
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
+    // Hämta inmatade värden (trim + fallback)
     $firstname = trim($_POST["firstname"] ?? "");
     $lastname  = trim($_POST["lastname"] ?? "");
-    if (strpos($firstname, 'G6') !== 0) {
-        $firstname = 'G6' . $firstname;
-    }
     $sex       = trim($_POST["sex"] ?? "");
     $dob       = trim($_POST["dob"] ?? "");
     $ssn       = trim($_POST["ssn"] ?? "");
     $username  = trim($_POST["username"] ?? "");
     $password  = trim($_POST["password"] ?? "");
+    $status    = trim($_POST["status"] ?? "Active");
 
-    // Kontroll – alla obligatoriska fält måste fyllas
-    if ($firstname === "" || $lastname === "" || $sex === "" || $ssn === "" ||  $username === "" || $password === "") {
-        die("<h3>Något obligatoriskt fält saknas. Vänligen fyll i formuläret korrekt.</h3>");
+    // Prefixa G6 framför förnamnet om det inte redan finns
+    if ($firstname !== "" && strpos($firstname, "G6") !== 0) {
+        $firstname = "G6" . $firstname;
     }
 
-    // Fullständigt namn (för ERPNext)
+    // Validering av obligatoriska fält
+    if ($firstname === "" || $lastname === "" || $sex === "" || $ssn === "" || $username === "" || $password === "") {
+        // Visa tydligt meddelande och stoppa
+        die("<h3 style='color:red;'>Något obligatoriskt fält saknas. Vänligen fyll i formuläret korrekt.</h3>");
+    }
+
+    // Fullständigt patientnamn som ERPNext förväntar sig
     $patient_name = $firstname . " " . $lastname;
 
-    // =========================
-    // 2. SPARA I MYSQL-DATABASEN
-    // =========================
+    // Spara patient_name i session (kan användas i andra sidor)
+    $_SESSION['patient_name'] = $patient_name;
 
-    // Todo: Kommenterat ut sålänge, Victor fixa databasen sen tjingeling
-    // Du ska ta $patient_name (se rad 173) och spara i session sedan tror jag?
-
-    // try {
-    //     $pdo = new PDO("mysql:dbname=grupp6;host=localhost", "sqllab", "Armadillo#2025");
-    //     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    //     $query = "INSERT INTO logindetails (ssn, username, password) VALUES (:ssn, :username, :password)";
-    //     $stmt = $pdo->prepare($query);
-
-    //     $stmt->bindParam(":ssn", $ssn);
-    //     $stmt->bindParam(":username", $username);
-    //     $stmt->bindParam(":password", $password); // ev. password_hash() om du vill kryptera
-
-    //     $stmt->execute();
-
-    // } catch (Exception $e) {
-    //     die("Kunde inte spara användare i databasen: " . $e->getMessage());
-    // }
-
-    // =========================
-    // 3. SKAPA PATIENT I ERPNEXT
-    // =========================
-
+    /* ================================
+       Logga in i ERPNext (session cookie)
+       ================================ */
     $baseurl = "http://193.93.250.83:8080/";
     $cookiepath = "/tmp/cookies.txt";
-    $tmeout = 3600;
+    $tmeout = 30;
 
-    // LOGIN
-    $ch = curl_init($baseurl . "api/method/login");
+    $login_ch = curl_init($baseurl . "api/method/login");
+    curl_setopt($login_ch, CURLOPT_POST, true);
+    curl_setopt($login_ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se","pwd":"HisLeo25!"}');
+    curl_setopt($login_ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+    curl_setopt($login_ch, CURLOPT_COOKIEJAR, $cookiepath);
+    curl_setopt($login_ch, CURLOPT_COOKIEFILE, $cookiepath);
+    curl_setopt($login_ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($login_ch, CURLOPT_TIMEOUT, $tmeout);
 
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $login_response = curl_exec($login_ch);
+    $login_errno = curl_errno($login_ch);
+    $login_error = curl_error($login_ch);
+    curl_close($login_ch);
 
-    $login_response = curl_exec($ch);
-    curl_close($ch);
+    if ($login_errno) {
+        die("<h3>Tekniskt fel vid login mot ERPNext:</h3><pre>$login_error</pre>");
+    }
 
-
-    // Patient-data som skickas till ERPNext
+    /* ================================
+       Bygg payload för Patient
+       ================================ */
     $patient_data = [
         "first_name"   => $firstname,
         "last_name"    => $lastname,
         "patient_name" => $patient_name,
         "sex"          => $sex,
-        "dob"          => $dob ?: null,
+        "dob"          => ($dob === "" ? null : $dob),
         "uid"          => $ssn,
-        "status"       => "Active"
+        "status"       => $status
     ];
 
     $json = json_encode($patient_data, JSON_UNESCAPED_SLASHES);
 
-    // Skicka POST till ERPNext
+    /* ================================
+       POST till ERPNext: skapa Patient
+       ================================ */
     $ch = curl_init($baseurl . "api/resource/Patient");
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
@@ -242,48 +93,143 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 
     $erp_response = curl_exec($ch);
-    $erp_result = json_decode($erp_response, true);
-
+    $curl_errno = curl_errno($ch);
+    $curl_error = curl_error($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-
-    // =========================
-    // 4. Kontrollera ERP-svar
-    // =========================
-    $http_code = null;
-    if (function_exists('curl_getinfo')) {
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($curl_errno) {
+        die("<h3>Tekniskt fel vid POST mot ERPNext:</h3><pre>$curl_error</pre>");
     }
 
-    // Godkända scenarion:
+    $erp_result = json_decode($erp_response, true);
+
+    // Godkända scenarion: HTTP 200/201 eller svar som innehåller data/message
     $success = false;
+    if ($http_code == 200 || $http_code == 201) $success = true;
+    if (isset($erp_result['data'])) $success = true;
+    if (isset($erp_result['message'])) $success = true;
 
-    if ($http_code == 200 || $http_code == 201) {
-        $success = true;
-    }
-    elseif (isset($erp_result["data"])) {
-        $success = true;
-    }
-    elseif (isset($erp_result["message"])) {
-        $success = true;
-    }
-
-    // Om misslyckat – visa fel
     if (!$success) {
-        echo "<h2>Fel: ERPNext kunde inte skapa patienten.</h2>";
-        echo "<h3>JSON som skickades:</h3><pre>$json</pre>";
-        echo "<h3>ERPNext svar:</h3><pre>" . print_r($erp_result, true) . "</pre>";
+        // Visa debug-info så du ser varför det misslyckades
+        echo "<h2 style='color:red;'>Fel: ERPNext kunde inte skapa patienten.</h2>";
+        echo "<h3>JSON som skickades:</h3><pre>" . htmlspecialchars($json) . "</pre>";
+        echo "<h3>ERPNext svar (rått):</h3><pre>" . htmlspecialchars($erp_response) . "</pre>";
+        echo "<h3>ERPNext svar (strukturerat):</h3><pre>" . print_r($erp_result, true) . "</pre>";
         exit;
     }
 
-    // =========================
-    // 5. Registreringen lyckades
-    // =========================
+    // Om ERPNext returnerar patientens id (name), spara det i session
+    if (isset($erp_result['data']['name'])) {
+        $_SESSION['patient_id'] = $erp_result['data']['name'];
+    } elseif (isset($erp_result['message'])) {
+        // ibland svarar ERPNext med "message": "Patient Created Successfully" men inte data
+        // För att vara säker kan vi försöka hämta patient via patient_name senare om behövs.
+    }
+
+    // Registrering klar — redirect till startsida eller profil
     header("Location: index.php");
     exit;
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Registrera konto - Mölndals vårdcentral</title>
+    <style>
+        :root {
+            --primary-blue: #1F6F78;
+            --primary-blue-light: #C2EBE8;
+            --mint-green: #E7FFF3;
+            --white: #FFFFFF;
+            --gray-light: #F5F5F5;
+            --text-dark: #0E2A2C;
+        }
+        body {
+            margin:0;
+            padding:0;
+            background:var(--gray-light);
+            font-family: Arial, Helvetica, sans-serif;
+            color:var(--text-dark);
+        }
+        h1 { text-align:center; margin-top:30px; color:var(--primary-blue); }
+        .form-container {
+            max-width:420px;
+            margin:40px auto;
+            background:var(--white);
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0 6px 24px rgba(0,0,0,0.06);
+        }
+        .form-label { display:block; margin-bottom:6px; font-weight:600; }
+        .form-input {
+            width:100%;
+            padding:10px;
+            margin-bottom:16px;
+            border-radius:8px;
+            border:1px solid var(--primary-blue-light);
+            background:var(--mint-green);
+            box-sizing:border-box;
+        }
+        .btn-primary {
+            width:100%;
+            padding:12px;
+            background:var(--primary-blue);
+            color:white;
+            border:none;
+            border-radius:8px;
+            font-weight:600;
+            cursor:pointer;
+        }
+        .hint { font-size:0.9rem; color:#555; margin-bottom:12px; }
+    </style>
+</head>
+<body>
+
+<h1>Mölndals vårdcentral — Registrera konto</h1>
+
+<div class="form-container">
+    <h2 style="margin-top:0; color:var(--primary-blue);">Registreringsformulär</h2>
+
+    <form action="register.php" method="POST" autocomplete="off">
+        <label class="form-label">Förnamn</label>
+        <input class="form-input" type="text" name="firstname" required placeholder="Ex: Karl">
+
+        <label class="form-label">Efternamn</label>
+        <input class="form-input" type="text" name="lastname" required placeholder="Ex: Karlsson">
+
+        <label class="form-label">Kön</label>
+        <select class="form-input" name="sex" required>
+            <option value="">Välj...</option>
+            <option value="Male">Man</option>
+            <option value="Female">Kvinna</option>
+        </select>
+
+        <label class="form-label">Födelsedatum</label>
+        <input class="form-input" type="date" name="dob">
+
+        <label class="form-label">Personnummer (ÅÅÅÅMMDD-XXXX)</label>
+        <input class="form-input" type="text" name="ssn" required pattern="[0-9]{8}-[0-9]{4}" placeholder="20000101-1234">
+
+        <label class="form-label">Användarnamn</label>
+        <input class="form-input" type="text" name="username" required>
+
+        <label class="form-label">Lösenord</label>
+        <input class="form-input" type="password" name="password" required>
+
+        <input type="hidden" name="status" value="Active">
+
+        <div class="hint">Obs: Förnamnet kommer automatiskt få prefixet <strong>G6</strong> när det sparas.</div>
+
+        <button class="btn-primary" type="submit">Registrera</button>
+    </form>
+</div>
+
 </body>
 </html>
