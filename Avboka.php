@@ -3,11 +3,12 @@ session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-$cookiepath = "/tmp/cookies.txt";
-$tmeout = 3600; // (3600=1hr)
-// här sätter ni er domän
-$baseurl = 'http://193.93.250.83:8080/'; 
 
+$cookiepath = "/tmp/cookies.txt";
+$tmeout = 3600; 
+$baseurl = 'http://193.93.250.83:8080/';
+
+// ------------------- LOGIN (DIN KOD INTakt) -------------------
 try {
   $ch = curl_init($baseurl . 'api/method/login');
 } catch (Exception $e) {
@@ -15,81 +16,70 @@ try {
 }
 
 curl_setopt($ch, CURLOPT_POST, true);
-//  ----------  Här sätter ni era login-data ------------------ //
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}'); 
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}');
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
 $response = curl_exec($ch);
 $response = json_decode($response, true);
-
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
 curl_close($ch);
 
-if (!empty($error_no)) {
-  echo "<div style='background-color:red'>";
-  echo '$error_no<br>';
-  var_dump($error_no);
-  echo "<hr>";
-  echo '$error<br>';
-  var_dump($error);
-  echo "<hr>";
-  echo "</div>";
-}
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
-$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["first_name","last_name"]&filters=[["first_name","LIKE","%G6%"]]'); 
-// man kan även specificera vilka fält man vill se
-// urlencode krävs när du har specialtecken eller mellanslag  
-// $ch = curl_init($baseurl . 'api/resource/User?fields='. urlencode('["name", "first_name", "last_login"]'));
-// det funkerar lika bra att ta bort mellanslaget i denna fråga
-// $ch = curl_init($baseurl . 'api/resource/User?fields=["name","first_name","last_login"]');
+// ---------------------------------------------------------
+// AVBOKA (DELETE) 
+// ---------------------------------------------------------
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["cancel_id"])) {
 
-//jag kör en get request, ibland vill man kanske köra en annan typ av request, och ibland så beöver man ha med postfields
+    $cancel_id = $_POST["cancel_id"];
+
+    $ch = curl_init($baseurl . 'api/resource/Patient%20Appointment/' . $cancel_id);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $result = curl_exec($ch);
+    curl_close($ch);
+
+    echo "<div style='background:lightgreen;padding:10px;margin-bottom:10px;'>
+            Bokningen <strong>$cancel_id</strong> har tagits bort.
+          </div>";
+}
+
+// ---------------------------------------------------------
+// HÄMTA ALLA BOKNINGAR
+// ---------------------------------------------------------
+$ch = curl_init($baseurl . 'api/resource/Patient%20Appointment?fields=["name","appointment_date","status"]');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-
 $response = curl_exec($ch);
-$response = json_decode($response, true);
-$practitioners = $response['data'] ?? [];
-
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
+$data = json_decode($response, true);
 curl_close($ch);
 
-if (!empty($error_no)) {
-  echo "<div style='background-color:red'>";
-  echo '$error_no<br>';
-  var_dump($error_no);
-  echo "<hr>";
-  echo '$error<br>';
-  var_dump($error);
-  echo "<hr>";
-  echo "</div>";
-}
-echo "<div style='background-color:white; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
+// ---------------------------------------------------------
+// VISA LISTA MED BOKNINGAR
+// ---------------------------------------------------------
+echo "<h2>Bokade tider</h2>";
 
-//här väljer jag att loopa över alla poster i [data] och för varje resultat så skriver jag ut name
-echo "<strong>LISTA:</strong><br>";
-foreach($response['data'] AS $key => $value){
-  echo $value["name"]."<br>";
+foreach ($data["data"] as $app) {
+
+    echo "{$app["name"]} – {$app["appointment_date"]} – {$app["status"]} ";
+
+    // Avboka-knapp som DELETE
+    echo '<form method="post" style="display:inline;">
+            <input type="hidden" name="cancel_id" value="' . $app["name"] . '">
+            <button type="submit" style="color:red;margin-left:10px;">Avboka</button>
+          </form>';
+
+    echo "<br>";
 }
+
+?>
