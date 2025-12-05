@@ -53,23 +53,7 @@ $error = curl_error($ch);
 curl_close($ch);
 
 
-//Skriver ut vad som är fel när det är fel.
-if (!empty($error_no)) {
-  echo "<div style='background-color:red'>";
-  echo '$error_no<br>';
-  var_dump($error_no);
-  echo "<hr>";
-  echo '$error<br>';
-  var_dump($error);
-  echo "<hr>";
-  echo "</div>";
-}
 
-//skriver ut response, status
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
 
 
 $patient_url = $baseurl . 'api/resource/Patient?fields=["patient_name"]&filters=[["patient_name","LIKE","%G6%"]]';
