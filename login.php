@@ -86,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mölndalsvårdcentral - Login</title>
-
     <style>
         :root {
             --primary-blue: #1F6F78;
@@ -186,7 +185,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #e88d59;
         }
     </style>
-
 </head>
 <body>
 
@@ -196,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Logga in för att ta del av våra tjänster</h2>
 
         <!-- LOGIN FORM -->
-        <form action="login.php" method="POST"><!--Postar inloggningsformuläret till sig själv för att kunna skapa sessionen, headerlocation sköter förlyttningen till index.php-->
+        <form action="login.php" method="POST">
             <label class="form-label" for="username">Användarnamn:</label>
             <input type="text" id="username" name="username" class="form-input" required>
 
