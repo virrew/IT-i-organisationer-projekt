@@ -58,31 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
     /* ============================================================
        3) SKAPA PATIENT I ERPNEXT
     ============================================================ */
-
-    $login_ch = curl_init($baseurl . "api/method/login");
-    curl_setopt($login_ch, CURLOPT_POST, true);
-    curl_setopt($login_ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se","pwd":"HisLeo25!"}');
-    curl_setopt($login_ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
-    curl_setopt($login_ch, CURLOPT_COOKIEJAR, $cookiepath);
-    curl_setopt($login_ch, CURLOPT_COOKIEFILE, $cookiepath);
-    curl_setopt($login_ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($login_ch, CURLOPT_TIMEOUT, $tmeout);
-
-
-    $login_response = curl_exec($login_ch);
-    $login_errno = curl_errno($login_ch);
-    $login_error = curl_error($login_ch);
-    curl_close($login_ch);
-
-
-    if ($login_errno) {
-        die("<h3>Tekniskt fel vid login mot ERPNext:</h3><pre>$login_error</pre>");
-    }
-
-
-    /* ================================
-       Bygg payload för Patient
-       ================================ */
     $patient_data = [
         "first_name"   => $firstname,
         "last_name"    => $lastname,
@@ -93,13 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
         "status"       => $status
     ];
 
-
     $json = json_encode($patient_data, JSON_UNESCAPED_SLASHES);
 
-
-    /* ================================
-       POST till ERPNext: skapa Patient
-       ================================ */
     $ch = curl_init($baseurl . "api/resource/Patient");
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
@@ -111,7 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-
     $erp_response = curl_exec($ch);
     $erp_error = curl_error($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -119,21 +88,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
 
     if ($erp_error) {
         die("<h3>Tekniskt fel vid skapande av patient i ERPNext:</h3><pre>$erp_error</pre>");
-
-    if ($curl_errno) {
-        die("<h3>Tekniskt fel vid POST mot ERPNext:</h3><pre>$curl_error</pre>");
     }
-
 
     $erp_result = json_decode($erp_response, true);
 
-
-    // Godkända scenarion: HTTP 200/201 eller svar som innehåller data/message
     $success = false;
     if ($http_code == 200 || $http_code == 201) $success = true;
     if (isset($erp_result["data"])) $success = true;
     if (isset($erp_result["message"])) $success = true;
-
 
     if (!$success) {
         echo "<h2 style='color:red;'>Fel: ERPNext kunde inte skapa patienten.</h2>";
@@ -144,8 +106,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
 
     // Hämta ERP-ID (name)
     $erpid = null;
-
-    // Om ERPNext returnerar patientens id (name), spara det i session
     if (isset($erp_result['data']['name'])) {
         $erpid = $erp_result['data']['name'];
         $_SESSION['patient_id'] = $erpid;
@@ -184,11 +144,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
     /* ============================================================
        5) KLART — redirect
     ============================================================ */
-
-    // Registrering klar — redirect till startsida eller profil
     header("Location: index.php");
     exit;
 }
+
 ?>
 
 
@@ -292,7 +251,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['firstname'])) {
         <input type="hidden" name="status" value="Active">
 
         <div class="hint">Obs: Förnamnet kommer automatiskt få <strong>G6</strong> när det sparas.</div>
-
 
         <button class="btn-primary" type="submit">Registrera</button>
     </form>
