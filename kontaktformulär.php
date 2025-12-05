@@ -36,6 +36,17 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
+if (!empty($error_no)) {
+  echo "<div style='background-color:red'>";
+  echo '$error_no<br>';
+  var_dump($error_no);
+  echo "<hr>";
+  echo '$error<br>';
+  var_dump($error);
+  echo "<hr>";
+  echo "</div>";
+}
+
 
 
 
