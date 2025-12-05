@@ -1,72 +1,69 @@
 <?php 
 session_start(); 
-if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) { // För att skicka ut användare som inte har ett konto
+
+// Se till att användaren är inloggad
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     header('Location: login.php');
     exit;
 }
-$patient = $_SESSION['patient'];
+
+// Hämtas från login.php där vi sparade ERPNext-ID
+$patient_id   = $_SESSION['patient_id'];      // Ex: HLC-PAT-2025-00018
+$patient_name = $_SESSION['patient_name'];    // Ex: G6Doris Dorisson
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 $cookiepath = "/tmp/cookies.txt";
-$tmeout = 3600; // (3600=1hr)
+$tmeout = 3600;
 $baseurl = 'http://193.93.250.83:8080/';
 
-try {
-  $ch = curl_init($baseurl . 'api/method/login');
-} catch (Exception $e) {
-  echo 'Caught exception: ', $e->getMessage(), "\n";
-}
-
+/* -----------------------------
+   1) Logga in i ERPNext
+------------------------------*/
+$ch = curl_init($baseurl . 'api/method/login');
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
+curl_exec($ch);
 curl_close($ch);
 
-$bokningar = $baseurl . '/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient_name%22,%22LIKE%22,%22%G6%%22]]';
+/* -----------------------------
+   2) Hämta bokningar för inloggad patient
+------------------------------*/
+
 $fields = [
     "name",
     "appointment_type",
-    "company",
-    "date",
-    "title",
-    "practitioner",
+    "appointment_date",
+    "appointment_time",
+    "status",
+    "practitioner_name"
 ];
 
 $filters = [
-    ["patient_name", "LIKE", "%$patient%"]
+    ["patient", "=", $patient_id]
 ];
 
-
-$url = $baseurl . '/api/resource/Patient%20Appointment?' .
-    'fields=' . urlencode(json_encode($fields)) .
-    '&filters=' . urlencode(json_encode($filters));
+$url = $baseurl . 'api/resource/Patient%20Appointment?' .
+    'fields=' . urlencode(json_encode($fields)) . '&' .
+    'filters=' . urlencode(json_encode($filters));
 
 $ch = curl_init($url);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($ch);
-$response = json_decode($response, true);
-$patients = $response['data'] ?? [];
 curl_close($ch);
-?> 
+
+$data = json_decode($response, true);
+$appointments = $data['data'] ?? [];   // Kommande bokningar
+?>
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -89,6 +86,40 @@ curl_close($ch);
             --gray-light: #F5F5F5;
             --text-dark: #0E2A2C;
         }
+
+        .appointment-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-left: 6px solid var(--primary-blue);
+        }
+
+        .appointment-row {
+            margin: 4px 0;
+            font-size: 0.95rem;
+        }
+
+        .appointment-label {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .status-Upcoming { background: var(--primary-blue); }
+        .status-Completed { background: green; }
+        .status-No\ Show { background: var(--warning-red); }
+        .status-Cancelled { background: gray; }
+
 
         body {
             margin: 0;
@@ -185,7 +216,6 @@ curl_close($ch);
     </style>
 </head>
 <body>
-
     <!-- Navigation -->
     <nav class="navbar">
     <div class="nav-brand">Mölndals Vårdcentral</div>
@@ -205,35 +235,57 @@ curl_close($ch);
     </nav>
 
     <div class="page-container">
-        <h1>Välkommen <?= htmlspecialchars($_SESSION['username']) ?></h1>
+    <h1>Välkommen <?= htmlspecialchars($_SESSION['username']) ?></h1>
 
-        <div class="welcome-card">
-            <h2>Din översikt</h2>
-            <p>
-                Här kan du som patient se och hantera dina digitala tjänster hos
-                Mölndals vårdcentral.
-            </p>
-        </div>
-
-        <div class="booking-card">
-            <h2>Kommande bokningar</h2>
-        <?php
-        if (empty($patients)) {
-            echo "<p>Inga kommande bokningar.</p>";
-            echo "<p>Gör en bokning här:</p>";
-            echo "<a href='kontaktformulär.php' class='btn-primary'>Boka tid</a>"; 
-        } else {
-            echo "<ul>";
-            foreach ($patients as $appointment) {
-                echo "<li>";
-                echo "Datum: " . htmlspecialchars($appointment['appointment_date']) . ", Tid: " . htmlspecialchars($appointment['appointment_time']) . ", Typ: " . htmlspecialchars($appointment['appointment_type']) . ", Status: " . htmlspecialchars($appointment['status']);
-                echo "</li>";
-            }
-            echo "</ul>";
-        }
-        ?>
+    <div class="welcome-card">
+        <h2>Din översikt</h2>
+        <p>
+            Här kan du som patient se och hantera dina digitala tjänster hos
+            Mölndals vårdcentral.
+        </p>
     </div>
 
-<!-- http://193.93.250.83:8080/api/resource/Patient%20Appointment?fields=[%22*%22]&filters=[[%22patient%22,%20%22=%22,%20%22G5Torkeli%20Knipa%22]] -->
+    <div class="booking-card">
+    <h2>Kommande bokningar</h2>
+    <?php if (empty($appointments)): ?>
+        <p>Inga kommande bokningar.</p>
+        <a href="kontaktformulär.php" class="btn-primary">Boka tid</a>
+
+    <?php else: ?>
+        <?php foreach ($appointments as $a): ?>
+            <div class="appointment-card">
+
+                <div class="appointment-row">
+                    <span class="appointment-label">📅 Datum:</span>
+                    <?= htmlspecialchars($a['appointment_date']) ?>
+                </div>
+
+                <div class="appointment-row">
+                    <span class="appointment-label">⏰ Tid:</span>
+                    <?= htmlspecialchars($a['appointment_time']) ?>
+                </div>
+
+                <div class="appointment-row">
+                    <span class="appointment-label">🏥 Typ:</span>
+                    <?= htmlspecialchars($a['appointment_type']) ?>
+                </div>
+
+                <div class="appointment-row">
+                    <span class="appointment-label">👩‍⚕️ Vårdgivare:</span>
+                    <?= htmlspecialchars($a['practitioner_name']) ?>
+                </div>
+
+                <div class="appointment-row">
+                    <span class="appointment-label">📌 Status:</span>
+                    <span class="status-pill status-<?= str_replace(' ', '', htmlspecialchars($a['status'])) ?>">
+                        <?= htmlspecialchars($a['status']) ?>
+                    </span>
+                </div>
+
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    </div>
 </body> 
 </html>
