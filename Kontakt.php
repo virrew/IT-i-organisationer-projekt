@@ -69,10 +69,7 @@ $response = curl_exec($ch);
 $response = json_decode($response, true);
 curl_close($ch);
 
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
+
 
 
 
@@ -97,10 +94,7 @@ $response = curl_exec($ch);
 $response = json_decode($response, true);
 curl_close($ch);
 
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
+
 ?>
 
 
