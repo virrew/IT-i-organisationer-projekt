@@ -5,116 +5,218 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// ====== Grundinställningar ======
+// Enkel konfiguration
 $cookiepath = "/tmp/cookies.txt";
 $baseurl    = "http://193.93.250.83:8080/";
-$timeout    = 3600;
+$tmeout     = 3600;
 
 $message = "";
+$valdt_bokning = "";
+$vald_datum    = "";
+$lediga_tider  = array();
 
-// ============================
-// 1. Logga in i ERPNext
-// ============================
-
-$login_url = $baseurl . "api/method/login";
-
-$ch = curl_init($login_url);
+/* 1. Logga in i ERPNext */
+$ch = curl_init($baseurl . 'api/method/login');
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"e24halal@student.his.se","pwd":"Mustafa65@1999!"}');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Accept: application/json"));
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"e24halal@student.his.se", "pwd":"Mustafa65@1999!"}');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 curl_exec($ch);
 curl_close($ch);
 
-// ============================
-// 2. Hämta alla bokningar
-// ============================
+/* 2. Hämta patient (G6) */
+$fields_patient  = urlencode('["name","patient_name","sex"]');
+$filters_patient = urlencode('[["patient_name","LIKE","%G6%"]]');
 
-$appointments_url =
-    $baseurl .
-    "api/resource/Patient%20Appointment" .
-    "?fields=[\"*\"]" .
-    "&filters=[[\"patient_name\",\"LIKE\",\"%G6%\"]]";
+$patient_url = $baseurl . "api/resource/Patient?fields=" . $fields_patient . "&filters=" . $filters_patient;
 
-$ch = curl_init($appointments_url);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Accept: application/json"));
+$ch = curl_init($patient_url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-
-$response = curl_exec($ch);
+$patient_response = curl_exec($ch);
 curl_close($ch);
 
-$data = json_decode($response, true);
+$patient_data = json_decode($patient_response, true);
 
-// Utan ?? :
-$appointments = array();
-if (isset($data["data"])) {
-    $appointments = $data["data"];
+if (!isset($patient_data['data']) || count($patient_data['data']) === 0) {
+    die("Kunde inte hitta patientdata.");
 }
 
-// ============================
-// 3. PUT – Omboka
-// ============================
+$patient      = $patient_data['data'][0];
+$patient_id   = $patient['name'];
+$patient_name = $patient['patient_name'];
 
+/* 3. Hämta alla bokningar för patienten */
+$fields_appt  = urlencode('["name","appointment_date","appointment_time","patient","practitioner"]');
+$filters_appt = urlencode('[["patient","=","' . $patient_id . '"]]');
+
+$appointments_url = $baseurl . "api/resource/Patient%20Appointment?fields=" . $fields_appt . "&filters=" . $filters_appt;
+
+$ch = curl_init($appointments_url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$appointments_response = curl_exec($ch);
+curl_close($ch);
+
+$appointments_data = json_decode($appointments_response, true);
+$appointments = array();
+
+if (isset($appointments_data['data'])) {
+    $appointments = $appointments_data['data'];
+}
+
+if (count($appointments) === 0) {
+    // har ingen bokad tid → gå till boka
+    header("Location: boka.php");
+    exit;
+}
+
+/* Hjälp: hitta practitioner för vald bokning */
+function hitta_practitioner_for_bokning($appointments, $appointment_name) {
+    foreach ($appointments as $appt) {
+        if (isset($appt["name"]) && $appt["name"] === $appointment_name) {
+            if (isset($appt["practitioner"])) {
+                return $appt["practitioner"];
+            }
+        }
+    }
+    return "";
+}
+
+/* 4. Hantera POST (Visa lediga tider / Omboka) */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // Utan ??
-    $appointment_name = "";
     if (isset($_POST["appointment_name"])) {
-        $appointment_name = $_POST["appointment_name"];
+        $valdt_bokning = $_POST["appointment_name"];
     }
-
-    $new_date = "";
     if (isset($_POST["new_date"])) {
-        $new_date = $_POST["new_date"];
+        $vald_datum = $_POST["new_date"];
     }
 
-    $new_time = "";
-    if (isset($_POST["new_time"])) {
-        $new_time = $_POST["new_time"];
+    // A) Visa lediga tider
+    if (isset($_POST["check_availability"])) {
+
+        if ($valdt_bokning === "" || $vald_datum === "") {
+            $message = "Välj bokning och datum först.";
+        } else {
+
+            $prac_id = hitta_practitioner_for_bokning($appointments, $valdt_bokning);
+
+            if ($prac_id === "") {
+                $message = "Kunde inte hitta vårdgivare för bokningen.";
+            } else {
+
+                $fields_booked  = urlencode('["appointment_time"]');
+                $filters_booked = urlencode(
+                    '[["practitioner","=","' . $prac_id . '"],["appointment_date","=","' . $vald_datum . '"]]'
+                );
+
+                $booked_url = $baseurl . "api/resource/Patient%20Appointment?fields=" .
+                              $fields_booked . "&filters=" . $filters_booked;
+
+                $ch = curl_init($booked_url);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+                curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+                curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+                curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+                curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $booked_response = curl_exec($ch);
+                curl_close($ch);
+
+                $booked_data  = json_decode($booked_response, true);
+                $booked_times = array();
+
+                if (isset($booked_data["data"])) {
+                    foreach ($booked_data["data"] as $row) {
+                        if (isset($row["appointment_time"])) {
+                            $booked_times[] = $row["appointment_time"];
+                        }
+                    }
+                }
+
+                // alla tider 08:00–15:00 (30 min)
+                $alla_tider = array(
+                    "08:00:00","08:30:00",
+                    "09:00:00","09:30:00",
+                    "10:00:00","10:30:00",
+                    "11:00:00","11:30:00",
+                    "12:00:00","12:30:00",
+                    "13:00:00","13:30:00",
+                    "14:00:00","14:30:00",
+                    "15:00:00"
+                );
+
+                $lediga_tider = array();
+                foreach ($alla_tider as $tid) {
+                    if (!in_array($tid, $booked_times)) {
+                        $lediga_tider[] = $tid;
+                    }
+                }
+
+                if (count($lediga_tider) === 0) {
+                    $message = "Inga lediga tider för valt datum.";
+                }
+            }
+        }
     }
 
-    // Enkel validering
-    if ($appointment_name === "" || $new_date === "" || $new_time === "") {
-        $message = "Fyll i alla fält.";
-    } else {
+    // B) Gör ombokningen
+    if (isset($_POST["do_reschedule"])) {
 
-        // Lägg till sekunder om de saknas
-        if (strlen($new_time) === 5) {
-            $new_time = $new_time . ":00";
+        $new_time = "";
+        if (isset($_POST["new_time"])) {
+            $new_time = $_POST["new_time"];
         }
 
-        $payload = array(
-            "appointment_date" => $new_date,
-            "appointment_time" => $new_time
-        );
-
-        // PUT URL
-        $update_url = $baseurl . "api/resource/Patient%20Appointment/" . urlencode($appointment_name);
-
-        $ch = curl_init($update_url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Accept: application/json"));
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-
-        $update_response = curl_exec($ch);
-        $err = curl_error($ch);
-        curl_close($ch);
-
-        if ($err !== "") {
-            $message = "Fel vid ombokning: " . $err;
+        if ($valdt_bokning === "" || $vald_datum === "" || $new_time === "") {
+            $message = "Välj bokning, datum och tid.";
         } else {
-            $message = "Tiden är ombokad!";
+
+            if (strlen($new_time) === 5) {
+                $new_time = $new_time . ":00";
+            }
+
+            $payload = array(
+                "appointment_date" => $vald_datum,
+                "appointment_time" => $new_time
+            );
+
+            $update_url = $baseurl . "api/resource/Patient%20Appointment/" . urlencode($valdt_bokning);
+
+            $ch = curl_init($update_url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $update_response = curl_exec($ch);
+            $err = curl_error($ch);
+            curl_close($ch);
+
+            if ($err !== "") {
+                $message = "Fel vid ombokning: " . $err;
+            } else {
+                $message = "Tiden är ombokad!";
+                $lediga_tider = array();
+            }
         }
     }
 }
@@ -122,87 +224,166 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <!doctype html>
 <html lang="sv">
 <head>
-    <meta charset="utf-8">
-    <title>Omboka tid</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Omboka tid</title>
+  <style>
+    :root {
+        --primary-blue: #1F6F78;
+        --primary-blue-light: #C2EBE8;
+        --accent-orange: #FCA06A;
+        --white: #FFFFFF;
+        --gray-light: #F5F5F5;
+        --text-dark: #0E2A2C;
+        --shadow-primary: rgba(31,111,120,0.25);
+    }
+    .navbar {
+      background: var(--primary-blue);
+      color: var(--white);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      margin-left: 16px;
+    }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: var(--gray-light);
+      margin: 0;
+      padding: 0;
+      color: var(--text-dark);
+    }
+    .container {
+      max-width: 900px;
+      margin: 24px auto;
+      background: var(--white);
+      border-radius: 12px;
+      padding: 24px;
+      border: 2px solid var(--primary-blue);
+      box-shadow: 0 6px 30px rgba(0,0,0,0.06);
+    }
+    form.booking {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .field { display: flex; flex-direction: column; }
+    .full { grid-column: 1 / -1; }
+    select, input[type="date"] {
+      padding: 8px 10px;
+      border: 1px solid var(--primary-blue-light);
+      border-radius: 8px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button.btn, a.btn {
+      background: var(--primary-blue);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px var(--shadow-primary);
+    }
+    a.btn.orange { background: var(--accent-orange); }
+    .message {
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      background: #dcfce7;
+    }
+  </style>
 </head>
 <body>
+  <nav class="navbar">
+    <div>Mölndals Vårdcentral</div>
+    <div class="nav-links">
+      <a href="index.php">Hem</a>
+      <a href="boka.php">Boka</a>
+      <a href="bokningar.php">Mina bokningar</a>
+    </div>
+  </nav>
 
-<h1>Omboka tid</h1>
+  <div class="container">
+    <h1>Omboka tid</h1>
+    <p>Inloggad som: <strong><?php echo htmlspecialchars($patient_name); ?></strong></p>
 
-<?php
-if ($message !== "") {
-    echo "<p><strong>" . htmlspecialchars($message) . "</strong></p>";
-}
-?>
+    <?php if ($message !== ""): ?>
+      <div class="message"><strong><?php echo htmlspecialchars($message); ?></strong></div>
+    <?php endif; ?>
 
-<?php if (count($appointments) === 0): ?>
+    <form method="post" class="booking">
 
-    <p>Inga bokningar hittades.</p>
-
-<?php else: ?>
-
-<form method="post">
-
-    <p>
-        <label>Välj bokning:</label><br>
-        <select name="appointment_name" required>
+      <div class="field full">
+        <label for="appointment_name">Välj bokning att omboka</label>
+        <select id="appointment_name" name="appointment_name" required>
+          <option value="">-- Välj --</option>
+          <?php foreach ($appointments as $appt): ?>
             <?php
-            foreach ($appointments as $appt) {
-
-                $date = "";
-                if (isset($appt["appointment_date"])) {
-                    $date = $appt["appointment_date"];
-                }
-
-                $time = "";
-                if (isset($appt["appointment_time"])) {
-                    $time = $appt["appointment_time"];
-                }
-
-                $patient = "";
-                if (isset($appt["patient"])) {
-                    $patient = $appt["patient"];
-                }
-
-                $prac = "";
-                if (isset($appt["practitioner"])) {
-                    $prac = $appt["practitioner"];
-                }
-
-                $name = "";
-                if (isset($appt["name"])) {
-                    $name = $appt["name"];
-                }
-
-                $label = $date . " " . $time . " - " . $patient . " / " . $prac;
-
-                echo "<option value='" . htmlspecialchars($name) . "'>" .
-                        htmlspecialchars($label) .
-                     "</option>";
-            }
+              $date = isset($appt["appointment_date"]) ? $appt["appointment_date"] : "";
+              $time = isset($appt["appointment_time"]) ? $appt["appointment_time"] : "";
+              $pat  = isset($appt["patient"]) ? $appt["patient"] : "";
+              $prac = isset($appt["practitioner"]) ? $appt["practitioner"] : "";
+              $name = isset($appt["name"]) ? $appt["name"] : "";
+              $label = $date . " " . $time . " - " . $pat . " / " . $prac;
+              $selected_attr = "";
+              if ($valdt_bokning !== "" && $valdt_bokning === $name) {
+                  $selected_attr = "selected";
+              }
             ?>
+            <option value="<?php echo htmlspecialchars($name); ?>" <?php echo $selected_attr; ?>>
+              <?php echo htmlspecialchars($label); ?>
+            </option>
+          <?php endforeach; ?>
         </select>
-    </p>
+      </div>
 
-    <p>
-        <label>Nytt datum:</label><br>
-        <input type="date" name="new_date" required>
-    </p>
+      <div class="field">
+        <label for="new_date">Nytt datum</label>
+        <input type="date" id="new_date" name="new_date"
+               value="<?php echo htmlspecialchars($vald_datum); ?>" required>
+      </div>
 
-    <p>
-        <label>Ny tid:</label><br>
-        <input type="time" name="new_time" required>
-    </p>
+      <div class="field full">
+        <div class="btn-row">
+          <button class="btn" type="submit" name="check_availability">Visa lediga tider</button>
+        </div>
+      </div>
 
-    <p>
-        <button type="submit">Omboka</button>
-    </p>
+      <?php if (count($lediga_tider) > 0): ?>
+        <div class="field">
+          <label for="new_time">Lediga tider</label>
+          <select id="new_time" name="new_time" required>
+            <option value="">-- Välj tid --</option>
+            <?php foreach ($lediga_tider as $tid): ?>
+              <?php $visad_tid = substr($tid, 0, 5); ?>
+              <option value="<?php echo htmlspecialchars($tid); ?>">
+                <?php echo htmlspecialchars($visad_tid); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
 
-</form>
+        <div class="field full">
+          <div class="btn-row">
+            <button class="btn" type="submit" name="do_reschedule">Omboka</button>
+          </div>
+        </div>
+      <?php endif; ?>
+       <div class="btn-row">
+            <a href="boka.php" class="btn orange">Boka ny tid</a>
+            <a href="index.php" class="btn orange">Till startsidan</a>
+          </div>
 
-<?php endif; ?>
-
-<p><a href="index.php">Tillbaka till startsidan</a></p>
-
+    </form>
+  </div>
 </body>
 </html>
