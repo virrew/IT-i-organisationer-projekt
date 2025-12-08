@@ -46,7 +46,8 @@ $fields = [
 ];
 
 $filters = [
-    ["patient", "=", $patient_id]
+    ["patient", "=", $patient_id],
+    ["status", "=", "Scheduled"]
 ];
 
 $url = $baseurl . 'api/resource/Patient%20Appointment?' .
@@ -281,6 +282,20 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                         <?= htmlspecialchars($a['status']) ?>
                     </span>
                 </div>
+
+                <div class="appointment-row" style="margin-top:10px;">
+    <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" 
+       style=" display:inline-block; 
+           padding:4px 10px;
+           background:#D9534F;
+           color:white;
+           border-radius:4px;
+           font-size:0.8rem;
+           text-decoration:none;
+           font-weight:bold;">
+        ❌ Avboka min tid
+    </a>
+</div>
 
             </div>
         <?php endforeach; ?>
