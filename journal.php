@@ -55,6 +55,8 @@ $journaler = erp_get(
     'api/resource/Patient%20Medical%20Record?fields=' . urlencode(json_encode($fields)) .
     '&filters=' . urlencode(json_encode($filters))
 );
+// HÄMTAR JOURNALER 2 //
+//$encounters = erp_get("api/resource/Patient%20Encounter?fields=[\"name\",\"patient\",\"patient_name\",\"encounter_date\",\"healthcare_practitioner\",\"practitioner_name\",\"department\",\"status\",\"reference_doctype\",\"diagnosis\",\"notes\"]&filters=[[\"patient\",\"=\",\"$patient\"]]");
 //try {
 //  $ch = curl_init($baseurl . 'api/method/login');
 //} catch (Exception $e) {
@@ -246,6 +248,24 @@ $journaler = erp_get(
     tr:hoover {
         background: var(--primary-blue-light);
     }
+    .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.card {
+    background: var(--white);
+    border: 1px solid var(--primary-blue-light);
+    border-radius: 12px;
+    padding: 20px;
+    width: 250px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.card p {
+    margin: 6px 0;
+}
     </style>
 <body>
 
@@ -272,55 +292,45 @@ $journaler = erp_get(
 
 <?php if (!empty($journaler)): ?>
 
-<table>
-    <tr>
-        <th>Datum</th>
-        <th>Vårdgivare</th>
-        <th>Status</th>
-        <th>Typ av möte</th>
-    </tr>
+<div class="card-container">
+    <?php
+    $practitioner_lookup = [];
+    foreach ($practitioner as $p) {
+        $practitioner_lookup[$p['name']] = trim(($p['first_name'] ?? '') . ' ' . ($p['last_name'] ??''));
+    }
 
-    <?php foreach ($journaler as $journal): ?>
-        <?php
+    foreach ($journaler as $journal):
         $date = $journal['communication_date'] ?? '';
         // Delar upp subject så att endast vårdgivarens namn dyker upp
-        $subject = $journal['subject'] ?? '';
-        if ($subject) {
-            $parts = explode(': ', $subject);
-            $practitioner_name = end($parts);
-        }
-        $status = $journal['status'] ??'';
+        $subject = $journal['subject'] ?? ''; // Tar bort <strong> och <br>
+        $parts = explode(":", $subject);
+        $pract_code = trim($parts[1] ?? '');
+        // Hämtar vårdgivarens namn från lookup-arrayen
+        $pract_name = $practitioner_lookup[$pract_code] ?? $pract_code;
         $appointment_type = $journal['reference_doctype'] ?? '';
         ?>
-        <tr>
-            <td><?= htmlspecialchars($date) ?></td>
-            <td><?= strip_tags($practitioner_name) ?></td>
-            <td><?= htmlspecialchars($status) ?></td>
-            <td><?= htmlspecialchars($appointment_type) ?></td>
-        </tr>
+            <div class="card">
+                <p><strong>Datum:</strong> <?= htmlspecialchars($date) ?></p>
+                <p><strong>Vårdgivare:</strong> <?= strip_tags($pract_name) ?></p>
+                <p><strong>Typ av möte:</strong> <?= htmlspecialchars($appointment_type) ?></p>
+                <p><strong>Diagnoser:<strong>
+            </div>
     <?php endforeach; ?>
-</table>
+</div>
 
 <?php else: ?>
     <p>Ingen journaldata hittades för dig.</p>
 <?php endif; ?>
 
-    <!-- Provsvar-tabell -->
-    <h2>Provsvar</h2>
-    <table border="1">
-        <tr>
-            <th>Provnamn</th>
-            <th>Datum</th>
-            <th>Resultat</th>
-            <th>Referensintervall</th>
-        </tr>
-        <tr>
-            <td>Hemoglobin</td>
-            <td>2025-11-18</td>
-            <td>132 g/L</td>
-            <td>120–155 g/L</td>
-        </tr>
-    </table>
+<h2>Provsvar</h2>
+<div class="card-container">
+    <div class="card">
+        <p><strong>Provnamn:</strong> Hemaglobin</p>
+        <p><strong>Datum:</strong> 2025-11-18</p>
+        <p><strong>Resultat</strong> 132 g/L</p>
+        <p><strong>Referensintervall:</strong> 120-155 g/L</p>
+    </div>
+</div>
 
 </div>
 </body>
