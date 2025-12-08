@@ -46,7 +46,8 @@ $fields = [
 ];
 
 $filters = [
-    ["patient", "=", $patient_id]
+    ["patient", "=", $patient_id],
+    ["status", "=", "Scheduled"]
 ];
 
 $url = $baseurl . 'api/resource/Patient%20Appointment?' .
