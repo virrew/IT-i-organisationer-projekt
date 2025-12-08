@@ -283,9 +283,9 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                 </div>
 
                 <div class="appointment-row" style="margin-top:10px;">
-    <a href="cancel.php?id=<?= urlencode($a['name']) ?>" 
+    <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" 
        style=" display:inline-block; 
-            padding:4px 10px;
+           padding:4px 10px;
            background:#D9534F;
            color:white;
            border-radius:4px;
