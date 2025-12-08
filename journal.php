@@ -14,93 +14,143 @@ error_reporting(E_ALL);
 
 $cookiepath = "/tmp/cookies.txt";
 $tmeout = 3600; // (3600=1hr)
-$baseurl = 'http://193.93.250.83:8080/'; 
+$baseurl = 'http://193.93.250.83:8080/';
 
-try {
-  $ch = curl_init($baseurl . 'api/method/login');
-} catch (Exception $e) {
-  echo 'Caught exception: ',  $e->getMessage(), "\n";
+function erp_get($endpoint) {
+    global $cookiepath, $tmeout, $baseurl;
+
+    $ch = curl_init($baseurl . $endpoint);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Accept: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    $err = curl_error($ch);
+    curl_close($ch);
+
+    if ($err) {
+        die("cURL error: $err");
+    }
+
+    $json = json_decode($response, true);
+    return $json['data'] ?? [];
 }
 
-curl_setopt($ch, CURLOPT_POST, true);
-//  ----------  Här sätter ni era login-data ------------------ //
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24hedan@student.his.se", "pwd":"9901hed0199And!"}'); 
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+// HÄMTA VÅRDGIVARE //
+$practitioner = erp_get('api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
+
+// HÄMTA JOURNALER //
+$fields = ['name','subject','communication_date','owner','status','reference_doctype','reference_name'];
+$filters = [['patient', '=', $patient]];
+
+$journaler = erp_get(
+    'api/resource/Patient%20Medical%20Record?fields=' . urlencode(json_encode($fields)) .
+    '&filters=' . urlencode(json_encode($filters))
+);
+//try {
+//  $ch = curl_init($baseurl . 'api/method/login');
+//} catch (Exception $e) {
+//  echo 'Caught exception: ',  $e->getMessage(), "\n";
+//}
+
+// LOGGA IN //
+
+//curl_setopt($ch, CURLOPT_POST, true);
+//curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24hedan@student.his.se", "pwd":"9901hed0199And!"}'); 
+//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+//curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+//curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+//curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+//curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+//curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-$login_response = curl_exec($ch);
-$login_response = json_decode($login_response, true);
+//$loginResponse = curl_exec($ch);
+//$loginResponse = json_decode($login_response, true);
 
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
-curl_close($ch);
+//$error_no = curl_errno($ch);
+//$error = curl_error($ch);
+//curl_close($ch);
 
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo 'LOGIN RESPONSE:<br><pre>';
-print_r($login_response) . "</pre><br>";
-echo "</div>";
+//echo "<div style='background-color:lightgray; border:1px solid black'>";
+//echo 'LOGIN RESPONSE:<br><pre>';
+//print_r($login_response) . "</pre><br>";
+//echo "</div>";
 
 // Hämtar alla fält
-$fields = urlencode('["*"]');
+//$fields = urlencode('["*"]');
 
 // Filter som inte är en sträng
-$filters_array = '[
- ["patient", "=", $patient]
-]';
-$filters = urlencode(json_encode($filters_array));
-// echo $filters_array;
-$ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
+//$filters_array = [
+// ["patient", "=", $patient]
+//];
+//$filters = urlencode(json_encode($filters_array));
 
-// man kan även specificera vilka fält man vill se
-// urlencode krävs när du har specialtecken eller mellanslag  
-// $ch = curl_init($baseurl . 'api/resource/User?fields='. urlencode('["name", "first_name", "last_login"]'));
-// det funkerar lika bra att ta bort mellanslaget i denna fråga
-// $ch = curl_init($baseurl . 'api/resource/User?fields=["name","first_name","last_login"]');
-
-//jag kör en get request, ibland vill man kanske köra en annan typ av request, och ibland så beöver man ha med postfields
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
-curl_close($ch);
+// HÄMTAR JOURNALDATA //
+//$ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
+//curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+//curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+//curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+//curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+//curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+//curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//$journalResponse = curl_exec($ch);
+//$journalResponse = json_decode($journalResponse, true);
+//$error_no = curl_errno($ch);
+//$error = curl_error($ch);
+//curl_close($ch);
 
 //här väljer jag att loopa över alla poster i [data] och för varje resultat så skriver jag ut name
-echo "<strong>LISTA:</strong><br>";
-foreach($response['data'] AS $key => $value){
-  echo $value["name"]."<br>";
-}
+//echo "<strong>LISTA:</strong><br>";
+//foreach($journalResponse['data'] AS $key => $value){
+//  echo $value["name"]."<br>";
+//}
 
 // Journaldata (Säker hantering)
-$journaler = [];
+//$journaler = [];
 // Om data finns läggs den här
-if (isset($response['data']) && is_array($response['data'])) {
-    $journaler = $response['data'];
-}
+//if (isset($journalResponse['data']) && is_array($journalResponse['data'])) {
+//    $journaler = $journalResponse['data'];
+//}
 
 // Visa journal i tabell
-echo "<h2>Journal för: $patient</h2>";
-echo "<strong>LISTA:</strong><br>";
+//echo "<h2>Journal för: $patient</h2>";
+//echo "<strong>LISTA:</strong><br>";
 
-if (empty($journaler)) {
-    echo "Din journal är tom.";
-} else {
-    foreach ($journaler as $row) {
-        echo htmlspecialchars($row["name"]) . "<br>";
-    }
-}
+//if (empty($journaler)) {
+//    echo "Din journal är tom.";
+//} else {
+//    foreach ($journaler as $row) {
+//        echo htmlspecialchars($row["name"]) . "<br>";
+//    }
+//}
+
+// HÄMTAR VÅRDGIVARE //
+//$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
+//curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+//curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+//curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+//curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+//curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+//curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//$practResponse = curl_exec($ch);
+//$practResponse = json_decode($practResponse, true);
+//$practitioner = $practResponse['data'] ?? [];
+//$error_no = curl_errno($ch);
+//$error = curl_error($ch);
+//curl_close($ch);
+
 ?>
 <!DOCTYPE html>
 <html lang="sv">
@@ -201,44 +251,59 @@ if (empty($journaler)) {
 
 <nav class="navbar">
     <div class="nav-brand">Mölndals Vårdcentral</div>
-
     <div class="nav-links">
-        <a href="index.php">Hem</a>
-        <a href="recept.php">Mina recept</a>
-        <a href="boka.php">Mina bokningar</a>
-        <a href="Kontakt.php">Kontakt</a>
-        <a href="logout.php">Logga ut</a>
+      <a href="index.php">Hem</a>
+      <a href="recept.php">Mina recept</a>
+      <a href="bokningar.php">Mina bokningar</a>
+      <a href="journal.php">Min journal</a>
+      <span style="margin-right: 15px;"><a href="Kontakt.php">Kontakt</a></span>
+      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+      <?= htmlspecialchars($_SESSION['username']) ?>
+      <a href="logout.php">Logga ut</a>
+      <?php else: ?>
+      <a href="login.php">Logga in</a>
+      <?php endif; ?>
     </div>
-</nav>
+    </nav>
 
 <div class="container">
 
-    <h1>Min journal för <?php echo htmlspecialchars($patient); ?></h1>
-  
-        <?php if (!empty($journaler) && isset($journaler[0]) && is_array($journaler[0])): ?>
-            <table border="1">
-                <tr>
-                    <?php
-                    // Rubriker baserat på första posten
-                    foreach ($journaler[0] as $key => $value) {
-                        echo "<th>" . htmlspecialchars($key) . "</th>";
-                    }
-                    ?>
-                <tr>
-                <?php
-                //loopar över alla journalposter
-                foreach ($journaler as $row) {
-                    echo "<tr>";
-                    foreach ($row as $value) {
-                        echo "<td>" . htmlspecialchars($value) . "</td>";
-                    }
-                    echo "</tr>";
-                }
-                ?>
-            </table>
-        <?php else: ?>
-            <p>Ingen journaldata hittades för dig.</p>
-        <?php endif; ?>
+<h2>Journalanteckningar</h2>
+
+<?php if (!empty($journaler)): ?>
+
+<table>
+    <tr>
+        <th>Datum</th>
+        <th>Vårdgivare</th>
+        <th>Status</th>
+        <th>Typ av möte</th>
+    </tr>
+
+    <?php foreach ($journaler as $journal): ?>
+        <?php
+        $date = $journal['communication_date'] ?? '';
+        // Delar upp subject så att endast vårdgivarens namn dyker upp
+        $subject = $journal['subject'] ?? '';
+        if ($subject) {
+            $parts = explode(': ', $subject);
+            $practitioner_name = end($parts);
+        }
+        $status = $journal['status'] ??'';
+        $appointment_type = $journal['reference_doctype'] ?? '';
+        ?>
+        <tr>
+            <td><?= htmlspecialchars($date) ?></td>
+            <td><?= strip_tags($practitioner_name) ?></td>
+            <td><?= htmlspecialchars($status) ?></td>
+            <td><?= htmlspecialchars($appointment_type) ?></td>
+        </tr>
+    <?php endforeach; ?>
+</table>
+
+<?php else: ?>
+    <p>Ingen journaldata hittades för dig.</p>
+<?php endif; ?>
 
     <!-- Provsvar-tabell -->
     <h2>Provsvar</h2>
