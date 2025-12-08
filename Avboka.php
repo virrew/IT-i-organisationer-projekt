@@ -42,6 +42,7 @@ if (isset($response['full_name'])) {
 }
 
 
+
 // DELETE (Avboka)
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["cancel_id"])) {
 
@@ -72,7 +73,7 @@ $fields = [
 ];
 
 $filters = [
-    ["patient_name", "=", $logged_in_user],
+  ["patient_name", "=", $logged_in_user],
     ["status", "=", "Scheduled"]
 ];
 
