@@ -1,12 +1,12 @@
 <?php 
 session_start();
- if (!isset($_SESSION['patient'])) {
+ if (!isset($_SESSION['patient_id'])) {
     // Om ingen är inloggad, skicka användaren till login
     header("Location: login.php");
     exit;
 }
 
-$patient = $_SESSION['patient']; // Inloggad patient
+$patient = $_SESSION['patient_id']; // Inloggad patient
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -32,36 +32,27 @@ curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-$response = curl_exec($ch);
-$response = json_decode($response, true);
+$login_response = curl_exec($ch);
+$login_response = json_decode($login_response, true);
 
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-if (!empty($error_no)) {
-  echo "<div style='background-color:red'>";
-  echo '$error_no<br>';
-  var_dump($error_no);
-  echo "<hr>";
-  echo '$error<br>';
-  var_dump($error);
-  echo "<hr>";
-  echo "</div>";
-}
 echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
+echo 'LOGIN RESPONSE:<br><pre>';
+print_r($login_response) . "</pre><br>";
 echo "</div>";
 
-// Filtrerar så att endast journalet för den inloggade patienten visas
+// Hämtar alla fält
 $fields = urlencode('["*"]');
 
+// Filter som inte är en sträng
 $filters_array = '[
- ["patient", "=", '. $patient . ']
+ ["patient", "=", $patient]
 ]';
-$filters = urlencode($filters_array);
-echo $filters_array;
+$filters = urlencode(json_encode($filters_array));
+// echo $filters_array;
 $ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
 
 // man kan även specificera vilka fält man vill se
@@ -82,26 +73,9 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 $response = curl_exec($ch);
 $response = json_decode($response, true);
-
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
-
-// Felhantering
-if (!empty($error_no)) {
-  echo "<div style='background-color:red'>";
-  echo '$error_no<br>';
-  var_dump($error_no);
-  echo "<hr>";
-  echo '$error<br>';
-  var_dump($error);
-  echo "<hr>";
-  echo "</div>";
-}
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
 
 //här väljer jag att loopa över alla poster i [data] och för varje resultat så skriver jag ut name
 echo "<strong>LISTA:</strong><br>";
@@ -109,9 +83,24 @@ foreach($response['data'] AS $key => $value){
   echo $value["name"]."<br>";
 }
 
-// Journaldata
-$journaler = $response['data'] ?? [];
+// Journaldata (Säker hantering)
+$journaler = [];
+// Om data finns läggs den här
+if (isset($response['data']) && is_array($response['data'])) {
+    $journaler = $response['data'];
+}
 
+// Visa journal i tabell
+echo "<h2>Journal för: $patient</h2>";
+echo "<strong>LISTA:</strong><br>";
+
+if (empty($journaler)) {
+    echo "Din journal är tom.";
+} else {
+    foreach ($journaler as $row) {
+        echo htmlspecialchars($row["name"]) . "<br>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="sv">
@@ -210,14 +199,6 @@ $journaler = $response['data'] ?? [];
     </style>
 <body>
 
-<!-- Visar vem som är inloggad 
-    <div>
-        Inloggad som: <strong><//?php  echo $_SESSION['patient_namn']; ?></strong>
-        | <a href="logout.php">Logga ut</a>
-    </div>
-    <hr>
--->
-
 <nav class="navbar">
     <div class="nav-brand">Mölndals Vårdcentral</div>
 
@@ -232,36 +213,32 @@ $journaler = $response['data'] ?? [];
 
 <div class="container">
 
-    <h1>Min journal</h1>
-
-    <h2>Journalanteckningar</h2>
-    <table border="1">
-        <tr>
-            <th>Datum</th>
-            <th>Vårdgivare</th>
-            <th>Patient</th>
-            <th>Diagnoser</th>
-            <th>Status</th>
-            <th>Provsvar</th>
-            <th>Behandlingar</th>
-        </tr>
+    <h1>Min journal för <?php echo htmlspecialchars($patient); ?></h1>
   
-        <?php if (!empty($journaler)): ?>
-            <?php  foreach ($journaler as $journal): ?>
+        <?php if (!empty($journaler) && isset($journaler[0]) && is_array($journaler[0])): ?>
+            <table border="1">
                 <tr>
-                    <td><?php echo htmlspecialchars ($journal['communication_date'] ?? ''); ?></td> <!-- $journal['nyckel'] ?? '' gör att det blir tomt om ingen nyckel finns -->
-                    <td><?php echo htmlspecialchars ($journal['owner'] ?? ''); ?></td>
-                    <td><?php echo htmlspecialchars ($journal['patient'] ?? ''); ?></td>
-                    <td><?php echo htmlspecialchars ($journal['subject'] ?? ''); ?></td>
-                    <td><?php echo htmlspecialchars ($journal['status']?? ''); ?></td>
-                    <td><?php echo htmlspecialchars ($journal['reference_doctype'] ?? ''); ?></td>
-                    <td><?php echo htmlspecialchars ($journal['reference_name']?? ''); ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="7">Ingen journaldata hittades för dig.</td></tr>
-            <?php endif; ?>
-    </table>
+                    <?php
+                    // Rubriker baserat på första posten
+                    foreach ($journaler[0] as $key => $value) {
+                        echo "<th>" . htmlspecialchars($key) . "</th>";
+                    }
+                    ?>
+                <tr>
+                <?php
+                //loopar över alla journalposter
+                foreach ($journaler as $row) {
+                    echo "<tr>";
+                    foreach ($row as $value) {
+                        echo "<td>" . htmlspecialchars($value) . "</td>";
+                    }
+                    echo "</tr>";
+                }
+                ?>
+            </table>
+        <?php else: ?>
+            <p>Ingen journaldata hittades för dig.</p>
+        <?php endif; ?>
 
     <!-- Provsvar-tabell -->
     <h2>Provsvar</h2>
