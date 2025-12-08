@@ -28,32 +28,15 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_exec($ch);
 curl_close($ch);
 
-/* 2. Hämta patient (G6) */
-$fields_patient  = urlencode('["name","patient_name","sex"]');
-$filters_patient = urlencode('[["patient_name","LIKE","%G6%"]]');
-
-$patient_url = $baseurl . "api/resource/Patient?fields=" . $fields_patient . "&filters=" . $filters_patient;
-
-$ch = curl_init($patient_url);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$patient_response = curl_exec($ch);
-curl_close($ch);
-
-$patient_data = json_decode($patient_response, true);
-
-if (!isset($patient_data['data']) || count($patient_data['data']) === 0) {
-    die("Kunde inte hitta patientdata.");
+/* 2. Hämta inloggad patient från sessionen (i stället för G6) */
+if (!isset($_SESSION['patient_id']) || !isset($_SESSION['patient_name'])) {
+    // Om ingen patient finns i sessionen → skicka tillbaka till startsidan eller login
+    header("Location: index.php");
+    exit;
 }
 
-$patient      = $patient_data['data'][0];
-$patient_id   = $patient['name'];
-$patient_name = $patient['patient_name'];
+$patient_id   = $_SESSION['patient_id'];   // t.ex. "PAT-0005"
+$patient_name = $_SESSION['patient_name']; // visas i "Inloggad som"
 
 /* 3. Hämta alla bokningar för patienten */
 $fields_appt  = urlencode('["name","appointment_date","appointment_time","patient","practitioner"]');
@@ -378,10 +361,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           </div>
         </div>
       <?php endif; ?>
-       <div class="btn-row">
-            <a href="boka.php" class="btn orange">Boka ny tid</a>
-            <a href="index.php" class="btn orange">Till startsidan</a>
-          </div>
+
+      <div class="btn-row">
+        <a href="boka.php" class="btn orange">Boka ny tid</a>
+        <a href="index.php" class="btn orange">Till startsidan</a>
+      </div>
 
     </form>
   </div>
