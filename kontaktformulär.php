@@ -47,11 +47,7 @@ if (!empty($error_no)) {
   echo "</div>";
 }
 
-if($_SERVER['REQUEST_METHOD'] !== 'POST' )
-  {
-    header("Location: Kontaktformulär.php");
-    exit;
-}
+
 
 $contact_field1 = trim($_POST['field1'] ?? '');
 $contact_field2 = trim($_POST['field2'] ?? '');
@@ -106,8 +102,7 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-header("Location: boka.php");
-exit;
+
 ?>
 
 <!doctype html>
