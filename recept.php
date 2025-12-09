@@ -288,40 +288,50 @@ echo "</div>";
 }
 
         /* NAVBAR */
-    .navbar {
-        background: var(--primary-blue);
-        color: var(--white);
-        padding: 12px 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-}
+        .navbar {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
 
-    .nav-brand {
-        font-size: 1.2rem;
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-user {
+            font-size: 0.95rem;
+        }
+
+        .nav-brand a {
+        color: var(--white);
         font-weight: bold;
-}
+        font-size: 1.2rem;
+        }
 
-    .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-}
-
-    .nav-links a {
-        color: var(--white);
-        text-decoration: none;
-        font-weight: 500;
-}
-
-    .nav-links a:hover {
-        text-decoration: underline;
-}
-
-    .nav-user {
-        font-size: 0.95rem;
-}
+        .nav-brand a:hover {
+            text-decoration: underline;
+        }
 </style>
 
 </head>
