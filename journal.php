@@ -56,7 +56,7 @@ $journaler = erp_get(
     '&filters=' . urlencode(json_encode($filters))
 );
 
-// HÄMTA JOURNALINFO FRÅN ENCOUNTERS I ERP //
+// HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
 $encounters = erp_get(
     'api/resource/Patient%20Encounter?fields=' . urlencode(json_encode([
         "name",
