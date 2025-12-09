@@ -1,21 +1,6 @@
 <?php
 session_start();
 
-$contact_field1 = trim($_POST['field1'] ?? '');
-$contact_field2 = trim($_POST['field2'] ?? '');
-$contact_field3 = trim($_POST['field3'] ?? '');
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['field1'])) {
-    if ($contact_field1 !== '' && $contact_field2 !== '' && $contact_field3 !== '') {
-        $_SESSION['contact_data'] = [
-            'field1' => $contact_field1,
-            'field2' => $contact_field2,
-            'field3' => $contact_field3
-        ];
-    }
-}
-
-$contactData = $_SESSION['contact_data'] ?? null;
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -24,6 +9,13 @@ error_reporting(E_ALL);
 $cookiepath = "/tmp/cookies.txt";
 $tmeout = 3600; // (3600=1hr)
 $baseurl = 'http://193.93.250.83:8080/';
+
+
+
+
+
+$contactData = $_SESSION['contact_data'] ?? null;
+
 
 try {
   $ch = curl_init($baseurl . 'api/method/login');
