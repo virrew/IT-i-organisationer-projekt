@@ -343,7 +343,7 @@ $encounters = erp_get(
     </div>
 
 <h2>Provsvar</h2>
-<?php if (!empty($enc['lab_test_prescription'])): ?>
+<?php if (!empty($encounter['lab_test_prescription'])): ?>
 <div class="card">
         <p><strong>Provnamn:</strong> <?=htmlspecialchars($encounter['lab_test_presciption']) ?></p>
         <p><strong>Datum:</strong> <?=htmlspecialchars($encounter['lab_test_date']) ?></p>
