@@ -55,13 +55,27 @@ $journaler = erp_get(
     'api/resource/Patient%20Medical%20Record?fields=' . urlencode(json_encode($fields)) .
     '&filters=' . urlencode(json_encode($filters))
 );
-// HÄMTAR JOURNALER 2 //
-//$encounters = erp_get("api/resource/Patient%20Encounter?fields=[\"name\",\"patient\",\"patient_name\",\"encounter_date\",\"healthcare_practitioner\",\"practitioner_name\",\"department\",\"status\",\"reference_doctype\",\"diagnosis\",\"notes\"]&filters=[[\"patient\",\"=\",\"$patient\"]]");
-//try {
-//  $ch = curl_init($baseurl . 'api/method/login');
-//} catch (Exception $e) {
-//  echo 'Caught exception: ',  $e->getMessage(), "\n";
-//}
+
+// HÄMTA JOURNALINFO FRÅN ENCOUNTERS I ERP //
+$encounters = erp_get(
+    'api/resource/Patient%20Encounter?fields=' . urlencode(json_encode([
+        "name",
+        "patient",
+        "patient_name",
+        "encounter_date",
+        "healthcare_practitioner",
+        "practitioner_name",
+        "medical_department",
+        "status",
+        "notes",
+        "custom_diagnos",
+        "custom_symtom",
+        "lab_test_persctiption"
+    ])) .
+    '&filters=' . urlencode(json_encode([
+        ["patient", "=", $patient]
+    ]))
+);
 
 // LOGGA IN //
 
@@ -290,31 +304,19 @@ $journaler = erp_get(
 
 <h2>Journalanteckningar</h2>
 
-<?php if (!empty($journaler)): ?>
+<?php if (!empty($encounters)): ?>
 
 <div class="card-container">
-    <?php
-    $practitioner_lookup = [];
-    foreach ($practitioner as $p) {
-        $practitioner_lookup[$p['name']] = trim(($p['first_name'] ?? '') . ' ' . ($p['last_name'] ??''));
-    }
 
-    foreach ($journaler as $journal):
-        $date = $journal['communication_date'] ?? '';
-        // Delar upp subject så att endast vårdgivarens namn dyker upp
-        $subject = $journal['subject'] ?? ''; // Tar bort <strong> och <br>
-        $parts = explode(":", $subject);
-        $pract_code = trim($parts[1] ?? '');
-        // Hämtar vårdgivarens namn från lookup-arrayen
-        $pract_name = $practitioner_lookup[$pract_code] ?? $pract_code;
-        $appointment_type = $journal['reference_doctype'] ?? '';
-        ?>
-            <div class="card">
-                <p><strong>Datum:</strong> <?= htmlspecialchars($date) ?></p>
-                <p><strong>Vårdgivare:</strong> <?= strip_tags($pract_name) ?></p>
-                <p><strong>Typ av möte:</strong> <?= htmlspecialchars($appointment_type) ?></p>
-                <p><strong>Diagnoser:<strong>
-            </div>
+    <?php foreach ($encounters as $encounter): ?>
+        <div class="card">
+            <p><strong>Datum:</strong> <?= htmlspecialchars($enc['encounter_date']) ?></p>
+            <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($enc['practitioner_name'] ?? 'Okänd') ?></p>
+            <p><strong>Avdelning:</strong> <?= htmlspecialchars($enc['department'] ?? '') ?></p>
+            <p><strong>Status:</strong> <?= htmlspecialchars($enc['status'] ?? '') ?></p>
+            <?php if (!empty($enc['notes'])): ?>
+                <p><strong>Anteckning:</strong><br><?= nl2br(htmlspecialchars($enc['notes'])) ?></p>
+            <?php endif; ?>
     <?php endforeach; ?>
 </div>
 
@@ -322,14 +324,32 @@ $journaler = erp_get(
     <p>Ingen journaldata hittades för dig.</p>
 <?php endif; ?>
 
-<h2>Provsvar</h2>
-<div class="card-container">
-    <div class="card">
-        <p><strong>Provnamn:</strong> Hemaglobin</p>
-        <p><strong>Datum:</strong> 2025-11-18</p>
-        <p><strong>Resultat</strong> 132 g/L</p>
-        <p><strong>Referensintervall:</strong> 120-155 g/L</p>
+<div class="card">
+        <p><strong>Diagnoser:</strong></p>
+
+        <?php if (!empty($enc['diagnosis'])): ?>
+            <ul>
+            <?php foreach ($enc['diagnosis'] as $diag): ?>
+                <li>
+                    <strong><?= htmlspecialchars($diag['diagnosis']) ?></strong>
+                    – <?= htmlspecialchars($diag['description'] ?? '') ?>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p>Inga diagnoser registrerade.</p>
+        <?php endif; ?>
     </div>
+
+<h2>Provsvar</h2>
+<?php if (!empty($enc['lab_test_perscription'])): ?>
+<div class="card">
+        <p><strong>Provnamn:</strong> <?=htmlspecialchars($enc['lab_test_persciption']) ?></p>
+        <p><strong>Datum:</strong> <?=htmlspecialchars($enc['lab_test_date']) ?></p>
+        <p><strong>Resultat</strong> <?=htmlspecialchars($enc['lab_test_result']) ?></p>
+        <p><strong>Referensintervall:</strong> <?=htmlspecialchars($enc['lab_test_reference']) ?></p>
+    </div>
+    <?php endif; ?>
 </div>
 
 </div>
