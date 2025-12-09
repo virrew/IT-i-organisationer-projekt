@@ -234,23 +234,35 @@ exit;
 </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-brand">Mölndals Vårdcentral</div>
-    <div class="nav-links">
-      <a href="index.php">Hem</a>
-      <a href="recept.php">Mina recept</a>
-      <a href="boka.php">Mina bokningar</a>
-      <a href="journal.php">Min journal</a>
-      <a href="Kontakt.php">Kontakt</a>
-      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-      <!-- Namnet i navbaren är bortkommenterat -->
-      <!-- <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span> -->
-      <a href="logout.php">Logga ut</a>
-      <?php else: ?>
-      <a href="login.php">Logga in</a>
-      <?php endif; ?>
-    </div>
-  </nav>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.php" style="color: white; text-decoration: none;">
+                Mölndals Vårdcentral
+            </a>
+        </div>
+
+        <div class="nav-links">
+
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+
+            <a href="journal.php">Min journal</a>
+            <a href="recept.php">Mina recept</a>
+            <a href="kontaktformulär.php">Boka tid här</a>
+            <a href="Kontakt.php">Kontakt</a>
+
+            <!-- Höger sida – användarnamn + logga ut -->
+            <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
+            <a href="logout.php">Logga ut</a>
+
+        <?php else: ?>
+
+            <a href="login.php">Logga in</a>
+
+        <?php endif; ?>
+
+        </div>
+    </nav>
   
   <div class="form-container">
     <h1>Boka tid hos oss</h1>
