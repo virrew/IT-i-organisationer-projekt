@@ -60,23 +60,23 @@ $journaler = erp_get(
 // HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
 $encounters = erp_get(
     'api/resource/Patient%20Encounter?fields=' . urlencode(json_encode([
-        "name",
         "patient",
         "patient_name",
-        "encounter_date",
-        "practitioner",
-        "practitioner_name",
-        "medical_department",
-        "status",
         "notes",
-        "custom_diagnos",
         "custom_symtom",
-        "lab_test_prescription"
+        "custom_diagnos",
+        "status",
+        "encounter_date",
+        "practitioner_name",
+        "medical_department"
     ])) .
     '&filters=' . urlencode(json_encode([
-        ["patient", "=", $patient]
+        ["patient", "=", $_SESSION['patient_id']]
     ]))
 );
+echo "<pre>";
+print_r($encounters);
+echo "</pre>";
 
 // LOGGA IN //
 
