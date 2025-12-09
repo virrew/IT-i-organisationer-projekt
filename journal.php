@@ -7,6 +7,7 @@ session_start();
 }
 
 $patient = $_SESSION['patient_id']; // Inloggad patient
+echo "PatientID i session: " . $patient;
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -63,14 +64,14 @@ $encounters = erp_get(
         "patient",
         "patient_name",
         "encounter_date",
-        "healthcare_practitioner",
+        "practitioner",
         "practitioner_name",
         "medical_department",
         "status",
         "notes",
         "custom_diagnos",
         "custom_symtom",
-        "lab_test_persctiption"
+        "lab_test_presctiption"
     ])) .
     '&filters=' . urlencode(json_encode([
         ["patient", "=", $patient]
@@ -323,12 +324,12 @@ $encounters = erp_get(
 
     <?php foreach ($encounters as $encounter): ?>
         <div class="card">
-            <p><strong>Datum:</strong> <?= htmlspecialchars($enc['encounter_date']) ?></p>
-            <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($enc['practitioner_name'] ?? 'Okänd') ?></p>
-            <p><strong>Avdelning:</strong> <?= htmlspecialchars($enc['department'] ?? '') ?></p>
-            <p><strong>Status:</strong> <?= htmlspecialchars($enc['status'] ?? '') ?></p>
-            <?php if (!empty($enc['notes'])): ?>
-                <p><strong>Anteckning:</strong><br><?= nl2br(htmlspecialchars($enc['notes'])) ?></p>
+            <p><strong>Datum:</strong> <?= htmlspecialchars($encounter['encounter_date']) ?></p>
+            <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
+            <p><strong>Avdelning:</strong> <?= htmlspecialchars($encounter['medical_department'] ?? '') ?></p>
+            <p><strong>Status:</strong> <?= htmlspecialchars($encounter['status'] ?? '') ?></p>
+            <?php if (!empty($encounter['notes'])): ?>
+                <p><strong>Anteckning:</strong><br><?= nl2br(htmlspecialchars($encounter['notes'])) ?></p>
             <?php endif; ?>
     <?php endforeach; ?>
 </div>
@@ -340,11 +341,11 @@ $encounters = erp_get(
 <div class="card">
         <p><strong>Diagnoser:</strong></p>
 
-        <?php if (!empty($enc['diagnosis'])): ?>
+        <?php if (!empty($encounter['custom_diagnos'])): ?>
             <ul>
-            <?php foreach ($enc['diagnosis'] as $diag): ?>
+            <?php foreach ($encounter['custom_diagnos'] as $diag): ?>
                 <li>
-                    <strong><?= htmlspecialchars($diag['diagnosis']) ?></strong>
+                    <strong><?= htmlspecialchars($diag['custom_diagnos']) ?></strong>
                     – <?= htmlspecialchars($diag['description'] ?? '') ?>
                 </li>
             <?php endforeach; ?>
@@ -355,12 +356,12 @@ $encounters = erp_get(
     </div>
 
 <h2>Provsvar</h2>
-<?php if (!empty($enc['lab_test_perscription'])): ?>
+<?php if (!empty($enc['lab_test_prescription'])): ?>
 <div class="card">
-        <p><strong>Provnamn:</strong> <?=htmlspecialchars($enc['lab_test_persciption']) ?></p>
-        <p><strong>Datum:</strong> <?=htmlspecialchars($enc['lab_test_date']) ?></p>
-        <p><strong>Resultat</strong> <?=htmlspecialchars($enc['lab_test_result']) ?></p>
-        <p><strong>Referensintervall:</strong> <?=htmlspecialchars($enc['lab_test_reference']) ?></p>
+        <p><strong>Provnamn:</strong> <?=htmlspecialchars($encounter['lab_test_presciption']) ?></p>
+        <p><strong>Datum:</strong> <?=htmlspecialchars($encounter['lab_test_date']) ?></p>
+        <p><strong>Resultat</strong> <?=htmlspecialchars($encounter['lab_test_result']) ?></p>
+        <p><strong>Referensintervall:</strong> <?=htmlspecialchars($encounter['lab_test_reference']) ?></p>
     </div>
     <?php endif; ?>
 </div>
