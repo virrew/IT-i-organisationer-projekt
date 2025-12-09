@@ -1,5 +1,11 @@
   <?php
   session_start();
+$_SESSION['contact_data'] = [
+    'field1' => $_POST['field1'] ?? '',
+    'field2' => $_POST['field2'] ?? '',
+    'field3' => $_POST['field3'] ?? ''
+];
+
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -54,16 +60,6 @@ $contact_field2 = trim($_POST['field2'] ?? '');
 $contact_field3 = trim($_POST['field3'] ?? '');
 
 
-    if ($contact_field1 !== '' && $contact_field2 !== '' && $contact_field3 !== '') {
-        $_SESSION['contact_data'] = [
-            'field1' => $contact_field1,
-            'field2' => $contact_field2,
-            'field3' => $contact_field3
-        ];
-    }
-
-
-
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -102,6 +98,10 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+header("Location: boka.php");
+exit;
+}
 
 ?>
 
@@ -255,7 +255,7 @@ curl_close($ch);
   <div class="form-container">
     <h1>Boka tid hos oss</h1>
     <!-- Todo: Gör kontroll på maxord -->
-    <form id="intake-form" method="post" action="boka.php">
+    <form id="intake-form" method="post" action="kontaktformulär.php">
       <input type="hidden" name="patientname" value="<?php echo htmlspecialchars($_SESSION['username']); ?>">
 
       <div class="field">
