@@ -63,7 +63,7 @@ $encounters = erp_get(
         "patient",
         "patient_name",
         "encounter_date",
-        "healthcare_practitioner",
+        "practitioner",
         "practitioner_name",
         "medical_department",
         "status",
@@ -312,7 +312,7 @@ $encounters = erp_get(
         <div class="card">
             <p><strong>Datum:</strong> <?= htmlspecialchars($enc['encounter_date']) ?></p>
             <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($enc['practitioner_name'] ?? 'Okänd') ?></p>
-            <p><strong>Avdelning:</strong> <?= htmlspecialchars($enc['department'] ?? '') ?></p>
+            <p><strong>Avdelning:</strong> <?= htmlspecialchars($enc['medical_department'] ?? '') ?></p>
             <p><strong>Status:</strong> <?= htmlspecialchars($enc['status'] ?? '') ?></p>
             <?php if (!empty($enc['notes'])): ?>
                 <p><strong>Anteckning:</strong><br><?= nl2br(htmlspecialchars($enc['notes'])) ?></p>
@@ -327,11 +327,11 @@ $encounters = erp_get(
 <div class="card">
         <p><strong>Diagnoser:</strong></p>
 
-        <?php if (!empty($enc['diagnosis'])): ?>
+        <?php if (!empty($enc['custom_diagnos'])): ?>
             <ul>
-            <?php foreach ($enc['diagnosis'] as $diag): ?>
+            <?php foreach ($enc['custom_diagnos'] as $diag): ?>
                 <li>
-                    <strong><?= htmlspecialchars($diag['diagnosis']) ?></strong>
+                    <strong><?= htmlspecialchars($diag['custom_diagnos']) ?></strong>
                     – <?= htmlspecialchars($diag['description'] ?? '') ?>
                 </li>
             <?php endforeach; ?>
