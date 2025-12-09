@@ -1,13 +1,13 @@
 <?php 
 session_start();
- if (!isset($_SESSION['patient_id'])) {
-    // Om ingen är inloggad, skicka användaren till login
-    header("Location: login.php");
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
+    header('Location: login.php');
     exit;
 }
 
-$patient = $_SESSION['patient_id']; // Inloggad patient
-echo "PatientID i session: " . $patient;
+$patient_id = $_SESSION['patient_id']; // G6förnamn+efternamn
+$patient_name = $_SESSION['patient_name'] ?? 'Patient'; // Förnamn
+echo "PatientID i session: " . $patient_id;
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -17,6 +17,8 @@ $cookiepath = "/tmp/cookies.txt";
 $tmeout = 3600; // (3600=1hr)
 $baseurl = 'http://193.93.250.83:8080/';
 
+
+// FUNKTION FÖR GET-ANROP MED cURL
 function erp_get($endpoint) {
     global $cookiepath, $tmeout, $baseurl;
 
@@ -45,17 +47,40 @@ function erp_get($endpoint) {
     return $json['data'] ?? [];
 }
 
+// LOGGA IN I ERP //
+$ch = curl_init($baseurl . 'api/method/login');
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24hedan@student.his.se", "pwd":"9901hed0199And!"}'); 
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+$loginResponse = curl_exec($ch);
+$loginResponse = json_decode($loginResponse, true);
+
+$error_no = curl_errno($ch);
+$error = curl_error($ch);
+curl_close($ch);
+
+echo "<div style='background-color:lightgray; border:1px solid black'>";
+echo 'LOGIN RESPONSE:<br><pre>';
+print_r($loginResponse) . "</pre><br>";
+echo "</div>";
+
 // HÄMTA VÅRDGIVARE //
-$practitioner = erp_get('api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
+//$practitioner = erp_get('api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
 
 // HÄMTA JOURNALER //
-$fields = ['name','subject','communication_date','owner','status','reference_doctype','reference_name'];
-$filters = [['patient', '=', $patient]];
+//$fields = ['name','subject','communication_date','owner','status','reference_doctype','reference_name'];
+//$filters = [['patient', '=', $patient]];
 
-$journaler = erp_get(
-    'api/resource/Patient%20Medical%20Record?fields=' . urlencode(json_encode($fields)) .
-    '&filters=' . urlencode(json_encode($filters))
-);
+//$journaler = erp_get(
+//    'api/resource/Patient%20Medical%20Record?fields=' . urlencode(json_encode($fields)) .
+//    '&filters=' . urlencode(json_encode($filters))
+//);
 
 // HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
 $encounters = erp_get(
@@ -77,29 +102,6 @@ $encounters = erp_get(
 echo "<pre>";
 print_r($encounters);
 echo "</pre>";
-
-// LOGGA IN //
-
-//curl_setopt($ch, CURLOPT_POST, true);
-//curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24hedan@student.his.se", "pwd":"9901hed0199And!"}'); 
-//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-//curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-//curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-//curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-//curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-//curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//$loginResponse = curl_exec($ch);
-//$loginResponse = json_decode($login_response, true);
-
-//$error_no = curl_errno($ch);
-//$error = curl_error($ch);
-//curl_close($ch);
-
-//echo "<div style='background-color:lightgray; border:1px solid black'>";
-//echo 'LOGIN RESPONSE:<br><pre>';
-//print_r($login_response) . "</pre><br>";
-//echo "</div>";
 
 // Hämtar alla fält
 //$fields = urlencode('["*"]');
@@ -258,58 +260,24 @@ echo "</pre>";
         margin-bottom: 16px;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 24px;
-        background: var(--white);
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.05);
-    }
-
-    th {
-        background: var(--primary-blue);
-        color: white;
-        padding: 12px;
-        text-align: left;
-        font-size: 0.95rem;
-    }
-
-    td {
-        padding: 10px;
-        border-bottom: 1px solid var(--primary-blue-light);
-        font-size: 0.9rem;
-        word-break: break-word;
-        white-space: normal;
-        overflow-wrap: break-word;
-    }
-
-    tr:nth-child(even) {
-        background: var(--mint-green);
-    }
-
-    tr:hoover {
-        background: var(--primary-blue-light);
-    }
     .card-container {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-}
+    }
 
-.card {
-    background: var(--white);
-    border: 1px solid var(--primary-blue-light);
-    border-radius: 12px;
-    padding: 20px;
-    width: 250px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
+    .card {
+        background: var(--white);
+        border: 1px solid var(--primary-blue-light);
+        border-radius: 12px;
+        padding: 20px;
+        width: 250px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
 
-.card p {
-    margin: 6px 0;
-}
+    .card p {
+        margin: 6px 0;
+    }
     </style>
 <body>
 
@@ -348,9 +316,7 @@ echo "</pre>";
 <h2>Journalanteckningar</h2>
 
 <?php if (!empty($encounters)): ?>
-
 <div class="card-container">
-
     <?php foreach ($encounters as $encounter): ?>
         <div class="card">
             <p><strong>Datum:</strong> <?= htmlspecialchars($encounter['encounter_date']) ?></p>
