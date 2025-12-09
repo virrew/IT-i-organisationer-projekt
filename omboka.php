@@ -286,14 +286,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div>Mölndals Vårdcentral</div>
-    <div class="nav-links">
-      <a href="index.php">Hem</a>
-      <a href="boka.php">Boka</a>
-      <a href="bokningar.php">Mina bokningar</a>
-    </div>
-  </nav>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.php" style="color: white; text-decoration: none;">
+                Mölndals Vårdcentral
+            </a>
+        </div>
+
+        <div class="nav-links">
+
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+
+            <a href="journal.php">Min journal</a>
+            <a href="recept.php">Mina recept</a>
+            <a href="kontaktformulär.php">Boka tid här</a>
+            <a href="Kontakt.php">Kontakt</a>
+
+            <!-- Höger sida – användarnamn + logga ut -->
+            <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
+            <a href="logout.php">Logga ut</a>
+
+        <?php else: ?>
+
+            <a href="login.php">Logga in</a>
+
+        <?php endif; ?>
+
+        </div>
+    </nav>
 
   <div class="container">
     <h1>Omboka tid</h1>

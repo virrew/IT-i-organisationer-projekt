@@ -166,6 +166,17 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
             font-size: 0.95rem;
         }
 
+        .nav-brand a {
+        color: var(--white);
+        font-weight: bold;
+        font-size: 1.2rem;
+        }
+
+        .nav-brand a:hover {
+            text-decoration: underline;
+        }
+
+
         /* PAGE LAYOUT */
         h1 {
             text-align: center;
@@ -219,20 +230,32 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-    <div class="nav-brand">Mölndals Vårdcentral</div>
-    <div class="nav-links">
-      <a href="index.php">Hem</a>
-      <a href="recept.php">Mina recept</a>
-      <a href="bokningar.php">Mina bokningar</a>
-      <a href="journal.php">Min journal</a>
-      <a href="Kontakt.php">Kontakt</a>
-      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-      <?= htmlspecialchars($_SESSION['username']) ?>
-      <a href="logout.php">Logga ut</a>
-      <?php else: ?>
-      <a href="login.php">Logga in</a>
-      <?php endif; ?>
-    </div>
+        <div class="nav-brand">
+            <a href="index.php" style="color: white; text-decoration: none;">
+                Mölndals Vårdcentral
+            </a>
+        </div>
+
+        <div class="nav-links">
+
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+
+            <a href="journal.php">Min journal</a>
+            <a href="recept.php">Mina recept</a>
+            <a href="kontaktformulär.php">Boka tid här</a>
+            <a href="Kontakt.php">Kontakt</a>
+
+            <!-- Höger sida – användarnamn + logga ut -->
+            <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
+            <a href="logout.php">Logga ut</a>
+
+        <?php else: ?>
+
+            <a href="login.php">Logga in</a>
+
+        <?php endif; ?>
+
+        </div>
     </nav>
 
     <div class="page-container">
