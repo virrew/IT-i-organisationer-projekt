@@ -71,7 +71,7 @@ $encounters = erp_get(
         "notes",
         "custom_diagnos",
         "custom_symtom",
-        "lab_test_presctiption"
+        "lab_test_prescription"
     ])) .
     '&filters=' . urlencode(json_encode([
         ["patient", "=", $patient]
@@ -358,7 +358,7 @@ $encounters = erp_get(
 <h2>Provsvar</h2>
 <?php if (!empty($encounter['lab_test_prescription'])): ?>
 <div class="card">
-        <p><strong>Provnamn:</strong> <?=htmlspecialchars($encounter['lab_test_presciption']) ?></p>
+        <p><strong>Provnamn:</strong> <?=htmlspecialchars($encounter['lab_test_prescription']) ?></p>
         <p><strong>Datum:</strong> <?=htmlspecialchars($encounter['lab_test_date']) ?></p>
         <p><strong>Resultat</strong> <?=htmlspecialchars($encounter['lab_test_result']) ?></p>
         <p><strong>Referensintervall:</strong> <?=htmlspecialchars($encounter['lab_test_reference']) ?></p>
