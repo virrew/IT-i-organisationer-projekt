@@ -43,8 +43,8 @@ function erp_get($endpoint) {
         die("cURL error: $err");
     }
 
-    $json = json_decode($response, true);
-    return $json['data'] ?? [];
+    return json_decode($response, true);
+   
 }
 
 // LOGGA IN I ERP //
@@ -60,7 +60,6 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $loginResponse = curl_exec($ch);
 $loginResponse = json_decode($loginResponse, true);
-
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
@@ -82,23 +81,27 @@ echo "</div>";
 //    '&filters=' . urlencode(json_encode($filters))
 //);
 
-// HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
-$encounters = erp_get(
-    'api/resource/Patient%20Encounter?fields=' . urlencode(json_encode([
-        "patient",
-        "patient_name",
-        "notes",
-        "custom_symtom",
-        "custom_diagnos",
-        "status",
-        "encounter_date",
-        "practitioner_name",
-        "medical_department"
-    ])) .
-    '&filters=' . urlencode(json_encode([
-        ["patient", "=", $_SESSION['patient_id']]
-    ]))
-);
+// HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP, FILTRERAR PÅ PATIENT-ID //
+$fields = [
+    "patient",
+    "patient_name",
+    "notes",
+    "custom_symtom",
+    "custom_diagnos",
+    "status",
+    "encounter_date",
+    "practitioner_name",
+    "medical_department",
+    "lab_test_prescription"
+];
+$filters = [
+    ["patient", "=", $patient_id]
+];
+
+$endpoint = 'api/resource/Patient%20Encounter?fields=' . urlencode(json_encode($fields)) .
+            '&filters=' . urlencode(json_encode($filters));
+$encounters = erp_get($endpoint);
+$encounters = $encounters['data'] ?? [];
 echo "<pre>";
 print_r($encounters);
 echo "</pre>";
