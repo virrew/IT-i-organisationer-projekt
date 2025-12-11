@@ -298,27 +298,19 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                     <?= htmlspecialchars($a['practitioner_name']) ?>
                 </div>
 
-                <div class="appointment-row">
-                    <span class="appointment-label">📌 Status:</span>
-                    <span class="status-pill status-<?= str_replace(' ', '', htmlspecialchars($a['status'])) ?>">
-                        <?= htmlspecialchars($a['status']) ?>
-                    </span>
-                </div>
-
                 <div class="appointment-row" style="margin-top:10px;">
-    <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" 
-       style=" display:inline-block; 
-           padding:4px 10px;
-           background:#D9534F;
-           color:white;
-           border-radius:4px;
-           font-size:0.8rem;
-           text-decoration:none;
-           font-weight:bold;">
-        ❌ Avboka min tid
-    </a>
-</div>
-
+                <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" 
+                style=" display:inline-block; 
+                    padding:4px 10px;
+                    background:#D9534F;
+                    color:white;
+                    border-radius:4px;
+                    font-size:0.8rem;
+                    text-decoration:none;
+                    font-weight:bold;">
+                    ❌ Avboka min tid
+                </a>
+                </div>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>

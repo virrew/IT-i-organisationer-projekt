@@ -7,7 +7,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     exit;
 }
 
-// Hämta patientnamnet från sessionen
+// Hämta patientnamnet från sessionen (från index.php)
 $patient_id   = $_SESSION['patient_id'];
 $patient_name = $_SESSION['patient_name'];
 $practitioner_name = $_SESSION['username'];
