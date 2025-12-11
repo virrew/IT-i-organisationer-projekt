@@ -480,18 +480,17 @@ if (!empty($response['data'])) {
             continue;
         }
 
-        // Beräkna slutdatum baserat på period (ex: "3 Week" → +3 veckor)
+        // Beräkna slutdatum baserat på period 
         $end_date = new DateTime($r['order_date']);
         $end_date->modify('+' . $r['period']);
 
-        // Hur många dagar kvar?
+        // Dagar kvar
         $days_left = (int)$today->diff($end_date)->format('%r%a');
 
-        // Lägg till värden i arrayen så vi kan använda i HTML
         $r['end_date'] = $end_date->format('Y-m-d');
         $r['days_left'] = $days_left;
 
-        // Om receptet har gått ut → flytta till utgångna
+        // Om receptet har gått ut, flytta till utgångna
         if ($days_left < 0) {
             $utgangna[] = $r;
         } else {
@@ -511,7 +510,7 @@ if (!empty($response['data'])) {
       </div>
 
       <div class="recept-info">
-        <!-- Lägg till mer information om dosering här, typ vilken stryka på preparatet -->
+        <!-- Information om dosering här -->
         <span class="recept-antal">Dosering: <?= htmlspecialchars($r['dosage_form'] ?? 'Okänd dosering') ?></span><br>
         <span class="recept-antal">När du ska ta: <?= htmlspecialchars($r['dosage'] ?? 'Okänd dosering') ?></span><br>
       </div>
