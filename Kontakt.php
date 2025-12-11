@@ -180,51 +180,55 @@ background-color: var(--gray-light);
       transform: translateY(-2px);
     }
 
-            /* NAVBAR */
-        .navbar {
-            background: var(--primary-blue);
-            color: var(--white);
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-        }
-
-        .nav-brand {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .nav-links a {
-            color: var(--white);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-
-        .nav-user {
-            font-size: 0.95rem;
-        }
-
-        .nav-brand a {
+    /* ===== NAVBAR ===== */
+    .navbar {
+        background: var(--primary-blue);
         color: var(--white);
-        font-weight: bold;
-        font-size: 1.2rem;
-        }
+        padding: 14px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
 
-        .nav-brand a:hover {
-            text-decoration: underline;
-        }
+    .nav-brand a {
+        color: var(--white);
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: opacity .2s ease;
+    }
+
+    .nav-brand a:hover {
+        opacity: 0.85;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .nav-links a {
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 500;
+        transition: opacity .2s ease;
+    }
+
+    .nav-links a:hover {
+        opacity: 0.75;
+    }
+
+    .nav-user {
+        font-weight: bold;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 8px;
+    }
   </style>
 </head>
 <body>
