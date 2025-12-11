@@ -311,6 +311,19 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                     ❌ Avboka min tid
                 </a>
                 </div>
+
+                <div class="appointment-row">
+                    <a href="omboka.php?id=<?= urlencode($a['name']) ?>"
+                    style="display:inline-block; 
+                            padding:4px 10px;
+                            background:#1F6F78;
+                            color:white;
+                            border-radius:4px;
+                            font-size:0.8rem;
+                            text-decoration:none;
+                            font-weight:bold;">
+                        🔁 Omboka min tid
+                    </a>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
