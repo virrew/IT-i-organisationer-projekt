@@ -228,7 +228,7 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
     </style>
 </head>
 <body>
-    <!-- Navigation -->
+<!-- Navigation -->
     <nav class="navbar">
         <div class="nav-brand">
             <a href="index.php" style="color: white; text-decoration: none;">
@@ -245,7 +245,6 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
             <a href="kontaktformulär.php">Boka tid här</a>
             <a href="Kontakt.php">Kontakt</a>
 
-            <!-- Höger sida – användarnamn + logga ut -->
             <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
             <a href="logout.php">Logga ut</a>
 

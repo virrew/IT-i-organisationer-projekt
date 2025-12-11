@@ -187,7 +187,7 @@ if (!isset($result["data"])) {
         --shadow-primary: rgba(31,111,120,0.25);
     }
 
-            /* NAVBAR */
+        /* NAVBAR */
         .navbar {
             background: var(--primary-blue);
             color: var(--white);
