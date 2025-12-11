@@ -362,7 +362,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
             data-practitioner-name="<?= htmlspecialchars($full) ?>"
             data-department="<?= htmlspecialchars($dep) ?>"
         >
-            <?= htmlspecialchars($full) ?>
+            <?= htmlspecialchars($full) ?> <i>(<?= htmlspecialchars($dep) ?>)</i>
         </option>
         <?php endforeach; ?>
       </select>
