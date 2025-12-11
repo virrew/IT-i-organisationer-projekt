@@ -8,8 +8,8 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 }
 
 // Hämtas från login.php där vi sparade ERPNext-ID
-$patient_id   = $_SESSION['patient_id'];      // Ex: HLC-PAT-2025-00018
-$patient_name = $_SESSION['patient_name'];    // Ex: G6Doris Dorisson
+$patient_id   = $_SESSION['patient_id'];
+$patient_name = $_SESSION['patient_name'];
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
