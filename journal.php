@@ -81,6 +81,16 @@ $url = $baseurl . "api/resource/Lab Test?" .
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+// HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
+$encounters = $baseurl .
+    'api/resource/Patient%20Encounter?fields=['.urlencode('"patient","patient_name","custom_symtom","custom_diagnos","status","encounter_date","practitioner_name","medical_department"').']' .
+    '&filters=' . urlencode('[["patient","=","' . $_SESSION['patient_id'] .'"]]');
+
+echo $encounters;
+
+$ch = curl_init($encounters); 
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
@@ -88,6 +98,8 @@ curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $response = curl_exec($ch);
+$encountersresponse = curl_exec($ch);
+$encountersresponse = json_decode($encountersresponse, true);
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
@@ -135,6 +147,8 @@ echo "<pre>Encounters:\n";
 print_r($encounters);
 echo "\nLab Results:\n";
 print_r($lab_results);
+echo "<pre>";
+print_r($encountersresponse);
 echo "</pre>";
 
 ?>
