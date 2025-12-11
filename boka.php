@@ -36,6 +36,32 @@ curl_setopt($login, CURLOPT_TIMEOUT, $tmeout);
 $login_response = curl_exec($login);
 curl_close($login);
 
+// Hämta patientdata
+$fields  = urlencode('["name","patient_name","sex"]');
+$filters = urlencode('[["name","=","'.$patient_id.'"]]');
+
+$patient_url = $baseurl . "api/resource/Patient?fields=$fields&filters=$filters";
+
+$ch = curl_init($patient_url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$patients = json_decode($response, true)['data'] ?? [];
+
+if (empty($patients)) {
+    die("Kunde inte hitta patientdata i ERPNext.");
+}
+
+// Uppdatera session:
+$_SESSION['patient_name'] = $patients[0]['patient_name'];
+$_SESSION['patient_sex']  = $patients[0]['sex'];
+
 // Hämta vårdpersonal förutom läkare
 $practitioners = [];
 
