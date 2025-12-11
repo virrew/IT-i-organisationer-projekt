@@ -99,18 +99,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
     if (strlen($time) == 5) $time .= ":00";
 
     $data = [
-        "appointment_type"        => $_POST["appointment_type"],
-        "appointment_date"        => $_POST["appointment_date"],
-        "appointment_time"        => $time,
+        "appointment_type" => $_POST["appointment_type"],
+        "appointment_date" => $_POST["appointment_date"],
+        "appointment_time" => $time,
         "healthcare_practitioner" => $_POST["healthcare_practitioner"],
-        "practitioner"            => $_POST["healthcare_practitioner"],
-        "practitioner_name"       => $_POST["practitioner_name"],
-        "department"              => $_POST["department"],
-        "duration"                => intval($_POST["duration"]),
-        "patient"                 => $patient_id,
-        "patient_name"            => $patient_name,
-        "patient_sex"             => $patient_sex,
-        "notes"                   => $_POST["notes"] ?? ""
+        "practitioner" => $_POST["healthcare_practitioner"],
+        "practitioner_name" => $_POST["practitioner_name"],
+        "department" => $_POST["department"],
+        "duration" => intval($_POST["duration"]),
+        "patient" => $patient_id,
+        "patient_name" => $patient_name,
+        "patient_sex" => $patient_sex,
+        "notes" => $_POST["notes"] ?? ""
+        "appointment_for" => $patient_id,
     ];
 
     $json = json_encode($data);
