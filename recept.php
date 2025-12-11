@@ -1,10 +1,6 @@
 <?php
 session_start();
 
-echo "<pre>";
-print_r($_SESSION);
-echo "</pre>";
-
 // Kontrollera att användaren är inloggad
 if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     header('Location: login.php');
@@ -12,7 +8,9 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 }
 
 // Hämta patientnamnet från sessionen
+$patient_id   = $_SESSION['patient_id'];
 $patient_name = $_SESSION['patient_name'];
+$practitioner_name = $_SESSION['username'];
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -55,10 +53,6 @@ if (!empty($error_no)) {
   echo "<hr>";
   echo "</div>";
 }
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
 
  // För att begära nytt recept, posta till ERP:t
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['renew_medication'])) {
@@ -139,8 +133,7 @@ $fields = [
 
 // Filtrera baserat på inloggad patients namn
 $filters = [
-    ["patient_name", "LIKE", "%G6%"],
-    ["patient_name", "LIKE", "%$patient_name%"]
+    ["patient", "=", $patient_id]
 ];
 
 // Enklare sätt att bygga URL:en
@@ -188,10 +181,6 @@ if (!empty($error_no)) {
   echo "<hr>";
   echo "</div>";
 }
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo '$response<br><pre>';
-echo print_r($response) . "</pre><br>";
-echo "</div>";
 ?>
 
 <!DOCTYPE html>
