@@ -299,6 +299,17 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                 </div>
 
                 <div class="appointment-row" style="margin-top:10px;">
+                <a href="omboka.php?id=<?= urlencode($a['name']) ?>"
+                    style="display:inline-block; 
+                            padding:4px 10px;
+                            background:#1F6F78;
+                            color:white;
+                            border-radius:4px;
+                            font-size:0.8rem;
+                            text-decoration:none;
+                            font-weight:bold;">
+                        🔁 Omboka min tid
+                </a>
                 <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" 
                 style=" display:inline-block; 
                     padding:4px 10px;
@@ -310,20 +321,6 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                     font-weight:bold;">
                     ❌ Avboka min tid
                 </a>
-                </div>
-
-                <div class="appointment-row">
-                    <a href="omboka.php?id=<?= urlencode($a['name']) ?>"
-                    style="display:inline-block; 
-                            padding:4px 10px;
-                            background:#1F6F78;
-                            color:white;
-                            border-radius:4px;
-                            font-size:0.8rem;
-                            text-decoration:none;
-                            font-weight:bold;">
-                        🔁 Omboka min tid
-                    </a>
                 </div>
             </div>
         <?php endforeach; ?>
