@@ -291,9 +291,6 @@ print_r($lab_results);
             <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
             <p><strong>Avdelning:</strong> <?= htmlspecialchars($encounter['medical_department'] ?? '') ?></p>
             <p><strong>Status:</strong> <?= htmlspecialchars($encounter['status'] ?? '') ?></p>
-            <?php if (!empty($encounter['notes'])): ?>
-                <p><strong>Anteckning:</strong><br><?= nl2br(htmlspecialchars($encounter['notes'])) ?></p>
-            <?php endif; ?>
     <?php endforeach; ?>
 </div>
 
