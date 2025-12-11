@@ -11,6 +11,9 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 
 $patient_id   = $_SESSION['patient_id'] ?? '';
 $patient_name = $_SESSION['patient_name'] ?? 'Patient';
+echo "<pre>";
+print_r($_SESSION);
+echo "</pre>";
 
 // cURL-konfiguration
 $cookiepath = "/tmp/cookies.txt";
@@ -68,10 +71,6 @@ curl_close($ch);
 echo "<pre>";
 print_r($encountersresponse);
 echo "</pre>";
-
-//$url = $baseurl . "api/resource/Patient%20Encounter?" .
-//"fields=" . urlencode(json_encode($fields)) . 
-//"&filters=" . urlencode(json_encode($filters));
 
 // Hämta provsvar (Lab Test) 
 $filters_lab = urlencode(json_encode([
