@@ -1,170 +1,142 @@
 <?php
 session_start();
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$cookiepath = "/tmp/cookies.txt";
-$tmeout = 3600; // (3600=1hr)
-$baseurl = 'http://193.93.250.83:8080/';
-
-$contactData = $_SESSION['contact_data'] ?? null;
-
-try {
-  $ch = curl_init($baseurl . 'api/method/login');
-} catch (Exception $e) {
-  echo 'Caught exception: ', $e->getMessage(), "\n";
-}
-
-/* -----------------------------
-   LOGIN TO ERPNext
-------------------------------*/
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
-curl_close($ch);
-
-/* -----------------------------
-   HEALTHCARE PRACTITIONERS
-------------------------------*/
-$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-$practitioners = $response['data'] ?? [];
-$error_no = curl_errno($ch);
-$error = curl_error($ch);
-curl_close($ch);
-// $practitioners = json_decode($response, true)['data'] ?? [];
-
-/* -----------------------------
-  PATIENT INFO
-------------------------------*/
-$fields = urlencode('["name","patient_name","sex"]');
-$filters = urlencode('[["patient_name","LIKE","%G6%"]]');
-
-$patient_url = $baseurl . "api/resource/Patient?fields=$fields&filters=$filters";
-$ch = curl_init($patient_url);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-$patients = $response['data'] ?? [];
-curl_close($ch);
-
-// $patients = json_decode($patient_response, true)['data'] ?? [];
-
-if (!empty($patients)) {
-    $_SESSION['patient_id']   = $patients[0]['name'] ?? '';
-    $_SESSION['patient_name'] = $patients[0]['patient_name'] ?? '';
-    $_SESSION['patient_sex']  = $patients[0]['sex'] ?? '';
-} else {
-    die("Kunde inte hitta patientdata.");
-}
-$session_user = $_SESSION['username'] ?? '';
-
-/* -----------------------------
-  BOOKING FORM
-------------------------------*/
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) {
-$time = $_POST["appointment_time"];
-if (strlen($time) == 5) { 
-    $time .= ":00";
-}
-
-// Hämta practitioner-id och name
-$practitioner_id = $_POST["healthcare_practitioner"] ?? '';
-$practitioner_name = $_POST["practitioner_name"] ?? '';
-$department = $_POST["department"] ?? '';
-
-// Patient-ID från session
-    $patient_id   = $_SESSION["patient_id"];
-    $patient_name = $_SESSION["patient_name"];
-    $patient_sex  = $_SESSION["patient_sex"];
-
-    // Data-arrayen
-    $data = [
-    "appointment_type"        => $_POST["appointment_type"],
-    "appointment_date"        => $_POST["appointment_date"],
-    "appointment_time"        => $time,                  // fast time format
-    "healthcare_practitioner" => $practitioner_id,       // FIX
-    "practitioner"            => $practitioner_id,       // FIX
-    "practitioner_name"       => $practitioner_name,
-    "department"              => $department,
-    "duration"                => intval($_POST["duration"]),
-    "patient"                 => $_SESSION["patient_id"],
-    "patient_name"            => $patient_name,
-    "patient_sex"             => $patient_sex,
-    "notes"                   => $_POST["notes"] ?? ""
-];
-
-    $json = json_encode($data, JSON_UNESCAPED_SLASHES);
-
-    // POST till ERPNext
-    $ch = curl_init($baseurl . 'api/resource/Patient%20Appointment');
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Accept: application/json'
-    ]);
-
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    $response = curl_exec($ch);
-    $error_no = curl_errno($ch);
-    $error = curl_error($ch);
-    curl_close($ch);
-
-    $result = json_decode($response, true);
-
-    if ($error_no) {
-        die("<h3>Tekniskt fel vid bokning:</h3><pre>$error</pre>");
-    }
-
-if (!isset($result["data"])) {
-    echo "<h3>ERPNext kunde inte skapa bokningen:</h3>";
-
-    echo "<h4>JSON som skickas:</h4>";
-    var_dump($json);
-
-    echo "<h4>Svar från ERPNext:</h4>";
-    echo "<pre>" . print_r($result, true) . "</pre>";
+// Kontrollera att patient är inloggad
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
+    header('Location: login.php');
     exit;
 }
 
-    $appointment_id = $result["data"]["name"];
+// Sessionshantering
+$patient_id   = $_SESSION['patient_id']   ?? '';
+$patient_name = $_SESSION['patient_name'] ?? '';
+$patient_sex  = $_SESSION['patient_sex']  ?? '';
+$username     = $_SESSION['username']     ?? '';
+
+if ($patient_id === '' || $patient_name === '') {
+    die("Kunde inte ladda patientdata från sessionen. Logga in igen.");
+}
+
+// ERPnext-anslutning
+$cookiepath = "/tmp/cookies.txt";
+$tmeout = 3600;
+$baseurl = 'http://193.93.250.83:8080/';
+
+$login = curl_init($baseurl . "api/method/login");
+curl_setopt($login, CURLOPT_POST, true);
+curl_setopt($login, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se","pwd":"HisLeo25!"}');
+curl_setopt($login, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+curl_setopt($login, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($login, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($login, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($login, CURLOPT_TIMEOUT, $tmeout);
+$login_response = curl_exec($login);
+curl_close($login);
+
+// Hämta patientdata
+$fields  = urlencode('["name","patient_name","sex"]');
+$filters = urlencode('[["name","=","'.$patient_id.'"]]');
+
+$patient_url = $baseurl . "api/resource/Patient?fields=$fields&filters=$filters";
+
+$ch = curl_init($patient_url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$patients = json_decode($response, true)['data'] ?? [];
+
+if (empty($patients)) {
+    die("Kunde inte hitta patientdata i ERPNext.");
+}
+
+// Uppdatera session:
+$_SESSION['patient_name'] = $patients[0]['patient_name'];
+$_SESSION['patient_sex']  = $patients[0]['sex'];
+
+// Hämta vårdpersonal förutom läkare
+$practitioners = [];
+
+$prac = curl_init(
+    $baseurl . 'api/resource/Healthcare%20Practitioner?' .
+    'fields=["name","first_name","last_name","department","designation","status"]' .
+    '&filters=[["first_name","LIKE","G6%"]]'
+);
+
+curl_setopt($prac, CURLOPT_HTTPGET, true);
+curl_setopt($prac, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($prac, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($prac, CURLOPT_TIMEOUT, $tmeout);
+
+$resp = curl_exec($prac);
+curl_close($prac);
+
+$data = json_decode($resp, true)['data'] ?? [];
+
+foreach ($data as $p) {
+
+    $dep  = strtolower($p["department"]   ?? "");
+    $desg = strtolower($p["designation"]  ?? "");
+
+    if (strpos($dep, "läkare") !== false || strpos($desg, "specialist") !== false) {
+        continue;
+    }
+    $practitioners[] = $p;
+}
+
+// Bokningshantering
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) {
+
+    $time = $_POST["appointment_time"];
+    if (strlen($time) == 5) $time .= ":00";
+
+    $data = [
+        "appointment_type" => $_POST["appointment_type"],
+        "appointment_date" => $_POST["appointment_date"],
+        "appointment_time" => $time,
+        "healthcare_practitioner" => $_POST["healthcare_practitioner"],
+        "practitioner" => $_POST["healthcare_practitioner"],
+        "practitioner_name" => $_POST["practitioner_name"],
+        "department" => $_POST["department"],
+        "duration" => intval($_POST["duration"]),
+        "patient" => $patient_id,
+        "patient_name" => $patient_name,
+        "patient_sex" => $patient_sex,
+        "notes" => $_POST["notes"] ?? ""
+        "appointment_for" => $patient_id,
+    ];
+
+    $json = json_encode($data);
+
+    $ch = curl_init($baseurl . "api/resource/Patient%20Appointment");
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $result = curl_exec($ch);
+    $decoded = json_decode($result, true);
+    curl_close($ch);
+
+    if (!isset($decoded["data"])) {
+        echo "<h2>Fel vid bokning</h2><pre>$result</pre>";
+        exit;
+    }
+
     header("Location: index.php");
     exit;
 }
 ?>
+
 <!doctype html>
 <html lang="sv">
 <head>
@@ -379,34 +351,17 @@ if (!isset($result["data"])) {
         </div>
     </nav>
 
-    <!-- Kontaktdata från formulär -->
-  <?php if ($contactData): ?>
-  <div class="container" style="background: var(--mint-green); border: 2px solid var(--primary-blue); margin-bottom: 24px;">
-      <h2 style="color: var(--primary-blue); margin-top:0;">Information du skickade in</h2>
-
-      <p><strong>Beskrivning av besvären:</strong><br>
-          <?php echo htmlspecialchars($contactData['field1']); ?></p>
-
-      <p><strong>Hur länge du haft besvären:</strong><br>
-          <?php echo htmlspecialchars($contactData['field2']); ?></p>
-
-      <p><strong>Tidigare vårdkontakt:</strong><br>
-          <?php echo htmlspecialchars($contactData['field3']); ?></p>
-  </div>
-  <?php endif; ?>
-
+  <!-- Innehåll för bokningsformulär -->
   <div class="container">
     <h1>Välj en tid</h1>
-    <p class="lead">Inloggad som: <strong><?php echo htmlspecialchars($session_user); ?></strong></p>
+    <p class="lead">Inloggad som: <strong><?php echo htmlspecialchars($_SESSION['patient_id']); ?></strong></p>
 
-<form class="booking" method="post" novalidate>
+  <form class="booking" method="post" novalidate>
 
-  <!-- Koppla $_session till patient i ERP -->
-  <input type="hidden" name="patient" value="<?= htmlspecialchars($session_user) ?>">
-  <input type="hidden" name="patient_name" value="<?= htmlspecialchars($session_user) ?>">
+  <input type="hidden" name="patient" value="<?= htmlspecialchars($_SESSION['patient_id']) ?>">
+  <input type="hidden" name="patient_name" value="<?= htmlspecialchars($_SESSION['patient_name']) ?>">
   <input type="hidden" name="patient_sex" value="<?= htmlspecialchars($_SESSION['patient_sex'] ?? '') ?>">
 
-  <!-- Appointment Type -->
   <div class="field">
     <label for="appointment_type">Typ av besök</label>
     <select id="appointment_type" name="appointment_type" required>
@@ -418,7 +373,6 @@ if (!isset($result["data"])) {
     </select>
   </div>
 
-  <!-- Healthcare Practitioner -->
   <div class="field">
     <label for="healthcare_practitioner">Välj vårdpersonal</label>
     <div class="select-wrap">
@@ -435,7 +389,7 @@ if (!isset($result["data"])) {
             data-practitioner-name="<?= htmlspecialchars($full) ?>"
             data-department="<?= htmlspecialchars($dep) ?>"
         >
-            <?= htmlspecialchars($full) ?>
+            <?= htmlspecialchars($full) ?> (<?= htmlspecialchars($dep) ?>)
         </option>
         <?php endforeach; ?>
       </select>
@@ -445,13 +399,11 @@ if (!isset($result["data"])) {
   <input type="hidden" name="practitioner_name" id="practitioner_name">
   <input type="hidden" name="department" id="department">
 
-  <!-- Datum -->
   <div class="field">
     <label for="appointment_date">Datum</label>
     <input id="appointment_date" type="date" name="appointment_date" required>
   </div>
 
-  <!-- Tid -->
   <div class="field">
     <label for="appointment_time">Tid</label>
     <select id="appointment_time" name="appointment_time" required>
@@ -464,13 +416,12 @@ if (!isset($result["data"])) {
     </select>
   </div>
 
-  <!-- Duration -->
   <div class="field">
     <label for="duration">Varaktighet (min)</label>
-    <input id="duration" type="number" name="duration" min="1" value="60" required>
+    <input type="hidden" name="duration" value="60">
+    <input id="duration" type="number" value="60" disabled>
   </div>
 
-  <!-- Anteckningar -->
   <div class="field full">
     <label for="notes">Anteckningar <i>(max 150 ord)</i></label>
     <textarea id="notes" name="notes" placeholder="Skriv eventuella kommentarer här..."></textarea>
@@ -483,27 +434,6 @@ if (!isset($result["data"])) {
   </div>
 
 </form>
-
-<script>
-// Automatisk fyllning av practitioner info
-document.getElementById('healthcare_practitioner').addEventListener('change', function () {
-    let s = this.options[this.selectedIndex];
-    document.getElementById('practitioner_name').value = s.dataset.practitionerName;
-    document.getElementById('department').value = s.dataset.department;
-});
-document.getElementById('healthcare_practitioner').dispatchEvent(new Event('change'));
-
-// Max 150 ord i anteckningar
-document.getElementById("notes").addEventListener("input", function() {
-    let words = this.value.trim().split(/\s+/);
-    if (words.length > 150) {
-        alert("Du får max skriva 150 ord.");
-        words = words.slice(0, 150);
-        this.value = words.join(" ");
-    }
-});
-</script>
-
 </div>
 </body>
 </html>
