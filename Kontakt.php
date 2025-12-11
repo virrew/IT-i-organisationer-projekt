@@ -249,7 +249,6 @@ background-color: var(--gray-light);
             <a href="kontaktformulär.php">Boka tid här</a>
             <a href="Kontakt.php">Kontakt</a>
 
-            <!-- Höger sida – användarnamn + logga ut -->
             <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
             <a href="logout.php">Logga ut</a>
 
