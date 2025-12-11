@@ -73,158 +73,173 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
     <title>Mölndalsvårdcentral – Mina sidor</title>
 
     <style>
-        /* Globala färgvariabler */
-        :root {
-            --primary-blue: #1F6F78;
-            --primary-blue-light: #C2EBE8;
+/* ===== FÄRGER ===== */
+:root {
+    --primary-blue: #1F6F78;
+    --primary-blue-light: #C2EBE8;
 
-            --mint-green: #E7FFF3;
-            --accent-orange: #FCA06A;
-            --info-blue: #0A5360;
-            --warning-red: #D9534F;
+    --mint-green: #E7FFF3;
+    --accent-orange: #FCA06A;
+    --info-blue: #0A5360;
+    --warning-red: #D9534F;
 
-            --white: #FFFFFF;
-            --gray-light: #F5F5F5;
-            --text-dark: #0E2A2C;
-        }
+    --white: #FFFFFF;
+    --gray-light: #F5F5F5;
+    --text-dark: #0E2A2C;
 
-        .appointment-card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 18px 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            border-left: 6px solid var(--primary-blue);
-        }
+    --card-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    --card-hover-shadow: 0 10px 26px rgba(0,0,0,0.12);
+}
 
-        .appointment-row {
-            margin: 4px 0;
-            font-size: 0.95rem;
-        }
+/* ===== PAGE ===== */
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--gray-light);
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-dark);
+}
 
-        .appointment-label {
-            font-weight: bold;
-            color: var(--primary-blue);
-        }
+/* ===== NAVBAR ===== */
+.navbar {
+    background: var(--primary-blue);
+    color: var(--white);
+    padding: 14px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
 
-        .status-pill {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: white;
-        }
+.nav-brand a {
+    color: var(--white);
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: opacity .2s ease;
+}
 
-        .status-Upcoming { background: var(--primary-blue); }
-        .status-Completed { background: green; }
-        .status-No\ Show { background: var(--warning-red); }
-        .status-Cancelled { background: gray; }
+.nav-brand a:hover {
+    opacity: 0.85;
+}
 
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
 
-        body {
-            margin: 0;
-            padding: 0;
-            background: var(--gray-light);
-            font-family: Arial, sans-serif;
-            color: var(--text-dark);
-        }
+.nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity .2s ease;
+}
 
-        /* NAVBAR */
-        .navbar {
-            background: var(--primary-blue);
-            color: var(--white);
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-        }
+.nav-links a:hover {
+    opacity: 0.75;
+}
 
-        .nav-brand {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
+.nav-user {
+    font-weight: bold;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+}
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+/* ===== PAGE HEADER ===== */
+h1 {
+    margin-top: 40px;
+    text-align: center;
+    color: var(--primary-blue);
+    font-size: 2rem;
+}
 
-        .nav-links a {
-            color: var(--white);
-            text-decoration: none;
-            font-weight: 500;
-        }
+/* ===== DASHBOARD CARDS ===== */
+.page-container {
+    max-width: 850px;
+    margin: 30px auto;
+    padding: 10px;
+}
 
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
+.card {
+    background: var(--white);
+    padding: 24px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    box-shadow: var(--card-shadow);
+    transition: box-shadow .15s ease, transform .15s ease;
+}
 
-        .nav-user {
-            font-size: 0.95rem;
-        }
+.card:hover {
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-2px);
+}
 
-        .nav-brand a {
-        color: var(--white);
-        font-weight: bold;
-        font-size: 1.2rem;
-        }
+.card h2 {
+    margin-top: 0;
+    color: var(--primary-blue);
+}
 
-        .nav-brand a:hover {
-            text-decoration: underline;
-        }
+.card p {
+    line-height: 1.5;
+}
 
+/* ===== BOOKING CARDS ===== */
+.appointment-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+    border-left: 6px solid var(--primary-blue);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
 
-        /* PAGE LAYOUT */
-        h1 {
-            text-align: center;
-            margin-top: 40px;
-            color: var(--primary-blue);
-        }
+.appointment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-hover-shadow);
+}
 
-        .page-container {
-            max-width: 800px;
-            margin: 20px auto 0;
-            padding: 0 16px;
-        }
+.appointment-row {
+    margin: 6px 0;
+    font-size: 1rem;
+}
 
-        .welcome-card, .booking-card {
-            margin-top: 20px;
-            background: var(--white);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        }
+.appointment-label {
+    font-weight: 600;
+    color: var(--info-blue);
+}
 
-        .welcome-card h2, .booking-card h2 {
-            margin-top: 0;
-            color: var(--text-dark);
-        }
+/* ===== MINI BUTTONS ===== */
+.mini-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-right: 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: opacity .2s ease, transform .1s ease;
+}
 
-        .welcome-card p, .booking-card p {
-            margin-bottom: 16px;
-        }
+.mini-btn:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+}
 
-        .btn-primary {
-            display: inline-block;
-            padding: 10px 18px;
-            background: var(--primary-blue);
-            color: var(--white);
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: bold;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-            transition: 0.1s ease;
-        }
+.mini-edit {
+    background: var(--primary-blue);
+    color: white;
+}
 
-        .btn-primary:hover {
-            background: var(--info-blue);
-            transform: translateY(-1px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.2);
-        }
-
+.mini-delete {
+    background: var(--warning-red);
+    color: white;
+}
     </style>
 </head>
 <body>
@@ -268,64 +283,47 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
         </p>
     </div>
 
-    <div class="booking-card">
-    <h2>Kommande bokningar</h2>
+    <div class="card">
+    <h2>📅 Kommande bokningar</h2>
+
     <?php if (empty($appointments)): ?>
-        <p>Inga kommande bokningar.</p>
-        <a href="kontaktformulär.php" class="btn-primary">Boka tid</a>
+        <p>Du har inga bokade tider just nu.</p>
+        <a href="kontaktformulär.php" class="mini-btn" style="background: var(--accent-orange); color:white;">
+            ➕ Boka tid
+        </a>
 
     <?php else: ?>
         <?php foreach ($appointments as $a): ?>
             <div class="appointment-card">
 
                 <div class="appointment-row">
-                    <span class="appointment-label">📅 Datum:</span>
+                    <span class="appointment-label">Datum:</span>
                     <?= htmlspecialchars($a['appointment_date']) ?>
                 </div>
 
                 <div class="appointment-row">
-                    <span class="appointment-label">⏰ Tid:</span>
+                    <span class="appointment-label">Tid:</span>
                     <?= htmlspecialchars($a['appointment_time']) ?>
                 </div>
 
                 <div class="appointment-row">
-                    <span class="appointment-label">🏥 Typ:</span>
+                    <span class="appointment-label">Typ:</span>
                     <?= htmlspecialchars($a['appointment_type']) ?>
                 </div>
 
                 <div class="appointment-row">
-                    <span class="appointment-label">👩‍⚕️ Vårdgivare:</span>
+                    <span class="appointment-label">Vårdgivare:</span>
                     <?= htmlspecialchars($a['practitioner_name']) ?>
                 </div>
 
-                <div class="appointment-row" style="margin-top:10px;">
-                <a href="omboka.php?id=<?= urlencode($a['name']) ?>"
-                    style="display:inline-block; 
-                            padding:4px 10px;
-                            background:#1F6F78;
-                            color:white;
-                            border-radius:4px;
-                            font-size:0.8rem;
-                            text-decoration:none;
-                            font-weight:bold;">
-                        🔁 Omboka min tid
-                </a>
-                <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" 
-                style=" display:inline-block; 
-                    padding:4px 10px;
-                    background:#D9534F;
-                    color:white;
-                    border-radius:4px;
-                    font-size:0.8rem;
-                    text-decoration:none;
-                    font-weight:bold;">
-                    ❌ Avboka min tid
-                </a>
+                <div style="margin-top:12px;">
+                    <a href="omboka.php?id=<?= urlencode($a['name']) ?>" class="mini-btn mini-edit">🔁 Omboka</a>
+                    <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" class="mini-btn mini-delete">❌ Avboka</a>
                 </div>
+
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
-
-    </div>
+</div>
 </body> 
 </html>
