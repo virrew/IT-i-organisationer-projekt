@@ -1,53 +1,23 @@
 <?php 
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     header('Location: login.php');
     exit;
 }
 
-$patient_id = $_SESSION['patient_id']; // G6förnamn+efternamn
-$patient_name = $_SESSION['patient_name'] ?? 'Patient'; // Förnamn
-echo "PatientID i session: " . $patient_id;
+$patient_id   = $_SESSION['patient_id'] ?? '';
+$patient_name = $_SESSION['patient_name'] ?? 'Patient';
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
+// cURL-konfiguration
 $cookiepath = "/tmp/cookies.txt";
-$tmeout = 3600; // (3600=1hr)
+$tmeout = 3600;
 $baseurl = 'http://193.93.250.83:8080/';
 
-
-// FUNKTION FÖR GET-ANROP MED cURL
-function erp_get($endpoint) {
-    global $cookiepath, $tmeout, $baseurl;
-
-    $ch = curl_init($baseurl . $endpoint);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Accept: application/json'
-    ]);
-    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-    $response = curl_exec($ch);
-    $err = curl_error($ch);
-    curl_close($ch);
-
-    if ($err) {
-        die("cURL error: $err");
-    }
-
-    $json = json_decode($response, true);
-    return $json['data'] ?? [];
-}
-
-// LOGGA IN I ERP //
+// LOGGA IN I ERP 
 $ch = curl_init($baseurl . 'api/method/login');
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24hedan@student.his.se", "pwd":"9901hed0199And!"}'); 
@@ -60,7 +30,6 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $loginResponse = curl_exec($ch);
 $loginResponse = json_decode($loginResponse, true);
-
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
@@ -70,105 +39,103 @@ echo 'LOGIN RESPONSE:<br><pre>';
 print_r($loginResponse) . "</pre><br>";
 echo "</div>";
 
-// HÄMTA VÅRDGIVARE //
-//$practitioner = erp_get('api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
+// Hämta journalanteckningar (Patient Encounter)
+$fields = ["patient","patient_name","notes","custom_symtom","custom_diagnos","status","encounter_date","practitioner_name","medical_department","lab_test_prescription"];
+$filters = [["patient","=",$patient_id]];
 
-// HÄMTA JOURNALER //
-//$fields = ['name','subject','communication_date','owner','status','reference_doctype','reference_name'];
-//$filters = [['patient', '=', $patient]];
+$url = $baseurl . "api/resource/Patient%20Encounter?" .
+"fields=" . urlencode(json_encode($fields)) . 
+"&filters=" . urlencode(json_encode($filters));
 
-//$journaler = erp_get(
-//    'api/resource/Patient%20Medical%20Record?fields=' . urlencode(json_encode($fields)) .
-//    '&filters=' . urlencode(json_encode($filters))
-//);
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+$response = curl_exec($ch);
+$error_no = curl_errno($ch);
+$error = curl_error($ch);
+curl_close($ch);
 
-// HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
-$encounters = erp_get(
-    'api/resource/Patient%20Encounter?fields=' . urlencode(json_encode([
-        "patient",
-        "patient_name",
-        "notes",
-        "custom_symtom",
-        "custom_diagnos",
-        "status",
-        "encounter_date",
-        "practitioner_name",
-        "medical_department"
-    ])) .
-    '&filters=' . urlencode(json_encode([
-        ["patient", "=", $_SESSION['patient_id']]
-    ]))
-);
-echo "<pre>";
+if (!empty($error_no)) {
+    echo "<div style='background-color:red'>GET Patient Encounter cURL error ($error_no): $error</div>";
+    $encounters = [];
+} else {
+    $encounters = json_decode($response, true)['data'] ?? [];
+}
+
+// Hämta provsvar (Lab Test) 
+$filters_lab = urlencode(json_encode([
+    ["docstatus","=",1],
+    ["patient_name","=",$patient_name]
+]));
+
+$url = $baseurl . "api/resource/Lab Test?" .
+"filters=" . urlencode(json_encode($filters_lab)) .
+"&limit_page_length=1000";
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+$response = curl_exec($ch);
+$error_no = curl_errno($ch);
+$error = curl_error($ch);
+curl_close($ch);
+
+if (!empty($error_no)) {
+    echo "<div style='background-color:red'>GET Lab Test cURL error ($error_no): $error</div>";
+    $labtests = [];
+} else {
+    $labtests = json_decode($response, true)['data'] ?? [];
+}
+
+// Hämta labresultat
+$lab_results = [];
+foreach ($labtests as $test) {
+    $url = $baseurl . "api/resource/Lab Test/" . $test["name"];
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $full_response = curl_exec($ch);
+    curl_close($ch);
+
+    $full = json_decode($full_response, true)['data'] ?? null;
+    if (!$full) continue;
+
+    $lab_results[] = [
+        "id" => $full["name"],
+        "date" => $full["result_date"],
+        "patient" => $full["patient_name"],
+        "template" => $full["template"],
+        "status" => $full["status"],
+        "practitioner" => $full["practitioner_name"],
+        "results" => $full["normal_test_items"] ?? [],
+        "descriptive" => $full["descriptive_test_items"] ?? []
+    ];
+}
+
+// 5. Visa resultat (exempel)
+echo "<pre>Encounters:\n";
 print_r($encounters);
+echo "\nLab Results:\n";
+print_r($lab_results);
 echo "</pre>";
-
-// Hämtar alla fält
-//$fields = urlencode('["*"]');
-
-// Filter som inte är en sträng
-//$filters_array = [
-// ["patient", "=", $patient]
-//];
-//$filters = urlencode(json_encode($filters_array));
-
-// HÄMTAR JOURNALDATA //
-//$ch = curl_init($baseurl . "api/resource/Patient%20Medical%20Record?fields=$fields&filters=$filters"); 
-//curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-//curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-//curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-//curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-//curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-//curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//$journalResponse = curl_exec($ch);
-//$journalResponse = json_decode($journalResponse, true);
-//$error_no = curl_errno($ch);
-//$error = curl_error($ch);
-//curl_close($ch);
-
-//här väljer jag att loopa över alla poster i [data] och för varje resultat så skriver jag ut name
-//echo "<strong>LISTA:</strong><br>";
-//foreach($journalResponse['data'] AS $key => $value){
-//  echo $value["name"]."<br>";
-//}
-
-// Journaldata (Säker hantering)
-//$journaler = [];
-// Om data finns läggs den här
-//if (isset($journalResponse['data']) && is_array($journalResponse['data'])) {
-//    $journaler = $journalResponse['data'];
-//}
-
-// Visa journal i tabell
-//echo "<h2>Journal för: $patient</h2>";
-//echo "<strong>LISTA:</strong><br>";
-
-//if (empty($journaler)) {
-//    echo "Din journal är tom.";
-//} else {
-//    foreach ($journaler as $row) {
-//        echo htmlspecialchars($row["name"]) . "<br>";
-//    }
-//}
-
-// HÄMTAR VÅRDGIVARE //
-//$ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
-//curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-//curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-//curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-//curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-//curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-//curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//$practResponse = curl_exec($ch);
-//$practResponse = json_decode($practResponse, true);
-//$practitioner = $practResponse['data'] ?? [];
-//$error_no = curl_errno($ch);
-//$error = curl_error($ch);
-//curl_close($ch);
 
 ?>
 <!DOCTYPE html>
@@ -351,15 +318,31 @@ echo "</pre>";
     </div>
 
 <h2>Provsvar</h2>
-<?php if (!empty($encounter['lab_test_prescription'])): ?>
-<div class="card">
-        <p><strong>Provnamn:</strong> <?=htmlspecialchars($encounter['lab_test_prescription']) ?></p>
-        <p><strong>Datum:</strong> <?=htmlspecialchars($encounter['lab_test_date']) ?></p>
-        <p><strong>Resultat</strong> <?=htmlspecialchars($encounter['lab_test_result']) ?></p>
-        <p><strong>Referensintervall:</strong> <?=htmlspecialchars($encounter['lab_test_reference']) ?></p>
-    </div>
-    <?php endif; ?>
-</div>
+<?php if (!empty($lab_results)): ?>
+<div class="card-container">
+    <?php foreach ($lab_results as $lab): ?>
+        <div class="card">
+            <p><strong>Provnamn:</strong> <?=htmlspecialchars($lab["template"]) ?></p>
+            <p><strong>Datum:</strong> <?=htmlspecialchars($lab["date"]) ?></p>
+            <p><strong>Status:</strong> <?=htmlspecialchars($lab["status"]) ?></p>
 
+            <?php if (!empty($lab["results"])): ?>
+                <p><strong>Resultat:</strong><p>
+                <ul>
+                    <?php foreach ($lab["results"] as $r): ?>
+                        <li>
+                            <?= htmlspecialchars($r["lab_test_name"]) ?>:
+                            <?= htmlspecialchars($r["result_value"]) ?>
+                            (Ref: <?= htmlspecialchars($r["normal_range"]) ?>)
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>    
+        </div>
+    <?php endforeach; ?>
+</div>
+<?php else: ?>
+    <p> Inga provsvar hittades.</p>
+<?php endif; ?>
 </div>
 </body>
