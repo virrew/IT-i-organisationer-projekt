@@ -194,11 +194,15 @@ if (!empty($error_no)) {
     body{
       font-size: 150%;
       background-color: var(--gray-light);
+      margin: 0;
+      padding: 0;
     }
 
-    h1, legend{
+    h1{
       text-align: center;
     }
+
+   
     
     form{
       border-style: solid;
@@ -206,7 +210,7 @@ if (!empty($error_no)) {
       border-radius: 50px;
       padding: 20px;
       width: 50%;
-      margin: auto auto;
+      margin: 40px auto;
       background-color: white;
     }
     
@@ -216,6 +220,30 @@ if (!empty($error_no)) {
       border-color: var( --primary-blue-light);
     }
 
+     legend{
+       color: var(--primary-blue);
+       font-weight: bold;
+       text-align: center;
+    }
+
+    p{
+      display: block;
+margin-top: 16px; /* ger mer luft mellan fälten */
+    }
+
+    label {
+  font-weight: 500;
+  color: var(--text-dark);
+}
+    label[for="gender"]{
+       display: block;
+    }
+
+   label[for="extra"] {
+    display: block;    /* gör att margin-top fungerar */
+    margin-top: 20px;  /* avstånd från fieldset ovanför */
+    margin-bottom: 0;  /* ingen extra luft under labeln */
+}
     textarea{
       width: 100%;
       border-radius: 20px;
@@ -224,10 +252,15 @@ if (!empty($error_no)) {
     input[type="submit"]{
       display: block;
       margin: 0 auto;
-      background-color: var(--primary-blue);
-      color: white;
-      padding: 10px;
+            background: var(--primary-blue);
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      font-weight: 600;
       border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(31,111,120,0.25);
+      transition: transform .06s ease, box-shadow .12s ease;
     }
 
     input[type="submit"]:hover{
@@ -321,11 +354,12 @@ if (!empty($error_no)) {
     
     <form method="post" action="">
       <h1>Formulär för bemötande</h1>
-      <input type="number" id="age" name="age" required>
       <label for="age">Hur gammal är du?</label><br>
+      <input type="number" id="age" name="age" required>
       
+      <label for="gender">Kön</label>
       <input type="text" id="gender" name="gender">
-      <label for="gender">Kön</label><br>
+      
       
       <fieldset>
         <legend>Allmänt om ditt besök på vårdcentralen</legend>
