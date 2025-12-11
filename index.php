@@ -324,6 +324,7 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                             font-weight:bold;">
                         🔁 Omboka min tid
                     </a>
+                </div>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
