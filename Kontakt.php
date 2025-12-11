@@ -51,33 +51,96 @@ $response = json_decode($response, true);
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
-?>
 
 
-
-
-
-
-
-
-
-<?php
 if(isset($_POST['age'])){
-   $postfields = json_encode([
-        "age" => $_POST['age'] ?? '',
-        "gender" => $_POST['gender'] ?? '',
-        "able" => $_POST['able'] ?? '',
-        "easy" => $_POST['easy'] ?? '',
-        "happy" => $_POST['happy'] ?? '',
-        "meet" => $_POST['meet'] ?? '',
-        "time" => $_POST['time'] ?? '',
-        "info" => $_POST['info'] ?? '',
-        "understand" => $_POST['understand'] ?? '',
-        "explain" => $_POST['explain'] ?? '',
-        "did" => $_POST['did'] ?? '',
-        "extra" => $_POST['extra'] ?? ''
-    ]);
+   if (isset($_POST['age'])) {
+    $age = $_POST['age'];
+} else {
+    $age = "";
+}
 
+if (isset($_POST['gender'])) {
+    $gender = $_POST['gender'];
+} else {
+    $gender = "";
+}
+
+if (isset($_POST['able'])) {
+    $able = $_POST['able'];
+} else {
+    $able = "";
+}
+
+if (isset($_POST['easy'])) {
+    $easy = $_POST['easy'];
+} else {
+    $easy = "";
+}
+
+if (isset($_POST['happy'])) {
+    $happy = $_POST['happy'];
+} else {
+    $happy = "";
+}
+
+if (isset($_POST['meet'])) {
+    $meet = $_POST['meet'];
+} else {
+    $meet = "";
+}
+
+if (isset($_POST['time'])) {
+    $time = $_POST['time'];
+} else {
+    $time = "";
+}
+
+if (isset($_POST['info'])) {
+    $info = $_POST['info'];
+} else {
+    $info = "";
+}
+
+if (isset($_POST['understand'])) {
+    $understand = $_POST['understand'];
+} else {
+    $understand = "";
+}
+
+if (isset($_POST['explain'])) {
+    $explain = $_POST['explain'];
+} else {
+    $explain = "";
+}
+
+if (isset($_POST['did'])) {
+    $did = $_POST['did'];
+} else {
+    $did = "";
+}
+
+if (isset($_POST['extra'])) {
+    $extra = $_POST['extra'];
+} else {
+    $extra = "";
+}
+  
+  
+ $postfields = json_encode([
+    "age" => $age,
+    "gender" => $gender,
+    "able" => $able,
+    "easy" => $easy,
+    "happy" => $happy,
+    "meet" => $meet,
+    "time" => $time,
+    "info" => $info,
+    "understand" => $understand,
+    "explain" => $explain,
+    "did" => $did,
+    "extra" => $extra
+]);
 $ch = curl_init(
     $baseurl . "api/resource/G6FeedbackForm"
 );
