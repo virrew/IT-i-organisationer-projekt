@@ -72,6 +72,13 @@ echo "<pre>";
 print_r($encountersresponse);
 echo "</pre>";
 
+
+$labtests = $baseurl .
+    'api/resource/Lab%20Test?fields=[' .
+        urlencode('"name","patient","patient_name","status","result_date","docstatus"') .
+    ']' .
+    '&filters=' . urlencode('[["patient_name","like","g6%"]]');
+
 // Hämta provsvar (Lab Test) 
 $filters_lab = urlencode(json_encode([
     ["docstatus","=",1],
