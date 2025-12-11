@@ -73,163 +73,163 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
     <title>Mölndalsvårdcentral – Mina sidor</title>
 
     <style>
-/* ===== FÄRGER ===== */
-:root {
-    --primary-blue: #1F6F78;
-    --primary-blue-light: #C2EBE8;
+    /* ===== FÄRGER ===== */
+    :root {
+        --primary-blue: #1F6F78;
+        --primary-blue-light: #C2EBE8;
 
-    --mint-green: #E7FFF3;
-    --accent-orange: #FCA06A;
-    --info-blue: #0A5360;
-    --warning-red: #D9534F;
+        --mint-green: #E7FFF3;
+        --accent-orange: #FCA06A;
+        --info-blue: #0A5360;
+        --warning-red: #D9534F;
 
-    --white: #FFFFFF;
-    --gray-light: #F5F5F5;
-    --text-dark: #0E2A2C;
+        --white: #FFFFFF;
+        --gray-light: #F5F5F5;
+        --text-dark: #0E2A2C;
 
-    --card-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    --card-hover-shadow: 0 10px 26px rgba(0,0,0,0.12);
-}
+        --card-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        --card-hover-shadow: 0 10px 26px rgba(0,0,0,0.12);
+    }
 
-/* ===== PAGE ===== */
-body {
-    margin: 0;
-    padding: 0;
-    background: var(--gray-light);
-    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: var(--text-dark);
-}
+    /* ===== PAGE ===== */
+    body {
+        margin: 0;
+        padding: 0;
+        background: var(--gray-light);
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: var(--text-dark);
+    }
 
-/* ===== NAVBAR ===== */
-.navbar {
-    background: var(--primary-blue);
-    color: var(--white);
-    padding: 14px 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.22);
-    position: sticky;
-    top: 0;
-    z-index: 50;
-}
+    /* ===== NAVBAR ===== */
+    .navbar {
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 14px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
 
-.nav-brand a {
-    color: var(--white);
-    font-size: 1.4rem;
-    font-weight: bold;
-    text-decoration: none;
-    transition: opacity .2s ease;
-}
+    .nav-brand a {
+        color: var(--white);
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: opacity .2s ease;
+    }
 
-.nav-brand a:hover {
-    opacity: 0.85;
-}
+    .nav-brand a:hover {
+        opacity: 0.85;
+    }
 
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-}
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
 
-.nav-links a {
-    color: var(--white);
-    text-decoration: none;
-    font-weight: 500;
-    transition: opacity .2s ease;
-}
+    .nav-links a {
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 500;
+        transition: opacity .2s ease;
+    }
 
-.nav-links a:hover {
-    opacity: 0.75;
-}
+    .nav-links a:hover {
+        opacity: 0.75;
+    }
 
-.nav-user {
-    font-weight: bold;
-    padding: 6px 12px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 8px;
-}
+    .nav-user {
+        font-weight: bold;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 8px;
+    }
 
-/* ===== PAGE HEADER ===== */
-h1 {
-    margin-top: 40px;
-    text-align: center;
-    color: var(--primary-blue);
-    font-size: 2rem;
-}
+    /* ===== PAGE HEADER ===== */
+    h1 {
+        margin-top: 40px;
+        text-align: center;
+        color: var(--primary-blue);
+        font-size: 2rem;
+    }
 
-/* ===== DASHBOARD CARDS ===== */
-.page-container {
-    max-width: 850px;
-    margin: 30px auto;
-    padding: 10px;
-}
+    /* ===== DASHBOARD CARDS ===== */
+    .page-container {
+        max-width: 850px;
+        margin: 30px auto;
+        padding: 10px;
+    }
 
-.card {
-    background: var(--white);
-    padding: 24px;
-    border-radius: 14px;
-    margin-bottom: 24px;
-    box-shadow: var(--card-shadow);
-    transition: box-shadow .15s ease, transform .15s ease;
-}
+    .card {
+        background: var(--white);
+        padding: 24px;
+        border-radius: 14px;
+        margin-bottom: 24px;
+        box-shadow: var(--card-shadow);
+        transition: box-shadow .15s ease, transform .15s ease;
+    }
 
-.card h2 {
-    margin-top: 0;
-    color: var(--primary-blue);
-}
+    .card h2 {
+        margin-top: 0;
+        color: var(--primary-blue);
+    }
 
-.card p {
-    line-height: 1.5;
-}
+    .card p {
+        line-height: 1.5;
+    }
 
-/* ===== BOOKING CARDS ===== */
-.appointment-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 18px 22px;
-    margin-bottom: 16px;
-    box-shadow: var(--card-shadow);
-    border-left: 6px solid var(--primary-blue);
-    transition: transform .15s ease, box-shadow .15s ease;
-}
+    /* ===== BOOKING CARDS ===== */
+    .appointment-card {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 18px 22px;
+        margin-bottom: 16px;
+        box-shadow: var(--card-shadow);
+        border-left: 6px solid var(--primary-blue);
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
 
-.appointment-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--card-hover-shadow);
-}
+    .appointment-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--card-hover-shadow);
+    }
 
-.appointment-row {
-    margin: 6px 0;
-    font-size: 1rem;
-}
+    .appointment-row {
+        margin: 6px 0;
+        font-size: 1rem;
+    }
 
-.appointment-label {
-    font-weight: 600;
-    color: var(--info-blue);
-}
+    .appointment-label {
+        font-weight: 600;
+        color: var(--info-blue);
+    }
 
-/* ===== MINI BUTTONS ===== */
-.mini-btn {
-    display: inline-block;
-    padding: 6px 12px;
-    margin-right: 6px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    text-decoration: none;
-    transition: opacity .2s ease, transform .1s ease;
-}
+    /* ===== MINI BUTTONS ===== */
+    .mini-btn {
+        display: inline-block;
+        padding: 6px 12px;
+        margin-right: 6px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: opacity .2s ease, transform .1s ease;
+    }
 
-.mini-edit {
-    background: var(--primary-blue);
-    color: white;
-}
+    .mini-edit {
+        background: var(--primary-blue);
+        color: white;
+    }
 
-.mini-delete {
-    background: var(--warning-red);
-    color: white;
-}
+    .mini-delete {
+        background: var(--warning-red);
+        color: white;
+    }
     </style>
 </head>
 <body>
