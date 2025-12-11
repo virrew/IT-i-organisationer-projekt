@@ -1,5 +1,11 @@
   <?php
   session_start();
+$_SESSION['contact_data'] = [
+    'field1' => $_POST['field1'] ?? '',
+    'field2' => $_POST['field2'] ?? '',
+    'field3' => $_POST['field3'] ?? ''
+];
+
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -20,7 +26,7 @@ try {
 
 curl_setopt($ch, CURLOPT_POST, true);
 
-//  ----------  Här sätter ni era login-data ------------------ //
+
 curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24amala@student.his.se", "pwd":"VisslanChess15"}');  
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
@@ -49,14 +55,29 @@ if (!empty($error_no)) {
 
 
 
+$contact_field1 = trim($_POST['field1'] ?? '');
+$contact_field2 = trim($_POST['field2'] ?? '');
+$contact_field3 = trim($_POST['field3'] ?? '');
 
-if(isset($_POST['field1'])){
+
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+$cookiepath = "/tmp/cookies.txt";
+$tmeout = 3600; // (3600=1hr)
+$baseurl = 'http://193.93.250.83:8080/';
+
+
+
 $postfields = json_encode([
-    "patientname" => $_POST['patientname'] ?? '',
-    "field1" => $_POST['field1'] ?? '',
-    "field2" => $_POST['field2'] ?? '',
-    "field3" => $_POST['field3'] ?? ''
+    "patientname" => $_SESSION['patient_name'],
+    "field1" => $contact_field1,
+    "field2" => $contact_field2,
+    "field3" => $contact_field3
 ]);
+
 $ch = curl_init(
     $baseurl . "api/resource/G6Kontaktform"
 );
@@ -77,22 +98,10 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-
-if(!empty($error_no)) {
-        echo "<div style='background-color:red; padding:10px'>";
-        echo "CURL ERROR ($error_no): $error";
-        echo "</div>";
-        exit;
-    }
-
-    // cURL lyckades → omdirigera användaren
-    header("Location: boka.php");
-    exit;
-
-
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+header("Location: boka.php");
+exit;
 }
-
 
 ?>
 
@@ -124,34 +133,55 @@ if(!empty($error_no)) {
       color: var(--text-dark);
     }
 
-    /* NAVBAR */
+    /* ===== NAVBAR ===== */
     .navbar {
-      background: var(--primary-blue);
-      color: var(--white);
-      padding: 12px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 14px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+        position: sticky;
+        top: 0;
+        z-index: 50;
     }
 
-    .nav-brand {
-      font-size: 1.2rem;
-      font-weight: bold;
+    .nav-brand a {
+        color: var(--white);
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: opacity .2s ease;
+    }
+
+    .nav-brand a:hover {
+        opacity: 0.85;
     }
 
     .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 20px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
     }
 
     .nav-links a {
-      color: var(--white);
-      text-decoration: none;
-      font-weight: 500;
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 500;
+        transition: opacity .2s ease;
     }
-    .nav-links a:hover { text-decoration: underline; }
+
+    .nav-links a:hover {
+        opacity: 0.75;
+    }
+
+    .nav-user {
+        font-weight: bold;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 8px;
+    }
 
 
     /* FORM CONTAINER */
@@ -225,23 +255,35 @@ if(!empty($error_no)) {
 </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-brand">Mölndals Vårdcentral</div>
-    <div class="nav-links">
-      <a href="index.php">Hem</a>
-      <a href="recept.php">Mina recept</a>
-      <a href="boka.php">Mina bokningar</a>
-      <a href="journal.php">Min journal</a>
-      <a href="Kontakt.php">Kontakt</a>
-      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-      <!-- Namnet i navbaren är bortkommenterat -->
-      <!-- <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span> -->
-      <a href="logout.php">Logga ut</a>
-      <?php else: ?>
-      <a href="login.php">Logga in</a>
-      <?php endif; ?>
-    </div>
-  </nav>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.php" style="color: white; text-decoration: none;">
+                Mölndals Vårdcentral
+            </a>
+        </div>
+
+        <div class="nav-links">
+
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+
+            <a href="journal.php">Min journal</a>
+            <a href="recept.php">Mina recept</a>
+            <a href="kontaktformulär.php">Boka tid här</a>
+            <a href="Kontakt.php">Kontakt</a>
+
+            <!-- Höger sida – användarnamn + logga ut -->
+            <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
+            <a href="logout.php">Logga ut</a>
+
+        <?php else: ?>
+
+            <a href="login.php">Logga in</a>
+
+        <?php endif; ?>
+
+        </div>
+    </nav>
   
   <div class="form-container">
     <h1>Boka tid hos oss</h1>

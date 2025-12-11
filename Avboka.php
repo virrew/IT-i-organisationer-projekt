@@ -167,9 +167,84 @@ if ($appointment_id) {
         font-weight: bold;
         margin-bottom: 20px;
     }
+
+            /* NAVBAR */
+        .navbar {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-user {
+            font-size: 0.95rem;
+        }
+
+        .nav-brand a {
+        color: var(--white);
+        font-weight: bold;
+        font-size: 1.2rem;
+        }
+
+        .nav-brand a:hover {
+            text-decoration: underline;
+        }
   </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.php" style="color: white; text-decoration: none;">
+                Mölndals Vårdcentral
+            </a>
+        </div>
+
+        <div class="nav-links">
+
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+
+            <a href="journal.php">Min journal</a>
+            <a href="recept.php">Mina recept</a>
+            <a href="kontaktformulär.php">Boka tid här</a>
+            <a href="Kontakt.php">Kontakt</a>
+
+            <!-- Höger sida – användarnamn + logga ut -->
+            <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
+            <a href="logout.php">Logga ut</a>
+
+        <?php else: ?>
+
+            <a href="login.php">Logga in</a>
+
+        <?php endif; ?>
+
+        </div>
+    </nav>
 
 <header>Mina bokade tider</header>
 

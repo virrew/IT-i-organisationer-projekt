@@ -1,22 +1,6 @@
 <?php
 session_start();
 
-$contact_field1 = trim($_POST['field1'] ?? '');
-$contact_field2 = trim($_POST['field2'] ?? '');
-$contact_field3 = trim($_POST['field3'] ?? '');
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['field1'])) {
-    if ($contact_field1 !== '' && $contact_field2 !== '' && $contact_field3 !== '') {
-        $_SESSION['contact_data'] = [
-            'field1' => $contact_field1,
-            'field2' => $contact_field2,
-            'field3' => $contact_field3
-        ];
-    }
-}
-
-$contactData = $_SESSION['contact_data'] ?? null;
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -24,6 +8,8 @@ error_reporting(E_ALL);
 $cookiepath = "/tmp/cookies.txt";
 $tmeout = 3600; // (3600=1hr)
 $baseurl = 'http://193.93.250.83:8080/';
+
+$contactData = $_SESSION['contact_data'] ?? null;
 
 try {
   $ch = curl_init($baseurl . 'api/method/login');
@@ -50,7 +36,7 @@ $error = curl_error($ch);
 curl_close($ch);
 
 /* -----------------------------
-   FETCH HEALTHCARE PRACTITIONERS
+   HEALTHCARE PRACTITIONERS
 ------------------------------*/
 $ch = curl_init($baseurl . 'api/resource/Healthcare%20Practitioner?fields=["name","first_name","last_name","department"]&filters=[["first_name","LIKE","%G6%"]]');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -70,7 +56,7 @@ curl_close($ch);
 // $practitioners = json_decode($response, true)['data'] ?? [];
 
 /* -----------------------------
-   FETCH PATIENT INFO
+  PATIENT INFO
 ------------------------------*/
 $fields = urlencode('["name","patient_name","sex"]');
 $filters = urlencode('[["patient_name","LIKE","%G6%"]]');
@@ -101,13 +87,11 @@ if (!empty($patients)) {
 $session_user = $_SESSION['username'] ?? '';
 
 /* -----------------------------
-   PROCESS BOOKING FORM (POST)
+  BOOKING FORM
 ------------------------------*/
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) {
-// Fixa time-format om det saknar sekunder
 $time = $_POST["appointment_time"];
-if (strlen($time) == 5) { // HH:MM
+if (strlen($time) == 5) { 
     $time .= ":00";
 }
 
@@ -116,12 +100,12 @@ $practitioner_id = $_POST["healthcare_practitioner"] ?? '';
 $practitioner_name = $_POST["practitioner_name"] ?? '';
 $department = $_POST["department"] ?? '';
 
-// Patient-ID (från ERPNext, inte användarnamn)
+// Patient-ID från session
     $patient_id   = $_SESSION["patient_id"];
     $patient_name = $_SESSION["patient_name"];
     $patient_sex  = $_SESSION["patient_sex"];
 
-    // Bygg data-arrayen
+    // Data-arrayen
     $data = [
     "appointment_type"        => $_POST["appointment_type"],
     "appointment_date"        => $_POST["appointment_date"],
@@ -176,29 +160,10 @@ if (!isset($result["data"])) {
     exit;
 }
 
-
     $appointment_id = $result["data"]["name"];
     header("Location: index.php");
     exit;
 }
-      // alla fält som behövs:
-      // appointment_type
-      // appointment_date
-      // appointment_time
-      // healthcare_practitioner
-      // practitioner_name
-      // department
-      // duration
-      // patient
-      // patient_name
-      // patient_sex
-
-      // Sedan klickas check availability och då behövs dessa fält fyllas i:
-
-      // Medical department (department)
-      // practitioner
-      // appointment_date
-      // appointment_time (från klockan 8-15 (kolla availability))
 ?>
 <!doctype html>
 <html lang="sv">
@@ -222,40 +187,54 @@ if (!isset($result["data"])) {
         --shadow-primary: rgba(31,111,120,0.25);
     }
 
-    /* NAVBAR */
+    /* ===== NAVBAR ===== */
     .navbar {
-      background: var(--primary-blue);
-      color: var(--white);
-      padding: 12px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 14px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+        position: sticky;
+        top: 0;
+        z-index: 50;
     }
 
-    .nav-brand {
-      font-size: 1.2rem;
-      font-weight: bold;
+    .nav-brand a {
+        color: var(--white);
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: opacity .2s ease;
+    }
+
+    .nav-brand a:hover {
+        opacity: 0.85;
     }
 
     .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 20px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
     }
 
     .nav-links a {
-      color: var(--white);
-      text-decoration: none;
-      font-weight: 500;
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 500;
+        transition: opacity .2s ease;
     }
 
     .nav-links a:hover {
-      text-decoration: underline;
+        opacity: 0.75;
     }
 
     .nav-user {
-      font-size: 0.95rem;
+        font-weight: bold;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 8px;
     }
 
     * { box-sizing: border-box; }
@@ -371,42 +350,36 @@ if (!isset($result["data"])) {
   </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
-    <div class="nav-brand">Mölndals Vårdcentral</div>
-    <div class="nav-links">
-      <a href="index.php">Hem</a>
-      <a href="recept.php">Mina recept</a>
-      <a href="bokningar.php">Mina bokningar</a>
-      <a href="journal.php">Min journal</a>
-      <a href="Kontakt.php">Kontakt</a>
-      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-      <?= htmlspecialchars($_SESSION['username']) ?>
-      <a href="logout.php">Logga ut</a>
-      <?php else: ?>
-      <a href="login.php">Logga in</a>
-      <?php endif; ?>
-    </div>
+        <div class="nav-brand">
+            <a href="index.php" style="color: white; text-decoration: none;">
+                Mölndals Vårdcentral
+            </a>
+        </div>
+
+        <div class="nav-links">
+
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+
+            <a href="journal.php">Min journal</a>
+            <a href="recept.php">Mina recept</a>
+            <a href="kontaktformulär.php">Boka tid här</a>
+            <a href="Kontakt.php">Kontakt</a>
+
+            <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
+            <a href="logout.php">Logga ut</a>
+
+        <?php else: ?>
+
+            <a href="login.php">Logga in</a>
+
+        <?php endif; ?>
+
+        </div>
     </nav>
 
-      <!-- alla fält som behövs:
-      appointment_type
-      appointment_date
-      appointment_time
-      healthcare_practitioner
-      practitioner_name
-      department
-      duration
-      patient
-      patient_name
-      patient_sex
-
-      Sedan klickas check availability och då behövs dessa fält fyllas i:
-
-      Medical department (department)
-      practitioner
-      appointment_date
-      appointment_time (från klockan 8-15 (kolla availability)) -->
-
+    <!-- Kontaktdata från formulär -->
   <?php if ($contactData): ?>
   <div class="container" style="background: var(--mint-green); border: 2px solid var(--primary-blue); margin-bottom: 24px;">
       <h2 style="color: var(--primary-blue); margin-top:0;">Information du skickade in</h2>
@@ -428,77 +401,78 @@ if (!isset($result["data"])) {
 
 <form class="booking" method="post" novalidate>
 
-  <!-- Behövs för ERPNext -->
-  <input type="hidden" name="patient" value="<?php echo htmlspecialchars($session_user); ?>">
-  <input type="hidden" name="patient_name" value="<?php echo htmlspecialchars($session_user); ?>">
-  <input type="hidden" name="patient_sex" value="<?php echo htmlspecialchars($_SESSION['patient_sex'] ?? ''); ?>">
+  <!-- Koppla $_session till patient i ERP -->
+  <input type="hidden" name="patient" value="<?= htmlspecialchars($session_user) ?>">
+  <input type="hidden" name="patient_name" value="<?= htmlspecialchars($session_user) ?>">
+  <input type="hidden" name="patient_sex" value="<?= htmlspecialchars($_SESSION['patient_sex'] ?? '') ?>">
 
   <!-- Appointment Type -->
   <div class="field">
     <label for="appointment_type">Typ av besök</label>
     <select id="appointment_type" name="appointment_type" required>
-      <option value="G6Dietistbesök">Sjuksköterskebesök</option>
-      <option value="G6Läkarbesök">Läkarbesök</option>
+      <option value="G6Sjuksköterskebesök">Sjuksköterskebesök</option>
       <option value="G6Provtagning">Provtagning</option>
       <option value="G6Fysioterapi">Fysioterapi</option>
       <option value="G6Samtalsterapi">Samtalsterapi</option>
+      <option value="G6Dietistbesök">Dietistbesök</option>
     </select>
   </div>
 
-<!-- Todo: hämta endast G6 ("appointment_type": "G6Samtalsterapi") -->
-
   <!-- Healthcare Practitioner -->
   <div class="field">
-    <label for="healthcare_practitioner">Välj sjuksköterska</label>
+    <label for="healthcare_practitioner">Välj vårdpersonal</label>
     <div class="select-wrap">
       <select id="healthcare_practitioner" name="healthcare_practitioner" required>
-        <?php foreach ($practitioners as $p): ?>
-        <?php
-        $practitioner_id = $p['name'] ?? '';
-        $first = $p['first_name'] ?? '';
-        $last = $p['last_name'] ?? '';
-        $full_name = trim("$first $last");
-        $department = $p['department'] ?? 'Allmänt';
+        <?php foreach ($practitioners as $p): 
+            $id = $p['name'];
+            $first = $p['first_name'] ?? '';
+            $last = $p['last_name'] ?? '';
+            $full = trim("$first $last");
+            $dep = $p['department'] ?? 'Allmänt';
         ?>
         <option 
-            value="<?php echo htmlspecialchars($practitioner_id); ?>"
-            data-practitioner-name="<?php echo htmlspecialchars($full_name); ?>"
-            data-department="<?php echo htmlspecialchars($department); ?>"
+            value="<?= htmlspecialchars($id) ?>"
+            data-practitioner-name="<?= htmlspecialchars($full) ?>"
+            data-department="<?= htmlspecialchars($dep) ?>"
         >
-            <?php echo htmlspecialchars($full_name); ?>
+            <?= htmlspecialchars($full) ?>
         </option>
         <?php endforeach; ?>
       </select>
     </div>
   </div>
 
-  <!-- Practitioner Name (fylls automatiskt via JS) -->
   <input type="hidden" name="practitioner_name" id="practitioner_name">
-
-  <!-- Department (fylls automatiskt via JS) -->
   <input type="hidden" name="department" id="department">
 
-  <!-- Appointment Date -->
+  <!-- Datum -->
   <div class="field">
     <label for="appointment_date">Datum</label>
     <input id="appointment_date" type="date" name="appointment_date" required>
   </div>
 
-  <!-- Appointment Time -->
+  <!-- Tid -->
   <div class="field">
     <label for="appointment_time">Tid</label>
-    <input id="appointment_time" type="time" name="appointment_time" min="08:00" max="15:00" required>
+    <select id="appointment_time" name="appointment_time" required>
+      <?php 
+        for ($hour = 8; $hour <= 15; $hour++): 
+            $time = sprintf("%02d:00", $hour);
+      ?>
+        <option value="<?= $time ?>"><?= $time ?></option>
+      <?php endfor; ?>
+    </select>
   </div>
 
   <!-- Duration -->
   <div class="field">
     <label for="duration">Varaktighet (min)</label>
-    <input id="duration" type="number" name="duration" min="1" value="30" required>
+    <input id="duration" type="number" name="duration" min="1" value="60" required>
   </div>
 
-  <!-- Notes -->
+  <!-- Anteckningar -->
   <div class="field full">
-    <label for="notes">Anteckningar</label>
+    <label for="notes">Anteckningar <i>(max 150 ord)</i></label>
     <textarea id="notes" name="notes" placeholder="Skriv eventuella kommentarer här..."></textarea>
   </div>
 
@@ -511,17 +485,25 @@ if (!isset($result["data"])) {
 </form>
 
 <script>
-  // Fyll practitioner_name + department automatiskt när man väljer vårdgivare
-  document.getElementById('healthcare_practitioner').addEventListener('change', function () {
-      let selected = this.options[this.selectedIndex];
-      document.getElementById('practitioner_name').value = selected.dataset.practitionerName;
-      document.getElementById('department').value = selected.dataset.department;
-  });
-  
-  // Kör direkt vid laddning
-  document.getElementById('healthcare_practitioner').dispatchEvent(new Event('change'));
+// Automatisk fyllning av practitioner info
+document.getElementById('healthcare_practitioner').addEventListener('change', function () {
+    let s = this.options[this.selectedIndex];
+    document.getElementById('practitioner_name').value = s.dataset.practitionerName;
+    document.getElementById('department').value = s.dataset.department;
+});
+document.getElementById('healthcare_practitioner').dispatchEvent(new Event('change'));
+
+// Max 150 ord i anteckningar
+document.getElementById("notes").addEventListener("input", function() {
+    let words = this.value.trim().split(/\s+/);
+    if (words.length > 150) {
+        alert("Du får max skriva 150 ord.");
+        words = words.slice(0, 150);
+        this.value = words.join(" ");
+    }
+});
 </script>
 
-  </div>
+</div>
 </body>
 </html>

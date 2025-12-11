@@ -51,50 +51,6 @@ $response = json_decode($response, true);
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
-
-
-
-
-
-$patient_url = $baseurl . 'api/resource/Patient?fields=["patient_name"]&filters=[["patient_name","LIKE","%G6%"]]';
-$ch = curl_init($patient_url);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-curl_close($ch);
-
-
-
-
-
-
-
-
-$fields = urlencode('["appointment_date","patient_name","status","duration","appointment_based_on_check_in"]');
-$filters = urlencode('[["patient_name","LIKE","%G6%"]]');
-
-$bokningar = $baseurl . '/api/resource/Patient%20Appointment?fields=' . $fields . '&filters=' . $filters;
-
-
-$ch = curl_init($bokningar);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-$response = json_decode($response, true);
-curl_close($ch);
-
-
 ?>
 
 
@@ -154,8 +110,7 @@ if (!empty($error_no)) {
   echo "</div>";
 }
 
-
- header("Location: " . $_SERVER['PHP_SELF']);
+ header("Location: " . $_SERVER['PHP_SELF'] . "?sent=1");
     exit;
 }
 
@@ -224,15 +179,100 @@ background-color: var(--gray-light);
     input[type="submit"]:hover{
       transform: translateY(-2px);
     }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 14px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    .nav-brand a {
+        color: var(--white);
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: opacity .2s ease;
+    }
+
+    .nav-brand a:hover {
+        opacity: 0.85;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .nav-links a {
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 500;
+        transition: opacity .2s ease;
+    }
+
+    .nav-links a:hover {
+        opacity: 0.75;
+    }
+
+    .nav-user {
+        font-weight: bold;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 8px;
+    }
   </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.php" style="color: white; text-decoration: none;">
+                Mölndals Vårdcentral
+            </a>
+        </div>
+
+        <div class="nav-links">
+
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+
+            <a href="journal.php">Min journal</a>
+            <a href="recept.php">Mina recept</a>
+            <a href="kontaktformulär.php">Boka tid här</a>
+            <a href="Kontakt.php">Kontakt</a>
+
+            <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
+            <a href="logout.php">Logga ut</a>
+
+        <?php else: ?>
+
+            <a href="login.php">Logga in</a>
+
+        <?php endif; ?>
+
+        </div>
+    </nav>
+
+    <?php
+if (isset($_GET['sent']) && $_GET['sent'] == 1) {
+    echo "<h2 style='color: green; text-align:center;'>Tack! Ditt formulär har skickats.</h2>";
+}
+?>
+
 <form method="post" action="">
 <h1>Formulär för bemötande</h1>
   <input type="number" id="age" name="age" required>
             <label for="age">Hur gammal är du?</label><br>
             
-            <input type="text" id="gender" name="gender" required>
+            <input type="text" id="gender" name="gender">
             <label for="gender">Kön</label><br>
 
 
