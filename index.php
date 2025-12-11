@@ -174,11 +174,6 @@ h1 {
     transition: box-shadow .15s ease, transform .15s ease;
 }
 
-.card:hover {
-    box-shadow: var(--card-hover-shadow);
-    transform: translateY(-2px);
-}
-
 .card h2 {
     margin-top: 0;
     color: var(--primary-blue);
@@ -224,11 +219,6 @@ h1 {
     font-weight: bold;
     text-decoration: none;
     transition: opacity .2s ease, transform .1s ease;
-}
-
-.mini-btn:hover {
-    opacity: 0.85;
-    transform: translateY(-2px);
 }
 
 .mini-edit {
