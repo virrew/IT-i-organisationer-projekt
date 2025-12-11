@@ -28,16 +28,6 @@ $response = curl_exec($ch);
 $response = json_decode($response, true);
 curl_close($ch);
 
-// Hämta användarnamn
-if (isset($response['full_name'])) {
-    $logged_in_user = $response['full_name'];
-} elseif (isset($response['user'])) {
-    $logged_in_user = $response['user'];
-} elseif (isset($response['message'])) {
-    $logged_in_user = $response['message'];
-} else {
-    $logged_in_user = '';
-}
 
 // GET-param för bokningens ID
 $appointment_id = $_GET['id'] ?? '';

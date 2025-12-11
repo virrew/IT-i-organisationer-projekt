@@ -307,8 +307,8 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                 </div>
 
                 <div style="margin-top:12px;">
+                    <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" class="mini-btn mini-delete">❌ Avboka min tid</a>
                     <a href="omboka.php?id=<?= urlencode($a['name']) ?>" class="mini-btn mini-edit">🔁 Omboka</a>
-                    <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" class="mini-btn mini-delete">❌ Avboka</a>
                 </div>
 
             </div>
