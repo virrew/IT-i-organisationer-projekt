@@ -7,7 +7,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     exit;
 }
 
-// Hämtas från login.php där vi sparade ERPNext-ID
+// Hämtas från login.php
 $patient_id   = $_SESSION['patient_id'];
 $patient_name = $_SESSION['patient_name'];
 
@@ -19,9 +19,7 @@ $cookiepath = "/tmp/cookies.txt";
 $tmeout = 3600;
 $baseurl = 'http://193.93.250.83:8080/';
 
-/* -----------------------------
-   1) Logga in i ERPNext
-------------------------------*/
+// ERP-Next
 $ch = curl_init($baseurl . 'api/method/login');
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a23leola@student.his.se", "pwd":"HisLeo25!"}');
@@ -32,9 +30,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_exec($ch);
 curl_close($ch);
 
-/* -----------------------------
-   2) Hämta bokningar för inloggad patient
-------------------------------*/
+// Hämta bokningar
 
 $fields = [
     "name",
@@ -91,7 +87,6 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
         --card-hover-shadow: 0 10px 26px rgba(0,0,0,0.12);
     }
 
-    /* ===== PAGE ===== */
     body {
         margin: 0;
         padding: 0;
@@ -209,7 +204,6 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
         color: var(--info-blue);
     }
 
-    /* ===== MINI BUTTONS ===== */
     .mini-btn {
         display: inline-block;
         padding: 6px 12px;
@@ -307,8 +301,8 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
                 </div>
 
                 <div style="margin-top:12px;">
-                    <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" class="mini-btn mini-delete">❌ Avboka min tid</a>
                     <a href="omboka.php?id=<?= urlencode($a['name']) ?>" class="mini-btn mini-edit">🔁 Omboka</a>
+                    <a href="Avboka.php?id=<?= urlencode($a['name']) ?>" class="mini-btn mini-delete">❌ Avboka min tid</a>
                 </div>
 
             </div>
