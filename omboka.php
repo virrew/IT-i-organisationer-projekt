@@ -371,7 +371,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               $prac = isset($appt["practitioner"]) ? $appt["practitioner"] : "";
               $name = isset($appt["name"]) ? $appt["name"] : "";
               $type = isset($appt["appointment_type"]) ? $appt["appointment_type"] : "";
-              $label = $date . " " . $time . " - " . $pat . " / " . $prac;
+              $label = $date . " " . $time . " - " . $pat ;
               $selected_attr = "";
 
               if ($type !== "") {
