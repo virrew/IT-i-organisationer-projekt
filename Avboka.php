@@ -213,6 +213,22 @@ if ($appointment_id) {
         .nav-brand a:hover {
             text-decoration: underline;
         }
+
+        .back {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #1F6F78; /* samma blå som header */
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition 0.3s;
+}
+
+.back-btn:hover {
+    background-color: #0A5360; /* mörkare blå vid hover */
+}
+
   </style>
 </head>
 <body>
@@ -276,6 +292,13 @@ if (!empty($success_msg)) {
 <?php else: ?>
     <p>Hittade ingen bokning.</p>
 <?php endif; ?>
+
+<!-- Knapp till startsidan -->
+<div style="text-align:center; margin-top: 25px;">
+    <a href="index.php" class="back">Till startsidan</a>
+</div>
+
+</div>
 
 </div>
 </body>
