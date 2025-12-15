@@ -48,7 +48,7 @@ echo "</div>";
 
 // HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
 $encounters = $baseurl .
-    'api/resource/Patient%20Encounter?fields=['.urlencode('"patient","patient_name","custom_symtom","custom_diagnos","status","encounter_date","practitioner_name","medical_department"').']' .
+    'api/resource/Patient%20Encounter?fields=['.urlencode('"patient","patient_name","custom_symtom","custom_diagnos","encounter_date","practitioner_name","medical_department"').']' .
     '&filters=' . urlencode('[["patient","=","' . $_SESSION['patient_id'] .'"]]');
 
 echo $encounters;
@@ -76,7 +76,7 @@ $encounters = $encountersresponse['data'] ?? [];
 
 // Hämta provsvar (Lab Test)
 $labtests = $baseurl .
-    'api/resource/Lab%20Test?fields=[' .urlencode('"lab_test_name","date","result_date","status","practitioner_name"').']' .
+    'api/resource/Lab%20Test?fields=[' .urlencode('"name","lab_test_name","date","result_date","practitioner_name","normal_test_items"').']' .
     '&filters=' . urlencode('[["docstatus","=","1"],["patient","=","' . $_SESSION['patient_id'] . '"]]') .'&limit_page_length=1000';
 
 $ch = curl_init($labtests);
@@ -94,11 +94,35 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
+$labtests = $labtestresponse['data'] ?? [];
+
 echo "<pre>";
 print_r($labtestresponse);
 echo "</pre>";
 
-$labtests = $labtestresponse['data'] ?? [];
+// Hämta detaljer för varje labtest inklusive normal_test_items
+foreach ($labtests as &$lab) {
+    $lab_detail_url = $baseurl . 'api/resource/Lab%20Test/' . urlencode($lab['name']);
+    $ch = curl_init($lab_detail_url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $detail_response = json_decode(curl_exec($ch), true);
+    curl_close($ch);
+
+    // Lägg till normal_test_items från detaljvyn
+    $lab['normal_test_items'] = $detail_response['data']['normal_test_items'] ?? [];
+}
+unset($lab); // bryt referens
+
+echo "<pre>";
+print_r($detail_response);
+echo "</pre>";
 
 ?>
 <!DOCTYPE html>
@@ -258,7 +282,6 @@ $labtests = $labtestresponse['data'] ?? [];
             <p><strong>Diagnos:</strong><?= htmlspecialchars($encounter['custom_diagnos'] ?? 'Ingen diagnos registrerad') ?></p>
             <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
             <p><strong>Avdelning:</strong> <?= htmlspecialchars($encounter['medical_department'] ?? '') ?></p>
-            <p><strong>Status:</strong> <?= htmlspecialchars($encounter['status'] ?? '') ?></p>
         </div>
     <?php endforeach; ?>
 </div>
@@ -274,17 +297,17 @@ $labtests = $labtestresponse['data'] ?? [];
         <div class="card">
             <p><strong>Provnamn:</strong> <?=htmlspecialchars($lab["lab_test_name"]) ?></p>
             <p><strong>Datum:</strong> <?=htmlspecialchars($lab["date"]) ?></p>
-            <p><strong>Status:</strong> <?=htmlspecialchars($lab["status"]) ?></p>
             <p><strong>Utfärdat av: </strong> <?=htmlspecialchars($lab["practitioner_name"]) ?></p>
 
-            <?php if (!empty($lab["results"])): ?>
+            <?php if (!empty($lab["normal_test_items"])): ?>
                 <p><strong>Resultat:</strong><p>
                 <ul>
-                    <?php foreach ($lab["results"] as $r): ?>
+                    <?php foreach ($lab["normal_test_items"] as $item): ?>
                         <li>
-                            <?= htmlspecialchars($r["lab_test_name"]) ?>:
-                            <?= htmlspecialchars($r["result_value"]) ?>
-                            (Ref: <?= htmlspecialchars($r["normal_range"]) ?>)
+                            <?= htmlspecialchars($item["lab_test_name"]) ?>:
+                            <?= htmlspecialchars($item["result_value"]) ?>
+                            <?= htmlspecialchars($item["lab_test_uom"]) ?>
+                            (Ref: <?= htmlspecialchars($item["normal_range"]) ?>)
                         </li>
                     <?php endforeach; ?>
                 </ul>
