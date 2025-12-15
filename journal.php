@@ -72,6 +72,7 @@ echo "<pre>";
 print_r($encountersresponse);
 echo "</pre>";
 
+$encounters = $encountersresponse['data'] ?? [];
 
 $labtests = $baseurl .
     'api/resource/Lab%20Test?fields=[' .
@@ -298,7 +299,7 @@ print_r($lab_results);
 <div class="card-container">
     <?php foreach ($encounters as $encounter): ?>
         <div class="card">
-            <p><strong>Datum:</strong> <?= htmlspecialchars($encounter['encounter_date']) ?></p>
+            <p><strong>Datum:</strong> <?= htmlspecialchars($encounter['encounter_date']?? '') ?></p>
             <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
             <p><strong>Avdelning:</strong> <?= htmlspecialchars($encounter['medical_department'] ?? '') ?></p>
             <p><strong>Status:</strong> <?= htmlspecialchars($encounter['status'] ?? '') ?></p>
