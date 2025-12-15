@@ -76,11 +76,8 @@ $encounters = $encountersresponse['data'] ?? [];
 
 // Hämta provsvar (Lab Test)
 $labtests = $baseurl .
-    'api/resource/Lab%20Test?fields=[' .
-        urlencode('"lab_test_name","date","result_date","status","practitioner_name"') .
-    ']' .
-    '&filters=' . urlencode('[["docstatus","=","1"],["patient","=","' . $_SESSION['patient_id'] . '"]]') .
-    '&limit_page_length=1000';
+    'api/resource/Lab%20Test?fields=[' .urlencode('"lab_test_name","date","result_date","status","practitioner_name"').']' .
+    '&filters=' . urlencode('[["docstatus","=","1"],["patient","=","' . $_SESSION['patient_id'] . '"]]') .'&limit_page_length=1000';
 
 $ch = curl_init($labtests);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -92,6 +89,7 @@ curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $labtestresponse = curl_exec($ch);
+$labtestresponse = json_decode($labtestresponse, true);
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
@@ -270,13 +268,14 @@ $labtests = $labtestresponse['data'] ?? [];
 
 
 <h2>Provsvar</h2>
-<?php if (!empty($lab_results)): ?>
+<?php if (!empty($labtests)): ?>
 <div class="card-container">
-    <?php foreach ($lab_results as $lab): ?>
+    <?php foreach ($labtests as $lab): ?>
         <div class="card">
-            <p><strong>Provnamn:</strong> <?=htmlspecialchars($lab["template"]) ?></p>
+            <p><strong>Provnamn:</strong> <?=htmlspecialchars($lab["lab_test_name"]) ?></p>
             <p><strong>Datum:</strong> <?=htmlspecialchars($lab["date"]) ?></p>
             <p><strong>Status:</strong> <?=htmlspecialchars($lab["status"]) ?></p>
+            <p><strong>Utfärdat av: </strong> <?=htmlspecialchars($lab["practitioner_name"]) ?></p>
 
             <?php if (!empty($lab["results"])): ?>
                 <p><strong>Resultat:</strong><p>
