@@ -74,77 +74,33 @@ echo "</pre>";
 
 $encounters = $encountersresponse['data'] ?? [];
 
+// Hämta provsvar (Lab Test)
 $labtests = $baseurl .
     'api/resource/Lab%20Test?fields=[' .
-        urlencode('"name","patient","patient_name","status","result_date","docstatus"') .
+        urlencode('"lab_test_name","date","result_date","status","practitioner_name"') .
     ']' .
-    '&filters=' . urlencode('[["patient_name","like","g6%"]]');
+    '&filters=' . urlencode('[["docstatus","=","1"],["patient","=","' . $_SESSION['patient_id'] . '"]]') .
+    '&limit_page_length=1000';
 
-// Hämta provsvar (Lab Test) 
-$filters_lab = urlencode(json_encode([
-    ["docstatus","=",1],
-    ["patient_name","=",$patient_name]
-]));
-
-$url = $baseurl . "api/resource/Lab Test?" .
-"filters=" . urlencode(json_encode($filters_lab)) .
-"&limit_page_length=1000";
-
-$ch = curl_init($url);
+$ch = curl_init($labtests);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-$response = curl_exec($ch);
+$labtestresponse = curl_exec($ch);
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-if (!empty($error_no)) {
-    echo "<div style='background-color:red'>GET Lab Test cURL error ($error_no): $error</div>";
-    $labtests = [];
-} else {
-    $labtests = json_decode($response, true)['data'] ?? [];
-}
+echo "<pre>";
+print_r($labtestresponse);
+echo "</pre>";
 
-// Hämta labresultat
-$lab_results = [];
-foreach ($labtests as $test) {
-    $url = $baseurl . "api/resource/Lab Test/" . $test["name"];
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
-    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    $full_response = curl_exec($ch);
-    curl_close($ch);
-
-    $full = json_decode($full_response, true)['data'] ?? null;
-    if (!$full) continue;
-
-    $lab_results[] = [
-        "id" => $full["name"],
-        "date" => $full["result_date"],
-        "patient" => $full["patient_name"],
-        "template" => $full["template"],
-        "status" => $full["status"],
-        "practitioner" => $full["practitioner_name"],
-        "results" => $full["normal_test_items"] ?? [],
-        "descriptive" => $full["descriptive_test_items"] ?? []
-    ];
-}
-
-// 5. Visa resultat (exempel)
-echo "\nLab Results:\n";
-print_r($lab_results);
+$labtests = $labtestresponse['data'] ?? [];
 
 ?>
 <!DOCTYPE html>
@@ -300,32 +256,18 @@ print_r($lab_results);
     <?php foreach ($encounters as $encounter): ?>
         <div class="card">
             <p><strong>Datum:</strong> <?= htmlspecialchars($encounter['encounter_date']?? '') ?></p>
+            <p><strong>Symtom:</strong><?= htmlspecialchars($encounter['custom_symtom'] ?? 'Ej angivet') ?></p>
+            <p><strong>Diagnos:</strong><?= htmlspecialchars($encounter['custom_diagnos'] ?? 'Ingen diagnos registrerad') ?></p>
             <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
             <p><strong>Avdelning:</strong> <?= htmlspecialchars($encounter['medical_department'] ?? '') ?></p>
             <p><strong>Status:</strong> <?= htmlspecialchars($encounter['status'] ?? '') ?></p>
+        </div>
     <?php endforeach; ?>
 </div>
-
 <?php else: ?>
     <p>Ingen journaldata hittades för dig.</p>
 <?php endif; ?>
 
-<div class="card">
-        <p><strong>Diagnoser:</strong></p>
-
-        <?php if (!empty($encounter['custom_diagnos'])): ?>
-            <ul>
-            <?php foreach ($encounter['custom_diagnos'] as $diag): ?>
-                <li>
-                    <strong><?= htmlspecialchars($diag['custom_diagnos']) ?></strong>
-                    – <?= htmlspecialchars($diag['description'] ?? '') ?>
-                </li>
-            <?php endforeach; ?>
-            </ul>
-        <?php else: ?>
-            <p>Inga diagnoser registrerade.</p>
-        <?php endif; ?>
-    </div>
 
 <h2>Provsvar</h2>
 <?php if (!empty($lab_results)): ?>
