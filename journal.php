@@ -163,6 +163,28 @@ echo "</pre>";
         box-shadow: 0 10px 40px rgba(0,0,0,0.06);
     }
 
+     .welcome-text {
+    background-color: var(--white);
+    color: var(--primary-blue);
+    padding: 20px 24px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 24px auto;
+    }
+
+    .welcome-text .welcome-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    }
+
+    .welcome-text .welcome-subtitle {
+        font-size: 1rem;
+        font-weight: 500;
+        margin: 0;
+    }
+
     /* ===== NAVBAR ===== */
     .navbar {
         background: var(--primary-blue);
@@ -216,7 +238,10 @@ echo "</pre>";
     h1, h2 {
         color: var(--primary-blue);
         margin-bottom: 16px;
+
     }
+
+    /* === JOURNALANTECKNINGAR === */
 
     .card-container {
     display: flex;
@@ -250,6 +275,8 @@ echo "</pre>";
         margin: 6px 0;
         color: var(--text-dark);
     }
+
+    /* === PROVSVAR === */
 
     .lab-entry {
         width: 100%;
@@ -301,6 +328,8 @@ echo "</pre>";
         border-bottom: 1px solid #e0e0e0;
     }
 
+    /* === FOOTER === */
+
     .site-footer {
     text-align: center;
     padding: 20px;
@@ -341,6 +370,10 @@ echo "</pre>";
     </nav>
 
 <div class="container">
+    <div class="welcome-text">
+        <p class="welcome-title">Välkommen till din <strong>Journal</strong></p>
+        <p class="welcome-subtitle">Här kan du ta del av dina journalanteckningar och provsvar på ett tryggt och enkelt sätt.</p>
+    </div>
 
 <h2>Journalanteckningar</h2>
 
