@@ -220,21 +220,92 @@ echo "</pre>";
 
     .card-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
     }
 
     .card {
+        width: 100%;
         background: var(--white);
-        border: 1px solid var(--primary-blue-light);
-        border-radius: 12px;
+        border: 1px solid var(--primary-blue);
+        border-radius: 5px;
         padding: 20px;
-        width: 250px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    .journal-header {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--info-blue);
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 6px;
+
     }
 
     .card p {
         margin: 6px 0;
+        color: var(--text-dark);
+    }
+
+    .lab-entry {
+        width: 100%;
+        max-width: 100%;
+        background: var(--white);
+        border: 1px solid var(--primary-blue);
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+
+    .lab-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: var(--info-blue);
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 6px;
+    }
+
+    .lab-entry p {
+        margin: 6px 0;
+        color: var(--text-dark);
+    }
+
+    .lab-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.95rem;
+    table-layout: fixed;
+    word-wrap: break-word;
+    }
+
+    .lab-table th {
+        text-align: left;
+        padding: 8px;
+        background: var(--primary-blue-light);
+        color: var(--info-blue);
+    }
+
+    .lab-table td {
+        padding: 8px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .site-footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #1F6F78;
+    color: white;
     }
     </style>
 <body>
@@ -277,9 +348,11 @@ echo "</pre>";
 <div class="card-container">
     <?php foreach ($encounters as $encounter): ?>
         <div class="card">
-            <p><strong>Datum:</strong> <?= htmlspecialchars($encounter['encounter_date']?? '') ?></p>
-            <p><strong>Symtom:</strong><?= htmlspecialchars($encounter['custom_symtom'] ?? 'Ej angivet') ?></p>
-            <p><strong>Diagnos:</strong><?= htmlspecialchars($encounter['custom_diagnos'] ?? 'Ingen diagnos registrerad') ?></p>
+            <div class="journal-header">
+                <?= htmlspecialchars($encounter['encounter_date'] ?? '') ?>
+            </div>
+            <p><strong>Symtom: </strong><?= htmlspecialchars($encounter['custom_symtom'] ?? 'Ej angivet') ?></p>
+            <p><strong>Diagnos: </strong><?= htmlspecialchars($encounter['custom_diagnos'] ?? 'Ingen diagnos registrerad') ?></p>
             <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
             <p><strong>Avdelning:</strong> <?= htmlspecialchars($encounter['medical_department'] ?? '') ?></p>
         </div>
@@ -294,24 +367,37 @@ echo "</pre>";
 <?php if (!empty($labtests)): ?>
 <div class="card-container">
     <?php foreach ($labtests as $lab): ?>
-        <div class="card">
-            <p><strong>Provnamn:</strong> <?=htmlspecialchars($lab["lab_test_name"]) ?></p>
-            <p><strong>Datum:</strong> <?=htmlspecialchars($lab["date"]) ?></p>
+        <div class="lab-entry">
+            <div class="lab-entry-header">
+                <span><strong>Provnamn:</strong> <?=htmlspecialchars($lab["lab_test_name"]) ?></span>
+                <span><strong>Datum:</strong> <?=htmlspecialchars($lab["date"]) ?></span>
+            </div>
+
             <p><strong>Utfärdat av: </strong> <?=htmlspecialchars($lab["practitioner_name"]) ?></p>
 
             <?php if (!empty($lab["normal_test_items"])): ?>
-                <p><strong>Resultat:</strong><p>
-                <ul>
-                    <?php foreach ($lab["normal_test_items"] as $item): ?>
-                        <li>
-                            <?= htmlspecialchars($item["lab_test_name"]) ?>:
-                            <?= htmlspecialchars($item["result_value"]) ?>
-                            <?= htmlspecialchars($item["lab_test_uom"]) ?>
-                            (Ref: <?= htmlspecialchars($item["normal_range"]) ?>)
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>    
+                <table class="lab-table">
+                    <thead>
+                        <tr>
+                            <th>Analys</th>
+                            <th>Resultat</th>
+                            <th>Referens</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($lab["normal_test_items"] as $item): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($item["lab_test_name"]) ?></td>
+                                <td>
+                                    <?= htmlspecialchars($item["result_value"]) ?>
+                                    <?= htmlspecialchars($item["lab_test_uom"]) ?>
+                                </td>
+                                <td><?= htmlspecialchars($item["normal_range"]) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
         </div>
     <?php endforeach; ?>
 </div>
@@ -320,3 +406,6 @@ echo "</pre>";
 <?php endif; ?>
 </div>
 </body>
+<footer class="site-footer">
+    <p>© 2025 Mölndals Vårdcentral</p>
+</footer>
