@@ -111,7 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_type'])) 
         "patient_name" => $patient_name,
         "patient_sex" => $patient_sex,
         "notes" => $_POST["notes"] ?? ""
-        "appointment_for" => $patient_id,
     ];
 
     $json = json_encode($data);

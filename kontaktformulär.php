@@ -53,11 +53,25 @@ if (!empty($error_no)) {
   echo "</div>";
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+if (isset($_POST['field1'])) {
+    $contact_field1 = trim($_POST['field1']);
+} else {
+    $contact_field1 = "";
+}
 
-$contact_field1 = trim($_POST['field1'] ?? '');
-$contact_field2 = trim($_POST['field2'] ?? '');
-$contact_field3 = trim($_POST['field3'] ?? '');
+if (isset($_POST['field2'])) {
+    $contact_field2 = trim($_POST['field2']);
+} else {
+    $contact_field2 = "";
+}
+
+if (isset($_POST['field3'])) {
+    $contact_field3 = trim($_POST['field3']);
+} else {
+    $contact_field3 = "";
+}
 
 
 
@@ -98,7 +112,7 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
 header("Location: boka.php");
 exit;
 }
