@@ -332,11 +332,20 @@ echo "</pre>";
 
     /* === FOOTER === */
 
-    .site-footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #1F6F78;
-    color: white;
+    footer {
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 25px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        max-width: 900px;
+        margin: auto;
     }
     </style>
 <body>
@@ -440,7 +449,29 @@ echo "</pre>";
     <p> Inga provsvar hittades.</p>
 <?php endif; ?>
 </div>
-</body>
-<footer class="site-footer">
-    <p>© 2025 Mölndals Vårdcentral</p>
+
+<footer>
+    <div class="footer-grid">
+        <div>
+            <h3>Kontakt</h3>
+            <p>✉️ info@molndalsvardcentral.se</p>
+            <p>📍 Mölndalsvägen 22</p>
+        </div>
+
+        <div>
+            <h3>Öppettider</h3>
+            <p>Mån–Fre: 08–20</p>
+            <p>Lör: 10–14</p>
+        </div>
+
+        <div>
+            <h3>Akut hjälp</h3>
+            <p>Ring 112 vid livshotande tillstånd.</p>
+            <p>För rådgivning – 1177 Vårdguiden.</p>
+        </div>
+    </div>
+    <p style="margin-top:20px;">© 2025 Mölndals Vårdcentral</p>
 </footer>
+</body> 
+</html>
+
