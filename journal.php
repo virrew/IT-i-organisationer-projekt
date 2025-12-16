@@ -94,6 +94,7 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
+//array av labtest-arrayer
 $labtests = $labtestresponse['data'] ?? [];
 
 echo "<pre>";
@@ -101,6 +102,7 @@ print_r($labtestresponse);
 echo "</pre>";
 
 // Hämta detaljer för varje labtest inklusive normal_test_items
+// &$lab är en referens (blir ej kopia, utan direktlänk) till array-elementet, därav kan man uppdatera elementen direkt
 foreach ($labtests as &$lab) {
     $lab_detail_url = $baseurl . 'api/resource/Lab%20Test/' . urlencode($lab['name']);
     $ch = curl_init($lab_detail_url);
@@ -118,7 +120,7 @@ foreach ($labtests as &$lab) {
     // Lägg till normal_test_items från detaljvyn
     $lab['normal_test_items'] = $detail_response['data']['normal_test_items'] ?? [];
 }
-unset($lab); // bryt referens
+unset($lab); // bryt referens för att inte råka ändra saker senare
 
 echo "<pre>";
 print_r($detail_response);
