@@ -66,7 +66,7 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mölndalsvårdcentral – Mina sidor</title>
+    <title>Mölndals Vårdcentral – Mina sidor</title>
 
     <style>
     /* ===== FÄRGER ===== */
@@ -282,7 +282,7 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
         <h2>Din översikt</h2>
         <p>
             Här kan du som patient se och hantera dina digitala tjänster hos
-            Mölndals vårdcentral.
+            Mölndals Vårdcentral.
         </p>
     </div>
 
@@ -351,7 +351,7 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
             <p>För rådgivning – 1177 Vårdguiden.</p>
         </div>
     </div>
-    <p style="margin-top:20px;">© 2025 Mölndalsvårdcentral</p>
+    <p style="margin-top:20px;">© 2025 Mölndals Vårdcentral</p>
 </footer>
 
 </body> 

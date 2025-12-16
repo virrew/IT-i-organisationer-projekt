@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mölndalsvårdcentral - Login</title>
+    <title>Mölndals Vårdcentral - Login</title>
 
     <style>
         :root {
@@ -304,11 +304,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
 <div class="welcome">
-    Välkommen till Mölndalsvårdcentral
+    Välkommen till Mölndals Vårdcentral
 </div>
 
 <div class="intro-box">
-   På Mölndals vårdcentral erbjuder vi råd, bedömning och behandling för både tillfälliga och långvariga hälsobesvär.
+   På Mölndals Vårdcentral erbjuder vi råd, bedömning och behandling för både tillfälliga och långvariga hälsobesvär.
    Vi finns här för att hjälpa dig med allt från vardagliga besvär till frågor som rör livsstil, hälsa och förebyggande vård.
 </div>
 
@@ -349,7 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 <div class="info">
-    <h2>  Digital vård hos Mölndalsvårdcentral</h2>
+    <h2>  Digital vård hos Mölndals Vårdcentral</h2>
     <p>
 Hos oss kan du enkelt sköta många vårdärenden online, som att boka tid, se dina kommande besök, läsa journalanteckningar och förnya recept.
 Logga in eller registrera dig för att få tillgång till alla våra digitala tjänster.
@@ -376,7 +376,7 @@ Logga in eller registrera dig för att få tillgång till alla våra digitala tj
             <p>För rådgivning – 1177 Vårdguiden.</p>
         </div>
     </div>
-    <p style="margin-top:20px;">© 2025 Mölndalsvårdcentral</p>
+    <p style="margin-top:20px;">© 2025 Mölndals Vårdcentral</p>
 </footer>
 
 </body>
