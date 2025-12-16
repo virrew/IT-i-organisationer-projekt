@@ -1,5 +1,10 @@
   <?php
   session_start();
+$_SESSION['contact_data'] = [
+    'field1' => $_POST['field1'] ?? '',
+    'field2' => $_POST['field2'] ?? '',
+    'field3' => $_POST['field3'] ?? ''
+];
 
 
 ini_set('display_errors', 1);
@@ -48,7 +53,7 @@ if (!empty($error_no)) {
   echo "</div>";
 }
 
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if (isset($_POST['field1'])) {
     $contact_field1 = trim($_POST['field1']);
@@ -107,7 +112,7 @@ $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
 header("Location: boka.php");
 exit;
 }
