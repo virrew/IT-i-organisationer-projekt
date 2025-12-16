@@ -416,7 +416,7 @@ echo "</pre>";
                         <tr>
                             <th>Analys</th>
                             <th>Resultat</th>
-                            <th>Referens</th>
+                            <th>Referensintervall</th>
                         </tr>
                     </thead>
                     <tbody>
