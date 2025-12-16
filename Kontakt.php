@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-//Väg och tid för cookie, görs inget på en viss tid ..
+//Väg och tid för cookie
 $cookiepath = "/tmp/cookies.txt";
 $tmeout = 3600; // (3600=1hr)
 
@@ -20,13 +20,13 @@ try {
 
 curl_setopt($ch, CURLOPT_POST, true);
 
-//  ----------  Här sätter ni era login-data ------------------ //
+//Inlogg data
 curl_setopt($ch, CURLOPT_POSTFIELDS, '{"usr":"a24amala@student.his.se", "pwd":"VisslanChess15"}');  
 
-// Atäller in hur det ska skickas
+// Ställer in hur det ska skickas
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 
-//Kolalr erp
+//Kollar erp
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 
 //Sätter cookies
@@ -47,8 +47,12 @@ $error = curl_error($ch);
 curl_close($ch);
 
 
+
+//ser till att saker bara händer om ålder skickats, random val
 if(isset($_POST['age'])){
-   if (isset($_POST['age'])) {
+   
+  //Variabler blir tilldelade värden
+  if (isset($_POST['age'])) {
     $age = $_POST['age'];
 } else {
     $age = "";
@@ -120,7 +124,7 @@ if (isset($_POST['extra'])) {
     $extra = "";
 }
   
-  
+  //Array skapas och görs om till JSON, datan kopplas med fields i erp.
  $postfields = json_encode([
     "age" => $age,
     "gender" => $gender,
@@ -136,10 +140,12 @@ if (isset($_POST['extra'])) {
     "extra" => $extra
 ]);
 
+//url för bemötande
 $ch = curl_init(
     $baseurl . "api/resource/G6FeedbackForm"
 );
 
+//Data skickas in
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
 curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
@@ -166,6 +172,7 @@ if (!empty($error_no)) {
   echo "</div>";
 }
 
+//om data skickats, blir sent=1
  header("Location: " . $_SERVER['PHP_SELF'] . "?sent=1");
     exit;
 }
@@ -228,7 +235,7 @@ if (!empty($error_no)) {
 
     p{
       display: block;
-margin-top: 16px; /* ger mer luft mellan fälten */
+margin-top: 16px; 
     }
 
     label {
@@ -240,9 +247,9 @@ margin-top: 16px; /* ger mer luft mellan fälten */
     }
 
    label[for="extra"] {
-    display: block;    /* gör att margin-top fungerar */
-    margin-top: 20px;  /* avstånd från fieldset ovanför */
-    margin-bottom: 0;  /* ingen extra luft under labeln */
+    display: block;    
+    margin-top: 20px;  
+    margin-bottom: 0;  
 }
     textarea{
       width: 100%;
@@ -266,6 +273,7 @@ margin-top: 16px; /* ger mer luft mellan fälten */
     input[type="submit"]:hover{
       transform: translateY(-2px);
     }
+
 
     /* ===== NAVBAR ===== */
     .navbar {
@@ -347,6 +355,7 @@ margin-top: 16px; /* ger mer luft mellan fälten */
     </nav>
     
     <?php
+    //om data skickats så ska tack medelande visas.
     if (isset($_GET['sent']) && $_GET['sent'] == 1) {
       echo "<h2 style='color: green; text-align:center;'>Tack! Ditt formulär har skickats.</h2>";
     }
