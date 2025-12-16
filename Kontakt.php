@@ -172,7 +172,7 @@ if (!empty($error_no)) {
   echo "</div>";
 }
 
-//om data skickats, blir sent=1
+//Ser till att post lagrats och kan användas till meddelande för användare
  header("Location: " . $_SERVER['PHP_SELF'] . "?sent=1");
     exit;
 }
@@ -355,7 +355,7 @@ margin-top: 16px;
     </nav>
     
     <?php
-    //om data skickats så ska tack medelande visas.
+    //om data skickats så ska tack meddelande visas.
     if (isset($_GET['sent']) && $_GET['sent'] == 1) {
       echo "<h2 style='color: green; text-align:center;'>Tack! Ditt formulär har skickats.</h2>";
     }
