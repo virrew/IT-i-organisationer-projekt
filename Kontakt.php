@@ -326,6 +326,7 @@ margin-top: 16px;
     }
 
     footer {
+      font-size: 80%;
             background: var(--primary-blue);
             color: var(--white);
             margin-top: 80px;
