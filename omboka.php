@@ -1,19 +1,20 @@
 <?php
-session_start();
+session_start();//startar sessionen så du kan använda $_SESSION (t.ex. patientens id och namn)
+//ini_set + error_reporting: gör att PHP visar fel under utveckling (bra när man bygger och testar).
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Enkel konfiguration
-$cookiepath = "/tmp/cookies.txt";
-$baseurl    = "http://193.93.250.83:8080/";
-$tmeout     = 3600;
+$cookiepath = "/tmp/cookies.txt"; //fil där inloggnings-cookie sparas så att nästa API-anrop “är inloggat”.
+$baseurl    = "http://193.93.250.83:8080/";//$baseurl: adressen till ERPNext-systemet.
+$tmeout     = 3600; //timeout för cURL så sidan inte fastnar om servern är seg.
 
-$message = "";
-$valdt_bokning = "";
-$vald_datum    = "";
-$lediga_tider  = array();
+$message = "";//feedback till användaren (t.ex. “Tiden är ombokad!”).
+$valdt_bokning = "";//vilken bokning man valt i dropdown.
+$vald_datum    = "";//datum användaren väljer.
+$lediga_tider  = array();//lista med tider som blir lediga för vald dag.
 
 /* 1. Logga in i ERPNext */
 $ch = curl_init($baseurl . 'api/method/login');
@@ -28,7 +29,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_exec($ch);
 curl_close($ch);
 
-/* 2. Hämta inloggad patient från sessionen (i stället för G6) */
+/* 2. Hämta inloggad patient från sessionen */
 if (!isset($_SESSION['patient_id']) || !isset($_SESSION['patient_name'])) {
     // Om ingen patient finns i sessionen → skicka tillbaka till startsidan eller login
     header("Location: index.php");
