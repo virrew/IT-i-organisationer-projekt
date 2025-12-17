@@ -134,6 +134,7 @@ echo "</pre>";
     <title>Min journal</title>
 </head>
 <style>
+
     :root {
         --primary-blue: #1F6F78;
         --primary-blue-light: #C2EBE8;
@@ -153,6 +154,7 @@ echo "</pre>";
         margin: 0;
         padding: 0;
         color: var(--text-dark);
+        overflow-x: hidden;
     }
 
     .container {
@@ -345,6 +347,10 @@ echo "</pre>";
         gap: 20px;
         max-width: 900px;
         margin: auto;
+    }
+
+    * {
+        box-sizing: border-box;
     }
     </style>
 <body>
