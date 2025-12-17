@@ -48,7 +48,7 @@ echo "</div>";
 
 // HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
 $encounters = $baseurl .
-    'api/resource/Patient%20Encounter?fields=['.urlencode('"patient","patient_name","custom_symtom","custom_diagnos","status","encounter_date","practitioner_name","medical_department"').']' .
+    'api/resource/Patient%20Encounter?fields=['.urlencode('"patient","patient_name","custom_symtom","custom_diagnos","encounter_date","practitioner_name","medical_department"').']' .
     '&filters=' . urlencode('[["patient","=","' . $_SESSION['patient_id'] .'"]]');
 
 echo $encounters;
@@ -72,78 +72,59 @@ echo "<pre>";
 print_r($encountersresponse);
 echo "</pre>";
 
+$encounters = $encountersresponse['data'] ?? [];
 
+// Hämta provsvar (Lab Test)
 $labtests = $baseurl .
-    'api/resource/Lab%20Test?fields=[' .
-        urlencode('"name","patient","patient_name","status","result_date","docstatus"') .
-    ']' .
-    '&filters=' . urlencode('[["patient_name","like","g6%"]]');
+    'api/resource/Lab%20Test?fields=[' .urlencode('"name","lab_test_name","date","result_date","practitioner_name","normal_test_items"').']' .
+    '&filters=' . urlencode('[["docstatus","=","1"],["patient","=","' . $_SESSION['patient_id'] . '"]]') .'&limit_page_length=1000';
 
-// Hämta provsvar (Lab Test) 
-$filters_lab = urlencode(json_encode([
-    ["docstatus","=",1],
-    ["patient_name","=",$patient_name]
-]));
-
-$url = $baseurl . "api/resource/Lab Test?" .
-"filters=" . urlencode(json_encode($filters_lab)) .
-"&limit_page_length=1000";
-
-$ch = curl_init($url);
+$ch = curl_init($labtests);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-$response = curl_exec($ch);
+$labtestresponse = curl_exec($ch);
+$labtestresponse = json_decode($labtestresponse, true);
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-if (!empty($error_no)) {
-    echo "<div style='background-color:red'>GET Lab Test cURL error ($error_no): $error</div>";
-    $labtests = [];
-} else {
-    $labtests = json_decode($response, true)['data'] ?? [];
-}
+//array av labtest-arrayer
+$labtests = $labtestresponse['data'] ?? [];
 
-// Hämta labresultat
-$lab_results = [];
-foreach ($labtests as $test) {
-    $url = $baseurl . "api/resource/Lab Test/" . $test["name"];
-    $ch = curl_init($url);
+echo "<pre>";
+print_r($labtestresponse);
+echo "</pre>";
+
+// Hämta detaljer för varje labtest inklusive normal_test_items
+// &$lab är en referens (blir ej kopia, utan direktlänk) till array-elementet, därav kan man uppdatera elementen direkt
+foreach ($labtests as &$lab) {
+    $lab_detail_url = $baseurl . 'api/resource/Lab%20Test/' . urlencode($lab['name']);
+    $ch = curl_init($lab_detail_url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
-    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
     curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    $full_response = curl_exec($ch);
+
+    $detail_response = json_decode(curl_exec($ch), true);
     curl_close($ch);
 
-    $full = json_decode($full_response, true)['data'] ?? null;
-    if (!$full) continue;
-
-    $lab_results[] = [
-        "id" => $full["name"],
-        "date" => $full["result_date"],
-        "patient" => $full["patient_name"],
-        "template" => $full["template"],
-        "status" => $full["status"],
-        "practitioner" => $full["practitioner_name"],
-        "results" => $full["normal_test_items"] ?? [],
-        "descriptive" => $full["descriptive_test_items"] ?? []
-    ];
+    // Lägg till normal_test_items från detaljvyn
+    $lab['normal_test_items'] = $detail_response['data']['normal_test_items'] ?? [];
 }
+unset($lab); // bryt referens för att inte råka ändra saker senare
 
-// 5. Visa resultat (exempel)
-echo "\nLab Results:\n";
-print_r($lab_results);
+echo "<pre>";
+print_r($detail_response);
+echo "</pre>";
 
 ?>
 <!DOCTYPE html>
@@ -182,6 +163,28 @@ print_r($lab_results);
         padding: 36px;
         border: 2px solid var(--primary-blue);
         box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+    }
+
+     .welcome-text {
+    background-color: var(--white);
+    color: var(--primary-blue);
+    padding: 20px 24px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 24px auto;
+    }
+
+    .welcome-text .welcome-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    }
+
+    .welcome-text .welcome-subtitle {
+        font-size: 1rem;
+        font-weight: 500;
+        margin: 0;
     }
 
     /* ===== NAVBAR ===== */
@@ -237,25 +240,112 @@ print_r($lab_results);
     h1, h2 {
         color: var(--primary-blue);
         margin-bottom: 16px;
+
     }
+
+    /* === JOURNALANTECKNINGAR === */
 
     .card-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
     }
 
     .card {
+        width: 100%;
         background: var(--white);
-        border: 1px solid var(--primary-blue-light);
-        border-radius: 12px;
+        border: 1px solid var(--primary-blue);
+        border-radius: 5px;
         padding: 20px;
-        width: 250px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    .journal-header {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--info-blue);
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 6px;
+
     }
 
     .card p {
         margin: 6px 0;
+        color: var(--text-dark);
+    }
+
+    /* === PROVSVAR === */
+
+    .lab-entry {
+        width: 100%;
+        max-width: 100%;
+        background: var(--white);
+        border: 1px solid var(--primary-blue);
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+
+    .lab-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: var(--info-blue);
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 6px;
+    }
+
+    .lab-entry p {
+        margin: 6px 0;
+        color: var(--text-dark);
+    }
+
+    .lab-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.95rem;
+    table-layout: fixed;
+    word-wrap: break-word;
+    }
+
+    .lab-table th {
+        text-align: left;
+        padding: 8px;
+        background: var(--primary-blue-light);
+        color: var(--info-blue);
+    }
+
+    .lab-table td {
+        padding: 8px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    /* === FOOTER === */
+
+    footer {
+        background: var(--primary-blue);
+        color: var(--white);
+        padding: 25px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        max-width: 900px;
+        margin: auto;
     }
     </style>
 <body>
@@ -291,6 +381,10 @@ print_r($lab_results);
     </nav>
 
 <div class="container">
+    <div class="welcome-text">
+        <p class="welcome-title">Välkommen till din <strong>Journal</strong></p>
+        <p class="welcome-subtitle">Här kan du ta del av dina journalanteckningar och provsvar på ett tryggt och enkelt sätt.</p>
+    </div>
 
 <h2>Journalanteckningar</h2>
 
@@ -298,55 +392,56 @@ print_r($lab_results);
 <div class="card-container">
     <?php foreach ($encounters as $encounter): ?>
         <div class="card">
-            <p><strong>Datum:</strong> <?= htmlspecialchars($encounter['encounter_date']) ?></p>
+            <div class="journal-header">
+                <?= htmlspecialchars($encounter['encounter_date'] ?? '') ?>
+            </div>
+            <p><strong>Symtom: </strong><?= htmlspecialchars($encounter['custom_symtom'] ?? 'Ej angivet') ?></p>
+            <p><strong>Diagnos: </strong><?= htmlspecialchars($encounter['custom_diagnos'] ?? 'Ingen diagnos registrerad') ?></p>
             <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
             <p><strong>Avdelning:</strong> <?= htmlspecialchars($encounter['medical_department'] ?? '') ?></p>
-            <p><strong>Status:</strong> <?= htmlspecialchars($encounter['status'] ?? '') ?></p>
+        </div>
     <?php endforeach; ?>
 </div>
-
 <?php else: ?>
     <p>Ingen journaldata hittades för dig.</p>
 <?php endif; ?>
 
-<div class="card">
-        <p><strong>Diagnoser:</strong></p>
-
-        <?php if (!empty($encounter['custom_diagnos'])): ?>
-            <ul>
-            <?php foreach ($encounter['custom_diagnos'] as $diag): ?>
-                <li>
-                    <strong><?= htmlspecialchars($diag['custom_diagnos']) ?></strong>
-                    – <?= htmlspecialchars($diag['description'] ?? '') ?>
-                </li>
-            <?php endforeach; ?>
-            </ul>
-        <?php else: ?>
-            <p>Inga diagnoser registrerade.</p>
-        <?php endif; ?>
-    </div>
 
 <h2>Provsvar</h2>
-<?php if (!empty($lab_results)): ?>
+<?php if (!empty($labtests)): ?>
 <div class="card-container">
-    <?php foreach ($lab_results as $lab): ?>
-        <div class="card">
-            <p><strong>Provnamn:</strong> <?=htmlspecialchars($lab["template"]) ?></p>
-            <p><strong>Datum:</strong> <?=htmlspecialchars($lab["date"]) ?></p>
-            <p><strong>Status:</strong> <?=htmlspecialchars($lab["status"]) ?></p>
+    <?php foreach ($labtests as $lab): ?>
+        <div class="lab-entry">
+            <div class="lab-entry-header">
+                <span><strong>Provnamn:</strong> <?=htmlspecialchars($lab["lab_test_name"]) ?></span>
+                <span><strong>Datum:</strong> <?=htmlspecialchars($lab["date"]) ?></span>
+            </div>
 
-            <?php if (!empty($lab["results"])): ?>
-                <p><strong>Resultat:</strong><p>
-                <ul>
-                    <?php foreach ($lab["results"] as $r): ?>
-                        <li>
-                            <?= htmlspecialchars($r["lab_test_name"]) ?>:
-                            <?= htmlspecialchars($r["result_value"]) ?>
-                            (Ref: <?= htmlspecialchars($r["normal_range"]) ?>)
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>    
+            <p><strong>Utfärdat av: </strong> <?=htmlspecialchars($lab["practitioner_name"]) ?></p>
+
+            <?php if (!empty($lab["normal_test_items"])): ?>
+                <table class="lab-table">
+                    <thead>
+                        <tr>
+                            <th>Analys</th>
+                            <th>Resultat</th>
+                            <th>Referensintervall</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($lab["normal_test_items"] as $item): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($item["lab_test_name"]) ?></td>
+                                <td>
+                                    <?= htmlspecialchars($item["result_value"]) ?>
+                                    <?= htmlspecialchars($item["lab_test_uom"]) ?>
+                                </td>
+                                <td><?= htmlspecialchars($item["normal_range"]) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
         </div>
     <?php endforeach; ?>
 </div>
@@ -354,4 +449,29 @@ print_r($lab_results);
     <p> Inga provsvar hittades.</p>
 <?php endif; ?>
 </div>
-</body>
+
+<footer>
+    <div class="footer-grid">
+        <div>
+            <h3>Kontakt</h3>
+            <p>✉️ info@molndalsvardcentral.se</p>
+            <p>📍 Mölndalsvägen 22</p>
+        </div>
+
+        <div>
+            <h3>Öppettider</h3>
+            <p>Mån–Fre: 08–20</p>
+            <p>Lör: 10–14</p>
+        </div>
+
+        <div>
+            <h3>Akut hjälp</h3>
+            <p>Ring 112 vid livshotande tillstånd.</p>
+            <p>För rådgivning – 1177 Vårdguiden.</p>
+        </div>
+    </div>
+    <p style="margin-top:20px;">© 2025 Mölndals Vårdcentral</p>
+</footer>
+</body> 
+</html>
+
