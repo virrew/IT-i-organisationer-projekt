@@ -225,14 +225,23 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
         color: white;
     }
 
+    .welcome-card {
+        background: var(--white);
+        padding: 24px;
+        border-radius: 14px;
+        margin-bottom: 24px;
+        box-shadow: var(--card-shadow);
+    }
 
+    .card {
+        overflow: hidden;
+    }
 
      footer {
             background: var(--primary-blue);
             color: var(--white);
             padding: 25px;
             text-align: center;
-                width: 100%;
         }
 
         .footer-grid {
@@ -326,6 +335,7 @@ $appointments = $data['data'] ?? [];   // Kommande bokningar
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
+</div>
 </div>
 
 
