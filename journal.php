@@ -337,7 +337,6 @@ echo "</pre>";
         color: var(--white);
         padding: 25px;
         text-align: center;
-        width: 100%;
     }
 
     .footer-grid {
