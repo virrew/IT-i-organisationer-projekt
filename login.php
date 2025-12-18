@@ -318,7 +318,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
+            text-decoration: none;
         }
+        #Flink:hover { background: var(--info-blue); }
     </style>
 </head>
 
