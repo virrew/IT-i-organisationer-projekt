@@ -10,7 +10,6 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 // Hämta patientnamnet från sessionen (från index.php)
 $patient_id   = $_SESSION['patient_id'];
 $patient_name = $_SESSION['patient_name'];
-$practitioner_name = $_SESSION['username'];
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -400,6 +399,8 @@ if (!empty($error_no)) {
         background: rgba(255,255,255,0.15);
         border-radius: 8px;
     }
+
+
 </style>
 
 </head>
@@ -434,33 +435,11 @@ if (!empty($error_no)) {
         </div>
     </nav>
 
-   <!-- <section class="header"> Fixa detta nångång
-        <h1>Mina recept</h1>
-        <p>Översikt över dina aktiva och utgångna recept</p>
-    </section> -->
     <!-- Sektion: Aktiva recept, genererar recept eftersom patienten får fler recept -->
     <section class="recept-list">
   <h2>Aktiva recept</h2>
-
   <?php
-  /*/ Dela upp recept i aktiva och utgångna
-$aktiva = [];
-$utgangna = [];
-
-// För att veta om receptet är aktivt eller utgånget
-if (!empty($response['data'])) {
-    foreach ($response['data'] as $r) {
-        $status = strtolower($r['status'] ?? '');
-
-        if (strpos($status, 'ended') !== false) {
-            $utgangna[] = $r;
-        } else {
-            $aktiva[] = $r;
-        }
-    }
-}
-    */
-
+  // Dela upp recept i aktiva och utgångna
 $aktiva = [];
 $utgangna = [];
 
@@ -588,5 +567,6 @@ if (!empty($response['data'])) {
     </article>
   <?php endforeach; ?>
 </section>
+
 </body>
 </html>
