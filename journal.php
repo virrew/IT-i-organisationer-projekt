@@ -11,9 +11,9 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 
 $patient_id   = $_SESSION['patient_id'] ?? '';
 $patient_name = $_SESSION['patient_name'] ?? 'Patient';
-echo "<pre>";
-print_r($_SESSION);
-echo "</pre>";
+//echo "<pre>";
+//print_r($_SESSION);
+//echo "</pre>";
 
 // cURL-konfiguration
 $cookiepath = "/tmp/cookies.txt";
@@ -30,28 +30,17 @@ curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $loginResponse = curl_exec($ch);
 $loginResponse = json_decode($loginResponse, true);
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-echo "<div style='background-color:lightgray; border:1px solid black'>";
-echo 'LOGIN RESPONSE:<br><pre>';
-print_r($loginResponse) . "</pre><br>";
-echo "</div>";
-
-// Hämta journalanteckningar (Patient Encounter)
-//$fields = ["patient","patient_name","notes","custom_symtom","custom_diagnos","status","encounter_date","practitioner_name","medical_department","lab_test_prescription"];
-//$filters = [["patient","=",$patient_id]];
-
 // HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
 $encounters = $baseurl .
-    'api/resource/Patient%20Encounter?fields=['.urlencode('"patient","patient_name","custom_symtom","custom_diagnos","encounter_date","practitioner_name","medical_department"').']' .
+    'api/resource/Patient%20Encounter?fields=['.urlencode('"patient","patient_name","custom_symtom","custom_diagnos","encounter_date","encounter_time","practitioner_name","medical_department"').']' .
     '&filters=' . urlencode('[["patient","=","' . $_SESSION['patient_id'] .'"]]');
-
-echo $encounters;
 
 $ch = curl_init($encounters); 
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
@@ -61,16 +50,16 @@ curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
 $encountersresponse = curl_exec($ch);
 $encountersresponse = json_decode($encountersresponse, true);
 $error_no = curl_errno($ch);
 $error = curl_error($ch);
 curl_close($ch);
 
-echo "<pre>";
-print_r($encountersresponse);
-echo "</pre>";
+//echo "<pre>";
+//print_r($encountersresponse);
+//echo "</pre>";
 
 $encounters = $encountersresponse['data'] ?? [];
 
@@ -87,7 +76,7 @@ curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiepath);
 curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
 curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
 $labtestresponse = curl_exec($ch);
 $labtestresponse = json_decode($labtestresponse, true);
 $error_no = curl_errno($ch);
@@ -96,10 +85,6 @@ curl_close($ch);
 
 //array av labtest-arrayer
 $labtests = $labtestresponse['data'] ?? [];
-
-echo "<pre>";
-print_r($labtestresponse);
-echo "</pre>";
 
 // Hämta detaljer för varje labtest inklusive normal_test_items
 // &$lab är en referens (blir ej kopia, utan direktlänk) till array-elementet, därav kan man uppdatera elementen direkt
@@ -112,7 +97,6 @@ foreach ($labtests as &$lab) {
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiepath);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, $tmeout);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $detail_response = json_decode(curl_exec($ch), true);
     curl_close($ch);
@@ -121,10 +105,6 @@ foreach ($labtests as &$lab) {
     $lab['normal_test_items'] = $detail_response['data']['normal_test_items'] ?? [];
 }
 unset($lab); // bryt referens för att inte råka ändra saker senare
-
-echo "<pre>";
-print_r($detail_response);
-echo "</pre>";
 
 ?>
 <!DOCTYPE html>
@@ -370,7 +350,6 @@ echo "</pre>";
             <a href="journal.php">Min journal</a>
             <a href="recept.php">Mina recept</a>
             <a href="kontaktformulär.php">Boka tid här</a>
-            <a href="Kontakt.php">Kontakt</a>
 
             <!-- Höger sida – användarnamn + logga ut -->
             <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
@@ -399,10 +378,11 @@ echo "</pre>";
         <div class="card">
             <div class="journal-header">
                 <?= htmlspecialchars($encounter['encounter_date'] ?? '') ?>
+                kl. <?= htmlspecialchars(substr($encounter['encounter_time'], 0, 5)) ?>
             </div>
             <p><strong>Symtom: </strong><?= htmlspecialchars($encounter['custom_symtom'] ?? 'Ej angivet') ?></p>
             <p><strong>Diagnos: </strong><?= htmlspecialchars($encounter['custom_diagnos'] ?? 'Ingen diagnos registrerad') ?></p>
-            <p><strong>Vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
+            <p><strong>Ansvarig vårdgivare:</strong> <?= htmlspecialchars($encounter['practitioner_name'] ?? 'Okänd') ?></p>
             <p><strong>Avdelning:</strong> <?= htmlspecialchars($encounter['medical_department'] ?? '') ?></p>
         </div>
     <?php endforeach; ?>
@@ -451,7 +431,7 @@ echo "</pre>";
     <?php endforeach; ?>
 </div>
 <?php else: ?>
-    <p> Inga provsvar hittades.</p>
+    <p> Inga provsvar registrerade.</p>
 <?php endif; ?>
 </div>
 

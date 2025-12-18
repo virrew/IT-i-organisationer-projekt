@@ -298,6 +298,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 1.1rem;
             border-bottom: 1px solid #d0d0d0;
         }
+
+        .Feedback{
+            max-width: 700px;                 
+            margin: 40px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;             
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08); 
+            text-align: center;
+        }
+        #Flink{
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-blue);
+            border: none;
+            border-radius: 999px;
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        #Flink:hover { background: var(--info-blue); }
     </style>
 </head>
 
@@ -354,6 +377,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 Hos oss kan du enkelt sköta många vårdärenden online, som att boka tid, se dina kommande besök, läsa journalanteckningar och förnya recept.
 Logga in eller registrera dig för att få tillgång till alla våra digitala tjänster.
 <p>
+</div>
+
+
+<div class="Feedback">
+    <h2>Utvärdera ditt vårdbesök</h2>
+    <p>
+    Om du nyligen haft ett vårdmöte hos oss får du gärna fylla i vårt formulär om hur du upplevde bemötandet.
+        <br>
+        Din feedback betyder mycket för oss.
+    </p>
+    <a href="feedback.php" id="Flink">Klicka här</a>
 </div>
 
 <footer>

@@ -1,8 +1,5 @@
   <?php
   session_start();
-
-
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -296,7 +293,6 @@ exit;
             <a href="journal.php">Min journal</a>
             <a href="recept.php">Mina recept</a>
             <a href="kontaktformulär.php">Boka tid här</a>
-            <a href="Kontakt.php">Kontakt</a>
 
             <!-- Höger sida – användarnamn + logga ut -->
             <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
