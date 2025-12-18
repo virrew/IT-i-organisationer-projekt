@@ -306,10 +306,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--text-dark);
             text-align: center;
             font-size: 1.1rem;
-            border-bottom: 1px solid #d0d0d0;
+            background-color: white;
         }
         #Flink{
-
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-blue);
+            border: none;
+            border-radius: 999px;
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
