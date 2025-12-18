@@ -356,6 +356,17 @@ Logga in eller registrera dig för att få tillgång till alla våra digitala tj
 <p>
 </div>
 
+
+<div class="Feedback">
+    <h2>Utvärdera ditt vårdbesök</h2>
+    <p>
+    Om du nyligen haft ett vårdmöte hos oss får du gärna fylla i vårt formulär om hur du upplevde bemötandet.
+        <br>
+        Din feedback betyder mycket för oss.
+    </p>
+    <a>
+</div>
+
 <footer>
     <div class="footer-grid">
         <div>
