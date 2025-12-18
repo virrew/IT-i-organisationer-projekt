@@ -388,7 +388,7 @@ echo "</pre>";
 <div class="container">
     <div class="welcome-text">
         <p class="welcome-title">Välkommen till din <strong>Journal</strong></p>
-        <p class="welcome-subtitle">Här kan du ta del av dina journalanteckningar och provsvar på ett tryggt och enkelt sätt.</p>
+        <p class="welcome-subtitle">Här kan du ta del av dina journalanteckningar och provsvar tryggt och enkelt.</p>
     </div>
 
 <h2>Journalanteckningar</h2>
