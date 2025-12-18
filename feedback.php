@@ -360,7 +360,6 @@ margin-top: 16px;
           <a href="journal.php">Min journal</a>
           <a href="recept.php">Mina recept</a>
           <a href="kontaktformulär.php">Boka tid här</a>
-          <a href="Kontakt.php">Kontakt</a>
         
           <span class="nav-user"><?= htmlspecialchars($_SESSION['username']) ?></span>
           <a href="logout.php">Logga ut</a>       
