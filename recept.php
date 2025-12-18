@@ -66,10 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['renew_medication'])) 
         "medication_item"   => $_POST['renew_medication'],
         "order_date"        => date('Y-m-d'),
         "order_time"        => date('H:i:s'),
-        "patient"           => $_POST['patient'],
-        "patient_name"      => $_POST['patient'],
+        "patient"           => $patient_id,
+        "patient_name"      => $patient_name,
         "practitioner"      => $_POST['practitioner'],
-        "practitioner_name" => $_SESSION['username'],
+        "practitioner_name" => $_POST['practitioner_name'] ?? 'Okänd läkare',
         "quantity"          => 1,
         "dosage_form"       => "Tablet",
         "dosage"            => "Once Daily",
@@ -400,9 +400,6 @@ if (!empty($error_no)) {
         border-radius: 8px;
     }
 
-<<<<<<< HEAD
-
-=======
          footer {
             background: var(--primary-blue);
             color: var(--white);
@@ -418,7 +415,6 @@ if (!empty($error_no)) {
             max-width: 900px;
             margin: auto;
         }
->>>>>>> bceb29a32bf1fab043ae2086e917e80914b5057c
 </style>
 
 </head>
@@ -586,8 +582,6 @@ if (!empty($response['data'])) {
   <?php endforeach; ?>
 </section>
 
-<<<<<<< HEAD
-=======
 <footer>
     <div class="footer-grid">
         <div>
@@ -610,6 +604,5 @@ if (!empty($response['data'])) {
     </div>
     <p style="margin-top:20px;">© 2025 Mölndalsvårdcentral</p>
 </footer>
->>>>>>> bceb29a32bf1fab043ae2086e917e80914b5057c
 </body>
 </html>
