@@ -71,10 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['renew_medication'])) 
         "practitioner"      => $_POST['practitioner'],
         "practitioner_name" => $_POST['practitioner_name'] ?? 'Okänd läkare',
         "quantity"          => 1,
-        "dosage_form"       => "Tablet",
-        "dosage"            => "Once Daily",
+        "dosage_form"       => $_POST['dosage_form'] ?? "Tablet",
+        "dosage"            => $_POST['dosage'] ?? "Once daily",
         "status"            => "active-Medication Request Status",
-        "period"            => "3 Week"
+        "period"            => $_POST['period'] ?? "3 Week"
     ];
 
     $json = json_encode($data, JSON_UNESCAPED_SLASHES);
@@ -576,6 +576,9 @@ if (!empty($response['data'])) {
       <input type="hidden" name="patient" value="<?= htmlspecialchars($r['patient'] ?? '') ?>">
       <input type="hidden" name="practitioner" value="<?= htmlspecialchars($r['practitioner'] ?? '') ?>">
       <input type="hidden" name="company" value="<?= htmlspecialchars($r['company'] ?? '') ?>">
+      <input type="hidden" name="dosage_form" value="<?= htmlspecialchars($r['dosage_form'] ?? '') ?>">
+      <input type="hidden" name="dosage" value="<?= htmlspecialchars($r['dosage'] ?? '') ?>">
+      <input type="hidden" name="period" value="<?= htmlspecialchars($r['period'] ?? '') ?>">
         <button type="submit" class="btn-renew">Begär nytt recept</button>
     </form>
     </article>
