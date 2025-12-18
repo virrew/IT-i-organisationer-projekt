@@ -400,7 +400,25 @@ if (!empty($error_no)) {
         border-radius: 8px;
     }
 
+<<<<<<< HEAD
 
+=======
+         footer {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 25px;
+            text-align: center;
+                width: 100%;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+>>>>>>> bceb29a32bf1fab043ae2086e917e80914b5057c
 </style>
 
 </head>
@@ -568,5 +586,30 @@ if (!empty($response['data'])) {
   <?php endforeach; ?>
 </section>
 
+<<<<<<< HEAD
+=======
+<footer>
+    <div class="footer-grid">
+        <div>
+            <h3>Kontakt</h3>
+            <p>✉️ info@molndalsvardcentral.se</p>
+            <p>📍 Mölndalsvägen 22</p>
+        </div>
+
+        <div>
+            <h3>Öppettider</h3>
+            <p>Mån–Fre: 08–20</p>
+            <p>Lör: 10–14</p>
+        </div>
+
+        <div>
+            <h3>Akut hjälp</h3>
+            <p>Ring 112 vid livshotande tillstånd.</p>
+            <p>För rådgivning – 1177 Vårdguiden.</p>
+        </div>
+    </div>
+    <p style="margin-top:20px;">© 2025 Mölndalsvårdcentral</p>
+</footer>
+>>>>>>> bceb29a32bf1fab043ae2086e917e80914b5057c
 </body>
 </html>
