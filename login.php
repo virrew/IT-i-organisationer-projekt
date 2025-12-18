@@ -298,6 +298,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 1.1rem;
             border-bottom: 1px solid #d0d0d0;
         }
+
+        .Feedback{
+            max-width: 750px;
+            margin: 25px auto 35px;
+            padding: 10px 10px;
+            color: var(--text-dark);
+            text-align: center;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #d0d0d0;
+        }
+        #Flink{
+
+        }
     </style>
 </head>
 
@@ -364,7 +377,7 @@ Logga in eller registrera dig för att få tillgång till alla våra digitala tj
         <br>
         Din feedback betyder mycket för oss.
     </p>
-    <a>
+    <a href="feedback.php" id="Flink">Klicka här</a>
 </div>
 
 <footer>
