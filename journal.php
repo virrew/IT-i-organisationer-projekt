@@ -42,10 +42,6 @@ echo 'LOGIN RESPONSE:<br><pre>';
 print_r($loginResponse) . "</pre><br>";
 echo "</div>";
 
-// Hämta journalanteckningar (Patient Encounter)
-//$fields = ["patient","patient_name","notes","custom_symtom","custom_diagnos","status","encounter_date","practitioner_name","medical_department","lab_test_prescription"];
-//$filters = [["patient","=",$patient_id]];
-
 // HÄMTAR JOURNALINFO FRÅN ENCOUNTERS I ERP //
 $encounters = $baseurl .
     'api/resource/Patient%20Encounter?fields=['.urlencode('"patient","patient_name","custom_symtom","custom_diagnos","encounter_date","practitioner_name","medical_department"').']' .
