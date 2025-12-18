@@ -300,13 +300,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .Feedback{
-            max-width: 750px;
-            margin: 25px auto 35px;
-            padding: 10px 10px;
-            color: var(--text-dark);
-            text-align: center;
-            font-size: 1.1rem;
+            max-width: 700px;                 
+            margin: 40px auto;
             background-color: white;
+            padding: 20px;
+            border-radius: 12px;             
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08); 
+            text-align: center;
         }
         #Flink{
             width: 100%;
