@@ -72,7 +72,7 @@ $encounters = $encountersresponse['data'] ?? [];
 
 // Hämta provsvar (Lab Test)
 $labtests = $baseurl .
-    'api/resource/Lab%20Test?fields=[' .urlencode('"name","lab_test_name","date","result_date","practitioner_name","normal_test_items"').']' .
+    'api/resource/Lab%20Test?fields=[' .urlencode('"lab_test_name","date","result_date","practitioner_name","normal_test_items"').']' .
     '&filters=' . urlencode('[["docstatus","=","1"],["patient","=","' . $_SESSION['patient_id'] . '"]]') .'&limit_page_length=1000';
 
 $ch = curl_init($labtests);
