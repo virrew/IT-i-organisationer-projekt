@@ -1,10 +1,6 @@
   <?php
   session_start();
-$_SESSION['contact_data'] = [
-    'field1' => $_POST['field1'] ?? '',
-    'field2' => $_POST['field2'] ?? '',
-    'field3' => $_POST['field3'] ?? ''
-];
+
 
 
 ini_set('display_errors', 1);
