@@ -400,6 +400,28 @@ if (!empty($error_no)) {
         border-radius: 8px;
     }
 
+/*  förnya-knapp  */
+.renew-form {
+  margin-top: 14px;
+}
+
+.btn-renew {
+  background: var(--accent-orange);
+  color: var(--white);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-renew:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+
          footer {
             background: var(--primary-blue);
             color: var(--white);
